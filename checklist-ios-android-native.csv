@@ -1,0 +1,19 @@
+完成,平台,階段,確認項目,優先度
+□,iOS,iOS 設計師交付 Checklist,4pt 格線建立，所有間距為 4pt 的倍數（4/8/12/16/24/32pt）,必要
+□,iOS,iOS 設計師交付 Checklist,Touch target ≥ 44×44pt（視覺可小，padding 延伸觸控區域）,必要
+□,iOS,iOS 設計師交付 Checklist,Safe area frame 建立：上方 59pt（Dynamic Island）/ 下方 34pt,必要
+□,iOS,iOS 設計師交付 Checklist,Variables 以 iOS 語意命名：label / secondaryLabel / systemBackground / fill,必要
+□,iOS,iOS 設計師交付 Checklist,Dark Mode Variables 建立（Light / Dark 兩套 mode）,必要
+□,iOS,iOS 設計師交付 Checklist,字型使用 SF Pro，設定 Dynamic Type scale（不 hardcode px）,—
+□,iOS,iOS 設計師交付 Checklist,iOS 26 Liquid Glass：nav bar / tab bar 透明玻璃效果考量,—
+□,iOS,iOS 設計師交付 Checklist,Cowork Spec：手勢說明 + Haptic Feedback + 轉場動畫規格,必要
+□,iOS,iOS 設計師交付 Checklist,真機測試：iPhone SE / 15 / 15 Pro Max 三種尺寸通過,必要
+□,Android,Android 設計師交付 Checklist,8dp 格線建立，所有間距為 8dp 的倍數（4/8/16/24/32dp）,必要
+□,Android,Android 設計師交付 Checklist,Touch target ≥ 48×48dp，相鄰觸控區域間距 ≥ 8dp,必要
+□,Android,Android 設計師交付 Checklist,System bars 標注：狀態列 24dp / 導航列 48dp（WindowInsets）,必要
+□,Android,Android 設計師交付 Checklist,Variables 以 Material 3 語意命名：primary / secondary / surface / error + on 前綴,必要
+□,Android,Android 設計師交付 Checklist,Dark Mode Variables：Light / Dark 兩套 mode,必要
+□,Android,Android 設計師交付 Checklist,字型用 sp 單位（Roboto 或品牌字型），支援無障礙字型縮放,—
+□,Android,Android 設計師交付 Checklist,Foldable 裝置考量：展開 / 折疊兩種佈局 frame 建立,—
+□,Android,Android 設計師交付 Checklist,Cowork Spec：Ripple Effect + Back gesture + Navigation 結構說明,必要
+□,Android,Android 設計師交付 Checklist,多裝置真機測試：小/中/大螢幕 + Foldable（展開/折疊兩種狀態）,必要

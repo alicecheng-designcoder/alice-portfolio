@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海葵花 Anemone — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      height: 56px; width: 100%;
+      background: rgba(245,240,232,0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1360px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 48px;
+    }
+    .nav-logo { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); text-decoration: none; }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a {
+      display: flex; align-items: center; padding: 0 22px; height: 56px;
+      border-left: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.32px;
+      color: var(--text); text-decoration: none; transition: background 0.15s;
+    }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── PROPOSAL 2: VERTICAL NARRATIVE ─────────────
+       頁面標題列 → 居中單欄敘事 → 左右交錯大圖
+       左側羅馬數字錨點，像 longform 報導
+    ─────────────────────────────────────────────── */
+
+    /* Page Header — 無圖，純文字標題，留白大氣 */
+    .page-header {
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header-top {
+      max-width: 1360px; margin: 0 auto;
+      display: flex; align-items: stretch;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header-index {
+      width: 80px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border-right: 1px solid var(--border);
+      font-family: var(--font-d); font-size: 28px; font-weight: 700;
+      color: var(--muted);
+    }
+    .page-header-tag {
+      flex: 1; display: flex; align-items: center;
+      padding: 0 40px;
+      font-size: 10px; font-weight: 500; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .page-header-date {
+      display: flex; align-items: center; padding: 0 40px;
+      border-left: 1px solid var(--border);
+      font-size: 11px; font-weight: 300; color: var(--muted);
+    }
+
+    .page-header-body {
+      max-width: 1360px; margin: 0 auto;
+      padding: 80px 48px 72px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .page-header-titles {
+      padding-right: 80px;
+      border-right: 1px solid var(--border);
+    }
+    .page-title-en {
+      font-family: var(--font-d); font-size: clamp(48px, 6vw, 88px);
+      font-weight: 700; font-style: italic;
+      color: var(--dark); line-height: 1; margin-bottom: 8px;
+    }
+    .page-title-zh {
+      font-family: var(--font-d); font-size: clamp(36px, 4.5vw, 64px);
+      font-weight: 700; color: var(--muted); line-height: 1;
+    }
+    .page-header-intro {
+      padding-left: 80px;
+      display: flex; align-items: flex-end;
+    }
+    .page-intro-text {
+      font-family: var(--font-d); font-size: clamp(18px, 1.8vw, 22px);
+      font-style: italic; font-weight: 400;
+      line-height: 1.6; color: var(--text);
+    }
+
+    /* Progress indicator — 水平時間軸 */
+    .progress-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .progress-inner {
+      max-width: 1360px; margin: 0 auto; padding: 0 48px;
+      display: flex;
+    }
+    .progress-step {
+      flex: 1; padding: 18px 0;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 4px;
+      position: relative;
+      cursor: default;
+    }
+    .progress-step:last-child { border-right: none; }
+    .progress-step::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px; background: transparent;
+      transition: background 0.2s;
+    }
+    .progress-step.active::after { background: var(--dark); }
+    .progress-num {
+      font-size: 9px; font-weight: 500; letter-spacing: 2px;
+      color: var(--muted);
+    }
+    .progress-label {
+      font-family: var(--font-d); font-size: 13px; font-weight: 700;
+      color: var(--dark);
+    }
+    .progress-step.active .progress-num { color: var(--dark); }
+
+    /* 主體 — 居中窄欄 + 左側錨點數字 */
+    .narrative-wrap {
+      max-width: 1360px; margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    /* 單一章節 */
+    .narrative-section {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* 左側羅馬數字 */
+    .narrative-anchor {
+      padding-top: 80px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      border-right: 1px solid var(--border);
+    }
+    .anchor-num {
+      font-family: var(--font-d); font-size: 13px; font-weight: 700;
+      color: var(--muted); writing-mode: vertical-rl;
+      transform: rotate(180deg); letter-spacing: 2px;
+    }
+    .anchor-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--border); flex-shrink: 0;
+    }
+
+    /* 右側內文區塊 */
+    .narrative-content {
+      padding: 80px 0 80px 80px;
+      max-width: 760px;
+    }
+    .narrative-section-label {
+      font-size: 9px; font-weight: 500; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .narrative-title {
+      font-family: var(--font-d); font-size: clamp(22px, 2.5vw, 32px);
+      font-weight: 700; color: var(--dark);
+      margin-bottom: 28px; line-height: 1.2;
+    }
+    .narrative-text {
+      font-size: 15px; font-weight: 300; line-height: 1.9;
+      color: var(--text); margin-bottom: 24px;
+    }
+    .narrative-text:last-child { margin-bottom: 0; }
+
+    /* 章節內引言 */
+    .narrative-quote {
+      margin: 40px 0;
+      padding: 28px 32px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--dark);
+    }
+    .narrative-quote p {
+      font-family: var(--font-d); font-size: 18px; font-style: italic;
+      line-height: 1.5; color: var(--dark);
+    }
+
+    /* 章節內數據列 */
+    .narrative-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      margin: 40px 0;
+    }
+    .narrative-stat-item {
+      padding: 24px 28px;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .narrative-stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--font-d); font-size: 40px; font-weight: 700;
+      color: var(--dark); line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 1.4px;
+      color: var(--muted); text-transform: uppercase;
+    }
+
+    /* 左右交錯圖片 — 在 narrative-wrap 外，全版 */
+    .narrative-img-block {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .narrative-img-inner {
+      max-width: 1360px; margin: 0 auto; padding: 0 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .narrative-img-left {
+      border-right: 1px solid var(--border);
+      padding-right: 48px; padding-top: 0;
+    }
+    .narrative-img-right {
+      padding-left: 48px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .narrative-img-alt { /* 右圖左文 */
+      flex-direction: row-reverse;
+    }
+    .img-frame-tall {
+      width: 100%; height: 480px;
+      background: rgba(137,164,192,0.2);
+      overflow: hidden;
+    }
+    .img-frame-tall img {
+      width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply;
+    }
+    .img-context-label {
+      font-size: 9px; font-weight: 500; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 20px;
+    }
+    .img-context-title {
+      font-family: var(--font-d); font-size: 24px; font-weight: 700;
+      color: var(--dark); margin-bottom: 16px; line-height: 1.2;
+    }
+    .img-context-text {
+      font-size: 14px; font-weight: 300; line-height: 1.8; color: var(--text);
+    }
+    .img-caption {
+      padding: 12px 0;
+      font-size: 10px; letter-spacing: 0.88px; color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* 前後導覽 */
+    .article-nav { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .article-nav-inner { max-width: 1360px; margin: 0 auto; display: flex; }
+    .article-nav-prev, .article-nav-next {
+      flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 8px;
+      text-decoration: none; transition: background 0.15s;
+    }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover { background: rgba(26,26,26,0.03); }
+    .article-nav-dir { font-size: 9px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .article-nav-title { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: var(--dark); }
+    .article-nav-sub { font-size: 11px; font-weight: 300; color: var(--muted); }
+
+    /* Contact + Footer */
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    /* RWD */
+    @media (max-width: 1024px) {
+      .page-header-body { grid-template-columns: 1fr; padding: 56px 40px 48px; }
+      .page-header-titles { padding-right: 0; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 40px; }
+      .page-header-intro { padding-left: 0; padding-top: 32px; }
+      .narrative-img-inner { grid-template-columns: 1fr; }
+      .narrative-img-left { border-right: none; padding-right: 0; border-bottom: 1px solid var(--border); }
+      .narrative-img-right { padding-left: 0; padding-top: 32px; padding-bottom: 40px; }
+      .img-frame-tall { height: 360px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .narrative-wrap { padding: 0 20px; }
+      .narrative-section { grid-template-columns: 48px 1fr; }
+      .narrative-anchor { padding-top: 48px; }
+      .narrative-content { padding: 48px 0 48px 32px; }
+      .narrative-stats { grid-template-columns: 1fr; }
+      .narrative-stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .narrative-stat-item:last-child { border-bottom: none; }
+      .progress-inner { padding: 0 20px; overflow-x: auto; }
+      .progress-step { min-width: 120px; }
+      .page-header-body { padding: 40px 20px; }
+      .page-header-top { padding: 0; }
+      .narrative-img-inner { padding: 0 20px; }
+      .img-frame-tall { height: 260px; }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .article-nav-next { padding: 24px 20px; }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Alice <em>Cheng</em></a>
+    <div class="nav-links">
+      <a href="index.html#works">WORKS</a>
+      <a href="index.html#about">ABOUT</a>
+      <a href="index.html#contact">CONTACT ↗</a>
+    </div>
+    <a href="index.html#works" class="nav-back">← ALL WORKS</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER — 純文字，雙欄對稱 -->
+<header class="page-header">
+  <div class="page-header-top">
+    <div class="page-header-index">I</div>
+    <div class="page-header-tag">001 &nbsp;·&nbsp; 期待 · Expectation</div>
+    <div class="page-header-date">2025 / 10 / 30</div>
+  </div>
+  <div class="page-header-body">
+    <div class="page-header-titles">
+      <h1 class="page-title-en">Anemone</h1>
+      <p class="page-title-zh">海葵花</p>
+    </div>
+    <div class="page-header-intro">
+      <p class="page-intro-text">
+        "An AI-assisted botanical design experiment exploring how
+        generative tools interpret emotion through botanical imagery.
+        What does 'expectation' look like when drawn by a machine?"
+      </p>
+    </div>
+  </div>
+</header>
+
+<!-- 進度指示列 -->
+<div class="progress-bar">
+  <div class="progress-inner">
+    <div class="progress-step active">
+      <span class="progress-num">I</span>
+      <span class="progress-label">Concept</span>
+    </div>
+    <div class="progress-step">
+      <span class="progress-num">II</span>
+      <span class="progress-label">Process</span>
+    </div>
+    <div class="progress-step">
+      <span class="progress-num">III</span>
+      <span class="progress-label">Iterations</span>
+    </div>
+    <div class="progress-step">
+      <span class="progress-num">IV</span>
+      <span class="progress-label">Reflection</span>
+    </div>
+  </div>
+</div>
+
+<!-- 章節 I — Concept -->
+<div class="narrative-wrap">
+  <div class="narrative-section">
+    <div class="narrative-anchor">
+      <span class="anchor-num">I</span>
+      <div class="anchor-dot"></div>
+    </div>
+    <div class="narrative-content">
+      <p class="narrative-section-label">Concept</p>
+      <h2 class="narrative-title">從花語到 Prompt：<br>情感的語言轉譯</h2>
+      <p class="narrative-text">
+        海葵花在日本花語中象徵「期待」與「相信」。這個系列的第一個問題是：
+        當情感被編碼進 prompt 語言，AI 生成的圖像是否還能承載那份等待的重量？
+      </p>
+      <p class="narrative-text">
+        設計的起點不是「怎麼畫一朵花」，而是「如何讓 AI 理解期待這件事」。
+        這意味著我需要找到情感的視覺語法——構圖、光線、密度、留白——
+        並將它們轉譯成機器能夠解讀的指令。
+      </p>
+      <div class="narrative-quote">
+        <p>"I didn't want the AI to draw a flower. I wanted it to draw
+        the feeling of waiting for something beautiful to happen."</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 章節 II — Process -->
+  <div class="narrative-section">
+    <div class="narrative-anchor">
+      <span class="anchor-num">II</span>
+      <div class="anchor-dot"></div>
+    </div>
+    <div class="narrative-content">
+      <p class="narrative-section-label">Process</p>
+      <h2 class="narrative-title">24 次迭代，3 個方向</h2>
+
+      <div class="narrative-stats">
+        <div class="narrative-stat-item">
+          <span class="stat-num">24</span>
+          <span class="stat-label">Prompts Tested</span>
+        </div>
+        <div class="narrative-stat-item">
+          <span class="stat-num">3</span>
+          <span class="stat-label">Visual Directions</span>
+        </div>
+        <div class="narrative-stat-item">
+          <span class="stat-num">3d</span>
+          <span class="stat-label">Days to Final</span>
+        </div>
+      </div>
+
+      <p class="narrative-text">
+        第一輪使用直接的植物學描述，結果偏向科學插圖風格，精確但缺乏情感。
+        第二輪引入日本大正時期美學作為參考語境，圖像開始出現我們想要的溫柔感。
+        第三輪加入構圖指令——大量留白、低角度仰拍——才真正抓住「期待」那種
+        向上延伸的渴望。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- 左右交錯圖片橫幅 -->
+<div class="narrative-img-block">
+  <div class="narrative-img-inner">
+    <div class="narrative-img-left">
+      <div class="img-frame-tall">
+        <img src="https://www.figma.com/api/mcp/asset/3078810c-c7ac-4fcc-aa72-eb7f0c7ec66c" alt="海葵花">
+      </div>
+      <p class="img-caption">Final iteration — Midjourney v6, botanical editorial style</p>
+    </div>
+    <div class="narrative-img-right">
+      <p class="img-context-label">III &nbsp;·&nbsp; Iterations</p>
+      <h3 class="img-context-title">當形式精準，<br>情感才真正浮現</h3>
+      <p class="img-context-text">
+        在第 18 次迭代後，圖像的結構趨於穩定。花莖的纖細、
+        花瓣的向外展開、背景的空曠——每一個細節都開始對應
+        「期待」這個情感的物理感受：輕盈、不確定、充滿可能。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- 章節 IV — Reflection -->
+<div class="narrative-wrap">
+  <div class="narrative-section" style="border-bottom: none;">
+    <div class="narrative-anchor">
+      <span class="anchor-num">IV</span>
+      <div class="anchor-dot"></div>
+    </div>
+    <div class="narrative-content">
+      <p class="narrative-section-label">Reflection</p>
+      <h2 class="narrative-title">AI 是協作者，不是作者</h2>
+      <p class="narrative-text">
+        這個實驗最大的收穫不是圖像本身，而是對設計決策的重新認識。
+        AI 能在形式上達到驚人的精準度，但情感的注入——留白的多寡、
+        構圖的重心——仍然需要設計者的主動決策。
+      </p>
+      <p class="narrative-text">
+        每一次我認為「這已經夠好了」，再多一輪迭代都會讓圖像更接近
+        那個我腦海中模糊的感覺。這種過程讓我意識到：設計眼光，
+        才是 AI 工作流中最不可替代的部分。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- 前後導覽 -->
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="#" class="article-nav-prev">
+      <span class="article-nav-dir">← Previous</span>
+      <span class="article-nav-title">帝王花 King Protea</span>
+      <span class="article-nav-sub">獨特 · Uniqueness · 009</span>
+    </a>
+    <a href="#" class="article-nav-next">
+      <span class="article-nav-dir">Next →</span>
+      <span class="article-nav-title">罌粟 Poppy</span>
+      <span class="article-nav-sub">安慰 · Comfort · 002</span>
+    </a>
+  </div>
+</nav>
+
+<section class="contact">
+  <div class="contact-inner">
+    <div class="contact-quote"><p>"Let's make something worth remembering."</p></div>
+    <div class="contact-email">
+      <p class="contact-email-label">GET IN TOUCH</p>
+      <a href="mailto:tofu@yahooinc.com">tofu@yahooinc.com</a>
+    </div>
+    <div class="contact-social">
+      <a href="#">LinkedIn ↗</a><a href="#">Behance ↗</a><a href="#">Dribbble ↗</a>
+    </div>
+  </div>
+</section>
+<footer><div class="footer-inner"><span>© 2026 Alice Cheng · AI Workflow Design Lab</span><span>TAIPEI, TAIWAN</span></div></footer>
+
+</body>
+</html>

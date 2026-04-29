@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 協作下的產品設計工作流程指南 — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="shared-components.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+      --toc-w:  240px;
+      /* Hero theme vars — set by JS */
+      --hero-bg:           #1a1a1a;
+      --hero-ghost:        rgba(255,255,255,0.05);
+      --hero-badge-border: rgba(255,255,255,0.2);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      height: 56px; width: 100%;
+      background: rgba(245,240,232,0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1360px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 48px;
+    }
+    .nav-logo { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); text-decoration: none; }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a {
+      display: flex; align-items: center; padding: 0 22px; height: 56px;
+      border-left: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.32px;
+      color: var(--text); text-decoration: none; transition: background 0.15s;
+    }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── HERO (MODULAR) ──────────────────────────── */
+    .article-hero {
+      background: var(--hero-bg, #f5f0e8);
+      border-bottom: 1px solid var(--border);
+      transition: background 1.2s ease;
+    }
+    .article-hero-inner {
+      max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--toc-w) 1fr;
+      min-height: 400px;
+    }
+    .hero-left {
+      border-right: 1px solid var(--border);
+      padding: 48px 32px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.8px;
+      color: var(--muted);
+      width: fit-content; margin-bottom: 40px;
+    }
+    .hero-date-badge {
+      background: var(--dark); border: 1px solid var(--dark);
+      padding: 12px 16px;
+      font-family: var(--font-d); font-size: 20px; font-weight: 700;
+      color: #fff; line-height: 24px; width: fit-content;
+    }
+    .hero-meta-list {
+      display: flex; flex-direction: column; gap: 16px;
+      margin-top: auto;
+    }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .hero-meta-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .hero-meta-value { font-size: 13px; font-weight: 400; color: var(--text); }
+
+    .hero-right {
+      padding: 64px 48px 64px 64px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .hero-index {
+      font-family: var(--font-d); font-size: clamp(88px, 12vw, 177px);
+      font-weight: 700; color: rgba(26,26,26,0.06);
+      line-height: 1; user-select: none; margin-bottom: -16px;
+    }
+    .hero-title-en {
+      font-family: var(--font-d); font-size: clamp(53px, 6vw, 97px);
+      font-weight: 700; font-style: italic; color: var(--dark); line-height: 1;
+    }
+    .hero-title-zh {
+      font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px);
+      font-weight: 700; color: var(--muted); line-height: 1.3;
+      margin-top: 12px; margin-bottom: 32px;
+    }
+    .hero-tagline {
+      font-size: 14px; font-weight: 300; line-height: 1.7;
+      color: var(--text); max-width: 560px;
+    }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .page-layout {
+      max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--toc-w) 1fr;
+      align-items: start;
+    }
+
+    /* ── STICKY TOC ──────────────────────────────── */
+    .toc {
+      position: sticky; top: 56px;
+      border-right: 1px solid var(--border);
+      min-height: calc(100vh - 56px);
+      padding: 48px 32px;
+      display: flex; flex-direction: column; gap: 32px;
+    }
+    .toc-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .toc-list { display: flex; flex-direction: column; gap: 0; }
+    .toc-item { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s; }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-item:hover .toc-item-title { color: var(--dark); }
+    .toc-num { font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
+    .toc-item-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+    .toc-item.active .toc-item-title { color: var(--dark); font-weight: 700; }
+    .toc-item.active .toc-num { color: var(--dark); }
+
+    .toc-info-card {
+      margin-top: auto;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+    .toc-info-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .toc-info-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .toc-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .toc-info-key { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .toc-info-val { font-size: 13px; font-weight: 500; color: var(--dark); }
+
+    /* ── CONTENT BLOCKS ──────────────────────────── */
+    .content-blocks { padding: 0 48px; }
+    .block { border-bottom: 1px solid var(--border); padding: 64px 0; }
+    .block:last-child { border-bottom: none; }
+
+    .block-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 32px; }
+    .block-num { font-size: 11px; font-weight: 500; letter-spacing: 2px; color: var(--muted); }
+    .block-title { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--dark); }
+
+    .block-sub { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: var(--dark); margin: 28px 0 10px; }
+    .block-text { font-size: 17px; font-weight: 300; line-height: 1.9; color: var(--text); margin-bottom: 20px; }
+    .block-text:last-child { margin-bottom: 0; }
+    .block-text strong { color: var(--dark); font-weight: 500; }
+
+    /* Stats */
+    .block-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--border); margin: 32px 0; }
+    .block-stat { padding: 28px 24px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .block-stat:last-child { border-right: none; }
+    .stat-big { font-family: var(--font-d); font-size: 49px; font-weight: 700; color: var(--dark); line-height: 1; }
+    .stat-label { font-size: 11px; font-weight: 500; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
+
+    /* Quote */
+    .block-quote { padding: 32px; background: var(--dark); margin: 32px 0; }
+    .block-quote p { font-family: var(--font-d); font-size: clamp(18px, 1.8vw, 22px); font-style: italic; line-height: 1.55; color: #fff; }
+    .block-quote-attr { margin-top: 16px; font-size: 12px; letter-spacing: 1.2px; color: rgba(255,255,255,0.4); }
+
+    /* Callout (colored) */
+    .callout-box { padding: 20px 24px; border-left: 3px solid; margin: 24px 0; }
+    .callout-box.blue { background: rgba(20,50,224,0.05); border-color: var(--blue); }
+    .callout-box.red  { background: rgba(192,48,48,0.05); border-color: var(--red); }
+    .callout-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 1.8px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .callout-box.blue .callout-label { color: var(--blue); }
+    .callout-box.red  .callout-label { color: var(--red); }
+    .callout-box p { font-size: 14px; font-weight: 400; line-height: 1.7; color: var(--text); }
+    .callout-box p strong { color: var(--dark); font-weight: 500; }
+
+    /* Tool grid */
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+    .tool-card { padding: 24px; background: var(--card-bg); border-top: 3px solid; }
+    .tool-card.blue   { border-top-color: var(--blue); }
+    .tool-card.dark   { border-top-color: var(--dark); }
+    .tool-card.red    { border-top-color: var(--red); }
+    .tool-card.muted  { border-top-color: var(--muted); }
+    .tool-card.purple { border-top-color: #7c3aed; }
+    .tool-card.full   { grid-column: 1 / -1; }
+    .tool-name { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .tool-role { font-size: 11px; font-weight: 500; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+    .tool-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .tool-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Compare table */
+    .compare-wrap { overflow-x: auto; margin: 24px 0; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+    .compare-table th {
+      padding: 10px 14px; background: var(--dark); color: #fff;
+      text-align: left; font-size: 10px; font-weight: 500;
+      letter-spacing: 1.5px; font-family: var(--font-b); text-transform: uppercase;
+    }
+    .compare-table th:not(:first-child) { border-left: 1px solid rgba(255,255,255,0.1); }
+    .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .compare-table td:not(:first-child) { border-left: 1px solid var(--border); }
+    .compare-table .row-label { font-weight: 500; color: var(--dark); }
+
+    /* Principle cards */
+    .principle-set { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin: 24px 0; }
+    .principle-card { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+    .principle-card:last-child { border-bottom: none; }
+    .principle-num { font-family: var(--font-d); font-size: 24px; font-weight: 700; color: var(--border); line-height: 1.2; padding-top: 2px; }
+    .principle-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+    .principle-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .principle-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Process steps */
+    .process-steps { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+    .process-step { display: grid; grid-template-columns: 48px 1fr; border: 1px solid var(--border); border-bottom: none; }
+    .process-step:last-child { border-bottom: 1px solid var(--border); }
+    .step-num { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); font-family: var(--font-d); font-size: 14px; font-weight: 700; color: var(--muted); }
+    .step-body { padding: 20px 24px; }
+    .step-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .step-text { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+
+    /* Flow diagram */
+    .flow-diagram { padding: 24px; background: var(--card-bg); border: 1px solid var(--border); margin: 24px 0; }
+    .flow-caption { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0; row-gap: 8px; }
+    .flow-node { padding: 8px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .flow-node.blue  { background: rgba(20,50,224,0.08); color: var(--blue); }
+    .flow-node.dark  { background: var(--dark); color: #fff; }
+    .flow-node.red   { background: rgba(192,48,48,0.08); color: var(--red); }
+    .flow-node.neutral { background: rgba(26,26,26,0.06); color: var(--text); }
+    .flow-arrow { padding: 0 6px; color: var(--muted); font-size: 12px; }
+    .flow-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+    /* Checklist */
+    .checklist-block { border: 1px solid var(--border); margin: 20px 0; }
+    .checklist-header {
+      padding: 10px 16px; font-size: 11px; font-weight: 500;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .checklist-header.blue  { background: rgba(20,50,224,0.07); color: var(--blue); }
+    .checklist-header.red   { background: rgba(192,48,48,0.07); color: var(--red); }
+    .checklist-header.dark  { background: var(--dark); color: #fff; }
+    .checklist-header.neutral { background: rgba(26,26,26,0.04); color: var(--muted); }
+    .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--border); font-size: 14px; color: var(--text); line-height: 1.55; }
+    .check-box { width: 14px; height: 14px; border: 1.5px solid var(--border); flex-shrink: 0; margin-top: 2px; }
+    .must-badge { margin-left: auto; flex-shrink: 0; font-size: 10px; font-weight: 500; letter-spacing: 0.5px; padding: 3px 8px; background: rgba(192,48,48,0.1); color: var(--red); white-space: nowrap; }
+    .checklist-item strong { color: var(--dark); font-weight: 500; }
+
+    /* Tags */
+    .block-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .block-tag { display: inline-flex; align-items: center; padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 0.88px; color: var(--dark); background: var(--card-bg); }
+    .block-tag.blue { background: rgba(20,50,224,0.07); border-color: rgba(20,50,224,0.2); color: var(--blue); }
+    .block-tag.red  { background: rgba(192,48,48,0.07); border-color: rgba(192,48,48,0.2); color: var(--red); }
+
+    /* Article nav */
+    .article-nav { border-top: 1px solid var(--border); }
+    .article-nav-inner { max-width: 1360px; margin: 0 auto; display: flex; }
+    .article-nav-prev, .article-nav-next { flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: background 0.15s; }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover { background: rgba(26,26,26,0.03); }
+    .article-nav-dir { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .article-nav-title { font-family: var(--font-d); font-size: 20px; font-weight: 700; color: var(--dark); }
+    .article-nav-sub { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+    /* Contact + Footer */
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    /* ── RWD ─────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      :root { --toc-w: 200px; }
+      .content-blocks { padding: 0 32px; }
+      .hero-right { padding: 48px 32px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-hero-inner { grid-template-columns: 1fr; }
+      .hero-left { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 20px; }
+      .hero-index { display: none; }
+      .hero-right { padding: 40px 20px; }
+      .page-layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+      .content-blocks { padding: 0 20px; }
+      .block { padding: 40px 0; }
+      .block-stats { grid-template-columns: 1fr; }
+      .block-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .block-stat:last-child { border-bottom: none; }
+      .tool-grid { grid-template-columns: 1fr; gap: 0; }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .article-nav-next { padding: 24px 20px; }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV — 由 shared-components.js 的 <site-nav> 元件渲染 -->
+<site-nav></site-nav>
+
+<!-- HERO — 隨機輪播品牌色，左欄資訊 + 右欄大字 -->
+<header class="article-hero" id="articleHero">
+  <div class="article-hero-inner">
+    <div class="hero-left">
+      <div>
+        <div class="hero-badge">GUIDE &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; WEB · IOS · ANDROID</div>
+        <div class="hero-date-badge"><p>20</p><p>26</p></div>
+      </div>
+      <div class="hero-meta-list">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Date</span>
+          <span class="hero-meta-value">2026 / 04 / 17</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Type</span>
+          <span class="hero-meta-value">工作流程指南</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Tools</span>
+          <span class="hero-meta-value">Claude Design · Figma Make · Claude Code · Google Stitch · Figma MCP</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <p class="hero-index">2026</p>
+      <h1 class="hero-title-en">AI × Design</h1>
+      <p class="hero-title-zh">產品設計師的 AI 協作工作流程指南</p>
+      <p class="hero-tagline">
+        當 AI 進入設計流程，設計師的判斷從未這麼重要。
+        從工具選型到三平台交付，建立系統性的 AI 設計工作方法。
+      </p>
+    </div>
+  </div>
+</header>
+
+<!-- STICKY TOC + CONTENT BLOCKS -->
+<div class="page-layout">
+
+  <!-- Sticky ToC -->
+  <aside class="toc">
+    <p class="toc-label">Contents</p>
+    <nav class="toc-list">
+      <a href="#preface" class="toc-item active">
+        <span class="toc-num">00</span>
+        <span class="toc-item-title">前言</span>
+      </a>
+      <a href="#tools" class="toc-item">
+        <span class="toc-num">01</span>
+        <span class="toc-item-title">工具定位</span>
+      </a>
+      <a href="#phases" class="toc-item">
+        <span class="toc-num">02</span>
+        <span class="toc-item-title">四個開發階段</span>
+      </a>
+      <a href="#principles" class="toc-item">
+        <span class="toc-num">03</span>
+        <span class="toc-item-title">六條設計原則</span>
+      </a>
+      <a href="#checklist" class="toc-item">
+        <span class="toc-num">04</span>
+        <span class="toc-item-title">交付 Checklist</span>
+      </a>
+      <a href="#closing" class="toc-item">
+        <span class="toc-num">05</span>
+        <span class="toc-item-title">結語</span>
+      </a>
+    </nav>
+    <div class="toc-info-card">
+      <p class="toc-info-label">About</p>
+      <div class="toc-info-row">
+        <span class="toc-info-key">閱讀時間</span>
+        <span class="toc-info-val">約 20 分鐘</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">適合對象</span>
+        <span class="toc-info-val">產品設計師</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">前提條件</span>
+        <span class="toc-info-val">已有設計系統</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Content Blocks -->
+  <div class="content-blocks">
+
+    <!-- Block 00 — 前言 -->
+    <section class="block" id="preface">
+      <div class="block-header">
+        <span class="block-num">前言</span>
+        <h2 class="block-title">AI 工具做得愈好，設計師的判斷就愈珍貴</h2>
+      </div>
+
+      <p class="block-text">
+        產品設計師面對 AI 工具的第一個問題往往是：「這些工具是要取代我嗎？」這個問題問錯了方向。
+        更準確的問題是：<strong>「當 AI 接管了執行工作，我的不可取代性在哪裡？」</strong>
+      </p>
+
+      <p class="block-text">
+        AI 工具擅長「量的擴大」——更多探索方向、更快彙整資料、更快生成骨架程式碼。
+        但設計師最核心的價值——為什麼用戶行為如此、洞察背後的文化脈絡、判斷哪個方向是對的——
+        始終是人的工作。
+      </p>
+
+      <div class="block-quote">
+        <p>「AI 工具讓執行的成本趨近於零，但也因此讓判斷力成為唯一稀缺的資源。」</p>
+      </div>
+
+      <p class="block-text">
+        Claude Design 可以在 30 分鐘內生成 5 個方向的互動原型，但它不知道你的用戶是誰、
+        你的品牌試圖傳遞什麼情緒、這個功能在整個產品旅程中的位置。那些判斷，是你的。
+      </p>
+
+      <div class="block-stats">
+        <div class="block-stat">
+          <span class="stat-big">20</span>
+          <span class="stat-label">分鐘閱讀</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">5</span>
+          <span class="stat-label">核心章節</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">3</span>
+          <span class="stat-label">平台規格</span>
+        </div>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag blue">AI 工具選型</span>
+        <span class="block-tag blue">設計工作流程</span>
+        <span class="block-tag">Web · iOS · Android</span>
+        <span class="block-tag">產品設計師必讀</span>
+      </div>
+    </section>
+
+    <!-- Block 01 — 工具定位 -->
+    <section class="block" id="tools">
+      <div class="block-header">
+        <span class="block-num">01</span>
+        <h2 class="block-title">工具定位：五個工具，五件不同的事</h2>
+      </div>
+
+      <p class="block-text">
+        設計師在 AI 工具選型上最常犯的錯誤，是把功能相似的工具當成可以互換的選項。
+        事實上，每個工具解決的是完全不同的問題——混用它們不會讓你更快，只會讓你在錯的節點用錯的工具。
+      </p>
+
+      <p class="block-text">
+        在這個工具鏈裡，有一個最根本的分類方式：<strong>視覺探索工具</strong>和<strong>流程文件工具</strong>
+        是兩類完全不同的東西。把流程文件工具當成視覺探索工具的替代品，就像問「可以用 Excel 取代 Photoshop 嗎」——
+        它們根本不在同一個工作節點上競爭。視覺探索工具之間，則是依照「誰主導」和「在哪裡工作」來選擇，而不是互相取代。
+      </p>
+
+      <div class="tool-grid">
+        <div class="tool-card blue">
+          <p class="tool-name">Claude Design</p>
+          <p class="tool-role">設計探索加速器 · Opus 4.7 · 設計師主導</p>
+          <p class="tool-desc">2026 年 4 月 17 日正式推出。對話式生成互動 HTML 原型，讀取你的 DESIGN.md 和 codebase 確保品牌一致性。30 分鐘內可以生成 3–5 個可點擊的方向供三方評選。<strong>最重要的能力是 Handoff Bundle——一鍵把探索結果交付給 Claude Code。</strong></p>
+        </div>
+        <div class="tool-card purple">
+          <p class="tool-name">Figma Make</p>
+          <p class="tool-role">Figma 生態系 · 留在 Figma 內探索</p>
+          <p class="tool-desc">直接在 Figma 內用 prompt、圖片或現有設計稿生成 Web App Prototype，生成時可讀取現有 Figma 設計系統的 component 作為參考。三條移植路徑：<strong>Copy design</strong>（截圖重建）/ <strong>html.to.design</strong> / <strong>MCP Write to Canvas</strong>（圖層品質最高）。最大優勢是不需切換工具；限制是移植後圖層與 Make 檔案斷開，設計系統 Variables 需手動替換。</p>
+        </div>
+        <div class="tool-card dark">
+          <p class="tool-name">Claude Code</p>
+          <p class="tool-role">工程師主導的設計探索 · CLI</p>
+          <p class="tool-desc">生活在終端機。探索即程式碼——原型就是真實元件，不需要翻譯步驟。<strong>根本差異：</strong>Claude Code 改變的是「誰主導探索」（工程師），而非「探索效率」。搭配 Figma MCP 可以雙向同步：Code → Figma 和 Figma → Code，但設計師技術門檻高，需工程師支援。</p>
+        </div>
+        <div class="tool-card muted">
+          <p class="tool-name">Google Stitch</p>
+          <p class="tool-role">免費 AI UI 生成 · Google Labs</p>
+          <p class="tool-desc">文字/圖片/語音 → 高保真 UI，多螢幕同步生成，直接 Export to Figma（帶 Auto Layout）。支援 7 種框架輸出：HTML / CSS / Tailwind / Vue / Angular / Flutter / SwiftUI。完全免費（350 次/月）。<strong>穩定性風險：</strong>Google Labs 實驗性產品，建議作為 Claude Design 的備援而非完全替換。</p>
+        </div>
+        <div class="tool-card muted full">
+          <p class="tool-name">Claude Cowork</p>
+          <p class="tool-role">流程文件工具 · 非視覺生成 · 貫穿全開發週期</p>
+          <p class="tool-desc">本質是結構化文件工具，負責 Spec 補充文件、QA Checklist 自動生成、Change log 維護、DESIGN.md 管理——<strong>不是視覺探索工具，無法取代上方四個工具中的任何一個。</strong>用 Cowork 取代 Claude Design，等於移除了整個設計探索能力。Cowork 的工作在探索工具的「下游」，與探索工具是串聯關係而非替代關係。</p>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">工具選型原則</p>
+        <p>視覺探索工具之間依場景互補，而非互相取代：<strong>Claude Design</strong> 用於大量視覺發散（設計師主導）；<strong>Figma Make</strong> 用於在 Figma 內驗證 UX 流程（已有方向時）；<strong>Claude Code</strong> 用於技術可行性驗證（工程師主導）；<strong>Google Stitch</strong> 作為免費備援選項。<strong>Claude Cowork</strong> 在所有情境下負責文件流程，不受探索工具替換影響。</p>
+      </div>
+
+      <p class="block-sub">各工具對 Web 和 App 的適用性差異</p>
+      <p class="block-text">
+        html.to.design、Anima Agent、Figma-Console-MCP 這三個「Claude → Figma 連接工具」，
+        本質上都是 Web-first 的工具。它們對設計工作的支援完整而有效，
+        但輸出的都是 HTML/CSS/React 這些 Web 框架的程式碼。
+        你不能把這些工具的輸出直接用在 native iOS（SwiftUI）或 native Android（Jetpack Compose）的開發上。
+      </p>
+
+      <div class="callout-box red">
+        <p class="callout-label">最常見的錯誤路徑</p>
+        <p>設計師用 html.to.design 或 Anima 把 App 設計稿「轉成程式碼」，然後工程師試圖在 iOS/Android 上使用這些 HTML/React 程式碼。這條路行不通。App Store 也會因為「重新包裝的網站」拒絕這類提交。</p>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>平台</th>
+              <th>程式碼生成工具</th>
+              <th>設計系統連結</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">Web</td>
+              <td>Figma Dev Mode + Code Connect</td>
+              <td>React / Vue</td>
+              <td>最完整，三工具天然支援</td>
+            </tr>
+            <tr>
+              <td class="row-label">iOS</td>
+              <td>Visual Copilot + Code Connect</td>
+              <td>SwiftUI</td>
+              <td>需額外設定 SwiftUI label</td>
+            </tr>
+            <tr>
+              <td class="row-label">Android</td>
+              <td>Visual Copilot + Code Connect</td>
+              <td>Jetpack Compose</td>
+              <td>需額外設定 Compose label</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Block 02 — 四個開發階段 -->
+    <section class="block" id="phases">
+      <div class="block-header">
+        <span class="block-num">02</span>
+        <h2 class="block-title">四個產品開發階段的工具選擇</h2>
+      </div>
+
+      <p class="block-text">
+        產品設計不是一個線性過程，但每個階段確實有不同的核心任務和最適合的工具組合。
+        理解「這個階段我在解決什麼問題」，比了解「這個工具有什麼功能」更重要。
+      </p>
+
+      <div class="flow-diagram">
+        <p class="flow-caption">FIG.01 · 三平台共用的前段工作流程</p>
+        <div class="flow-row">
+          <div class="flow-node blue">Research Brief<br><small>Cowork</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node red">設計探索<br><small>Claude Design</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">三方評選<br><small>Prototype URL</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">Figma 移植<br><small>Anima / html.to.design</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node dark">Figma 精修<br><small>設計系統套用</small></div>
+        </div>
+        <p class="flow-note">↓ Kickoff 後，Web / iOS / Android 進入各自的 Native 開發分支</p>
+      </div>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">I</span>
+          <div class="step-body">
+            <p class="step-title">Research — 研究與洞察</p>
+            <p class="step-text">
+              核心任務：把混亂的資料轉化為可驅動設計決策的結構化知識。
+              <strong>主要工具：Claude Cowork。</strong>建立 Research Project，把競品截圖、訪談逐字稿、數據報告一起餵進去。
+              補充：html.to.design 截取競品頁面直接帶入 Figma 做視覺對比。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">II</span>
+          <div class="step-body">
+            <p class="step-title">設計探索 — Design Exploration</p>
+            <p class="step-text">
+              AI 工具影響最深遠的階段。傳統上一週 2–3 個設計方向；現在 30 分鐘可以生成 5 個可點擊互動原型供三方評選。
+              <strong>設計師主導：Claude Design。</strong>已有設計系統時優先用 Anima Agent——直接讀取現有元件，移植後清理工作更少。
+              工程師必須在這個階段參與，讓他們對「為什麼選這個方向」有第一手理解。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">III</span>
+          <div class="step-body">
+            <p class="step-title">產品開發 — Development</p>
+            <p class="step-text">
+              核心問題：<strong>如何確保設計意圖在工程實作中不流失？</strong>
+              工程師不應透過截圖或口頭說明理解設計規格——Dev Mode 提供精確數值、版本 diff、以及搭配 Code Connect 後的真實元件使用範例。
+              Dev Mode 的輸出品質，100% 取決於設計師的 Figma 建檔品質。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">IV</span>
+          <div class="step-body">
+            <p class="step-title">產品維護 — Maintenance</p>
+            <p class="step-text">
+              最容易出現「設計漂移（design drift）」——工程師緊急修復時調整了 UI 但沒有更新 Figma。
+              <strong>修改的黃金順序：</strong>先 Cowork change log → 再更新 Figma → 再通知 iOS / Android / Web 三個平台工程師分別確認影響範圍。
+              「靜默覆蓋」是設計工程信任關係最常見的破壞點。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">三方評選的關鍵原則</p>
+        <p>方向評選必須讓 PM + 設計師 + 工程師三方都在場，不能只是設計師和 PM 決定。<strong>工程師在探索階段的參與，讓他們對「為什麼是這個設計」有第一手理解，是後續降低設計工程溝通往返的最重要前期投資。</strong></p>
+      </div>
+    </section>
+
+    <!-- Block 03 — 六條設計原則 -->
+    <section class="block" id="principles">
+      <div class="block-header">
+        <span class="block-num">03</span>
+        <h2 class="block-title">六條設計工作原則：從工程師視角提煉</h2>
+      </div>
+
+      <p class="block-text">
+        這六條原則是從大量設計工程摩擦點中反推出來的。它們不是關於 AI 工具怎麼用，
+        而是關於「如何讓整個設計→開發流程不在某個節點崩潰」。每一條都有對應的真實痛點。
+      </p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num">P1</div>
+          <div>
+            <p class="principle-title">Figma 建檔品質是工程效率的天花板</p>
+            <p class="principle-desc">所有 component 使用 Variables + Auto Layout。iOS 用 4pt 格線，Android 用 8dp 格線。Dev Mode 的輸出品質 100% 取決於設計師的建檔品質——<strong>AI 工具無法修補建檔問題，這個問題只存在於設計師的工作紀律中。</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P2</div>
+          <div>
+            <p class="principle-title">Spec 必須包含「是什麼」和「為什麼」</p>
+            <p class="principle-desc">Dev Mode 呈現視覺規格（是什麼），Cowork 補充文件說明設計意圖、手勢行為、Edge case 清單（為什麼）。<strong>Out of scope 清單和 in scope 清單同等重要</strong>——工程師遇到設計稿沒有覆蓋的情境，如果沒有明確的 out of scope，往往自行實作或等待確認，兩者都是成本。</p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P3</div>
+          <div>
+            <p class="principle-title">設計修改禁止靜默覆蓋，先記錄再改</p>
+            <p class="principle-desc">順序：Cowork change log → 更新 Figma → 通知 iOS / Android / Web 工程師分別確認。靜默覆蓋是設計工程信任關係最常見的破壞點。<strong>iOS 格線是 4pt，Android 是 8dp，同一個間距的修改對兩個平台的影響可能完全不同。</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P4</div>
+          <div>
+            <p class="principle-title">所有設計溝通集中在 Figma comment</p>
+            <p class="principle-desc">禁止用 Slack、Line 或口頭說明來溝通設計細節。Figma comment 讓決策與圖層連結，後來接手的人也能追溯。<strong>口頭說的不算，comment 才算。</strong> Dev Mode 的 comment 回覆有時間戳記，是設計工程溝通歷史的可追溯記錄。</p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P5</div>
+          <div>
+            <p class="principle-title">DESIGN.md 是三平台的品牌承諾書</p>
+            <p class="principle-desc">Web CSS token、iOS pt 規格、Android dp 規格統一維護在 DESIGN.md，每次 Variables 更新後 24 小時內同步。Claude Design 每次啟動前讀取最新版本，確保探索結果品牌合規。<strong>這份文件是整個 AI 工具鏈的知識基底，不是設計師的私人筆記。</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P6</div>
+          <div>
+            <p class="principle-title">驗收標準在 Kickoff 定義，不在 Review 爭論</p>
+            <p class="principle-desc">P0/P1/P2 問題分類，加上可接受偏差範圍（Web: ±2px，iOS: ±1pt，Android: ±2dp），在 Kickoff 前對齊並記錄在 Spec 文件中。<strong>這不是降低品質要求，而是讓設計師和工程師對「什麼是必須修的、什麼可以累積到下個 sprint」有共同語言。</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 04 — 交付 Checklist -->
+    <section class="block" id="checklist">
+      <div class="block-header">
+        <span class="block-num">04</span>
+        <h2 class="block-title">三平台交付 Checklist：每個設計師的最後防線</h2>
+      </div>
+
+      <p class="block-text">
+        Checklist 的目的不是行政程序——每一個項目都在防止某一種具體的返工。
+        標記「必要」的項目是根本性問題，一旦漏掉會造成大量工程修改；
+        未標記的是理想狀態，可以在時程壓力下累積到下個 sprint。
+      </p>
+
+      <p class="block-sub">Web 設計師交付 Checklist</p>
+
+      <div class="checklist-block">
+        <div class="checklist-header red">Phase A — 探索前（7 項）</div>
+        <div class="checklist-item"><div class="check-box"></div><span>研究 Brief 已整合 Cowork Project，有研究根據</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>DESIGN.md 最新版本，Claude Design 讀取時使用正確品牌 token</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>3–5 個方向，每個有一句話設計假設</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>方向評選：PM + 設計師 + 工程師三方參與</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>html.to.design / Anima 移植，圖層可編輯</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>移植後 hardcode 全部替換為 Variables</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>版本快照 v0.1 建立</span></div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">Phase B — Figma 精修（7 項）</div>
+        <div class="checklist-item"><div class="check-box"></div><span>所有 component 使用 Auto Layout</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>所有色彩/字型/spacing 使用 Variables，覆蓋 100%</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Default / Hover / Active / Disabled / Error / Loading 全部建立</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Empty state：列表為空 / 無結果 / 錯誤 至少三種</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Responsive breakpoint：375 / 768 / 1280 建立</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>動畫 transition 標注 + Annotation 設計決策說明</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>File Health Check：component audit 通過</span></div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header neutral">Phase C — Kickoff 前（6 項）</div>
+        <div class="checklist-item"><div class="check-box"></div><span>Cowork Spec：設計決策 + Edge case + Out of scope</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Ready for dev 標記完成，WIP 未標記</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>版本快照 v1.0 建立 + QA Checklist 預先生成</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Kickoff 議程：設計師不確定邊界提前列出</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>驗收標準：P0/P1/P2 分類 + 可接受偏差範圍</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Claude Design Prototype URL 附在交付包</span></div>
+      </div>
+
+      <p class="block-sub">iOS 設計師交付 Checklist（Native 專屬規格）</p>
+
+      <div class="callout-box blue">
+        <p class="callout-label">iOS 與 Web 的根本差異</p>
+        <p>iOS 設計稿的單位是 <strong>pt（點）</strong>，不是 px。Variables 需要以 iOS 語意色彩命名（label、systemBackground、secondaryLabel），不是直接用 hex。這些不是風格選擇，是 Code Connect 輸出正確 SwiftUI 程式碼的前提。</p>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">Figma 精修 — iOS 特有規格</div>
+        <div class="checklist-item"><div class="check-box"></div><span>4pt 格線建立，所有間距為 4pt 的倍數（4/8/12/16/24/32pt）</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Touch target ≥ 44×44pt（視覺可小，padding 延伸觸控區域）</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Safe area frame 建立：上方 59pt（Dynamic Island）/ 下方 34pt</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Variables 以 iOS 語意命名：label / secondaryLabel / systemBackground / fill</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>字型使用 SF Pro，設定 Dynamic Type scale（不 hardcode px）</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>iOS 26 Liquid Glass：nav bar / tab bar 透明玻璃效果考量</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Dark Mode Variables 建立（Light / Dark 兩套 mode）</span><div class="must-badge">必要</div></div>
+      </div>
+
+      <p class="block-sub">Android 設計師交付 Checklist（Native 專屬規格）</p>
+
+      <div class="callout-box red">
+        <p class="callout-label">Android 與 iOS 的關鍵差異</p>
+        <p>Android 使用 <strong>dp（density-independent pixels）</strong>，格線是 8dp。字型用 <strong>sp</strong>（支援使用者無障礙字型縮放）。Material 3 的色彩系統採用語意色彩，需要在 Figma Variables 完整對應 MaterialTheme。還需要考慮 Foldable 裝置（如 Galaxy Z Fold）的展開/折疊兩種佈局。</p>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header red">Figma 精修 — Android 特有規格</div>
+        <div class="checklist-item"><div class="check-box"></div><span>8dp 格線建立，所有間距為 8dp 的倍數（4/8/16/24/32dp）</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Touch target ≥ 48×48dp，相鄰觸控區域間距 ≥ 8dp</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>System bars 標注：狀態列 24dp / 導航列 48dp（WindowInsets）</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Variables 以 Material 3 語意命名：primary / secondary / surface / error + on 前綴</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>字型用 sp 單位（Roboto 或品牌字型），支援無障礙字型縮放</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Dark Mode Variables：Light / Dark 兩套 mode</span><div class="must-badge">必要</div></div>
+        <div class="checklist-item"><div class="check-box"></div><span>Foldable 裝置考量：展開 / 折疊兩種佈局 frame 建立</span></div>
+      </div>
+    </section>
+
+    <!-- Block 05 — 結語 -->
+    <section class="block" id="closing" style="border-bottom: none;">
+      <div class="block-header">
+        <span class="block-num">結語</span>
+        <h2 class="block-title">這週就可以開始的五件事</h2>
+      </div>
+
+      <p class="block-text">
+        不要試圖一次導入所有工具和流程。從一個最小可行的改變開始，
+        完成一次完整的循環，比規劃一個完美的系統然後擱置更有價值。
+      </p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num" style="color: var(--red);">1</div>
+          <div>
+            <p class="principle-title">更新 DESIGN.md：加入三平台規格區塊</p>
+            <p class="principle-desc">把現有 Web CSS token 對照表擴充，加入 iOS pt 規格和 Android dp 規格。30 分鐘完成。這份文件是整個 AI 工具鏈的共識基礎——Claude Design 每次啟動時讀取它，確保生成結果品牌合規。<strong>誰做：設計師</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color: var(--blue);">2</div>
+          <div>
+            <p class="principle-title">安裝 Anima Agent，驗證現有設計系統</p>
+            <p class="principle-desc">Figma 外掛安裝即用，不需技術背景。輸入一個現有產品畫面的 URL，看 Anima 是否正確讀取品牌 component。這一步是在驗證你的設計系統「是否已達到 AI 可用的成熟度」。<strong>誰做：設計師</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color: var(--muted);">3</div>
+          <div>
+            <p class="principle-title">選一個小功能，走完 Web Checklist 一輪</p>
+            <p class="principle-desc">不要一次導入所有工具。選一個 1–2 個畫面的小功能，從 Phase A 走到 Phase E 的 Checklist，感受每個步驟的工作節奏。這次試跑的本身就是最好的培訓。<strong>誰做：設計師 + PM</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color: var(--muted);">4</div>
+          <div>
+            <p class="principle-title">與工程師確認 Code Connect 評估計畫</p>
+            <p class="principle-desc">Web：React/Vue Code Connect 評估。iOS：SwiftUI Code Connect 評估（需 Org/Enterprise 方案）。Android：Jetpack Compose 評估。估算設定時間成本（約 1–2 週/平台），這是一次性投資但效益永久。<strong>誰做：工程師</strong></p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color: var(--muted);">5</div>
+          <div>
+            <p class="principle-title">設定 P0/P1/P2 驗收標準，下次 Kickoff 前對齊</p>
+            <p class="principle-desc">Web: spacing ±2px 可接受，token 錯誤不可接受。iOS: ±1pt 可接受，touch target 不符不可接受。Android: ±2dp 可接受，Safe area 遮擋不可接受。<strong>誰做：設計師 + 工程師</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block-quote">
+        <p>「AI 工具讓設計探索從 30 小時壓縮到 30 分鐘，但讓這 30 分鐘的探索有價值的，始終是設計師對問題的理解深度。工具改變的是執行速度，不可取代的是你的設計判斷力。」</p>
+      </div>
+    </section>
+
+  </div>
+</div><!-- /page-layout -->
+
+<!-- 前後導覽 -->
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="article-1-editorial.html" class="article-nav-prev">
+      <span class="article-nav-dir">← Previous</span>
+      <span class="article-nav-title">海葵花 Anemone</span>
+      <span class="article-nav-sub">Editorial Spread · 001</span>
+    </a>
+    <a href="article-2-timeline.html" class="article-nav-next">
+      <span class="article-nav-dir">Next →</span>
+      <span class="article-nav-title">海葵花 Vertical</span>
+      <span class="article-nav-sub">Vertical Narrative · 002</span>
+    </a>
+  </div>
+</nav>
+
+<!-- FOOTER — 由 shared-components.js 的 <site-footer> 元件渲染 -->
+<site-footer></site-footer>
+
+<script>
+  /* ── Hero Theme Rotation ───────────────────────────
+     9 pastel themes derived from the landing page card
+     background colors (rgba blended onto #f5f0e8 base).
+     001 海葵花  002 罌粟   003 鬱金香  004 相思樹
+     005 風鈴花  006 風尾花  007 櫻花   008 玫瑰
+     009 帝王花
+  ─────────────────────────────────────────────────── */
+  const heroThemes = [
+    'rgb(207,213,218)', // 001 steel blue   rgba(137,164,192,0.35)
+    'rgb(243,220,221)', // 002 rose pink     rgba(240,185,198,0.35)
+    'rgb(245,237,207)', // 003 soft yellow   rgba(240,230,140,0.35)
+    'rgb(227,216,228)', // 004 lavender      rgba(200,162,200,0.35)
+    'rgb(220,232,221)', // 005 mint green    rgba(177,217,181,0.35)
+    'rgb(216,208,206)', // 006 warm taupe    rgba(161,134,125,0.35)
+    'rgb(248,234,235)', // 007 pale blush    rgba(254,223,225,0.35)
+    'rgb(235,185,181)', // 008 dusty rose    rgba(215,84,85,0.35)
+    'rgb(245,236,185)', // 009 warm yellow   rgba(245,222,29,0.35)
+  ];
+
+  // If arriving from a card link (sessionStorage set on click), use that card's
+  // color as starting theme so it matches the thumbnail. Clear after reading.
+  const _stored = localStorage.getItem('heroTheme');
+  localStorage.removeItem('heroTheme');
+  let currentTheme = (_stored !== null && !isNaN(+_stored))
+    ? Math.abs(+_stored) % heroThemes.length
+    : Math.floor(Math.random() * heroThemes.length);
+
+  function applyHeroTheme(bg) {
+    document.documentElement.style.setProperty('--hero-bg', bg);
+  }
+
+  applyHeroTheme(heroThemes[currentTheme]);
+
+  setInterval(() => {
+    currentTheme = (currentTheme + 1) % heroThemes.length;
+    applyHeroTheme(heroThemes[currentTheme]);
+  }, 5000);
+
+  /* ── ToC Active State (scroll spy) ──────────────── */
+  const sections = document.querySelectorAll('.block[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocItems.forEach(item => item.classList.remove('active'));
+        const active = document.querySelector(`.toc-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

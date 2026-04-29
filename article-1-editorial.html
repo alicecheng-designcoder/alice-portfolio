@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海葵花 Anemone — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      height: 56px; width: 100%;
+      background: rgba(245,240,232,0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1360px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 48px;
+    }
+    .nav-logo {
+      font-family: var(--font-d); font-size: 17px; font-weight: 700;
+      color: var(--dark); text-decoration: none;
+    }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a {
+      display: flex; align-items: center; padding: 0 22px; height: 56px;
+      border-left: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.32px;
+      color: var(--text); text-decoration: none;
+      transition: background 0.15s;
+    }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 500; letter-spacing: 1.32px;
+      color: var(--muted); text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── PROPOSAL 1: EDITORIAL SPREAD ───────────────
+       大圖 Hero → 左寬右窄雙欄正文 → 全版圖片穿插
+    ─────────────────────────────────────────────── */
+
+    /* Page Hero — 全版大圖，文字疊加左下 */
+    .article-hero {
+      position: relative; width: 100%; height: 560px; overflow: hidden;
+      background: #b8a89a;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-hero-img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center;
+      opacity: 0.75;
+    }
+    .article-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(26,26,26,0.72) 0%, rgba(26,26,26,0.1) 55%, transparent 100%);
+    }
+    .article-hero-content {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      max-width: 1360px; margin: 0 auto;
+      padding: 0 48px 52px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .article-hero-meta {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .article-hero-tag {
+      font-size: 10px; font-weight: 500; letter-spacing: 2px;
+      color: rgba(255,255,255,0.6); text-transform: uppercase;
+    }
+    .article-hero-title {
+      font-family: var(--font-d); font-size: clamp(40px, 5vw, 72px);
+      font-weight: 700; color: #fff; line-height: 1.05;
+    }
+    .article-hero-subtitle {
+      font-family: var(--font-d); font-size: 18px; font-style: italic;
+      color: rgba(255,255,255,0.75);
+    }
+    .article-hero-num {
+      font-family: var(--font-d); font-size: 80px; font-weight: 700;
+      color: rgba(255,255,255,0.12); line-height: 1; user-select: none;
+    }
+
+    /* Article meta bar */
+    .article-meta-bar {
+      border-bottom: 1px solid var(--border);
+    }
+    .article-meta-inner {
+      max-width: 1360px; margin: 0 auto;
+      display: flex; align-items: stretch;
+    }
+    .meta-cell {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 20px 32px; border-right: 1px solid var(--border);
+      gap: 4px;
+    }
+    .meta-cell:last-child { border-right: none; flex: 1; }
+    .meta-label {
+      font-size: 9px; font-weight: 500; letter-spacing: 1.8px;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .meta-value {
+      font-family: var(--font-d); font-size: 14px; font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* Main content — 左 2/3 正文 + 右 1/3 sidebar */
+    .article-body {
+      max-width: 1360px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 0;
+      padding: 0 48px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* 左側主要正文 */
+    .article-main {
+      padding: 64px 80px 80px 0;
+      border-right: 1px solid var(--border);
+    }
+    .article-lead {
+      font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 28px);
+      font-weight: 700; font-style: italic;
+      line-height: 1.4; color: var(--dark);
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-text {
+      font-size: 15px; font-weight: 300; line-height: 1.9;
+      color: var(--text); margin-bottom: 28px;
+    }
+    .article-text:last-child { margin-bottom: 0; }
+
+    /* Pull quote — 引言特顯 */
+    .pull-quote {
+      margin: 48px 0;
+      padding: 32px 0 32px 32px;
+      border-left: 3px solid var(--dark);
+    }
+    .pull-quote p {
+      font-family: var(--font-d); font-size: clamp(18px, 2vw, 24px);
+      font-style: italic; font-weight: 700; line-height: 1.4;
+      color: var(--dark);
+    }
+
+    /* Inline 圖片（佔滿主欄寬度） */
+    .article-img {
+      width: 100%; margin: 48px 0;
+    }
+    .article-img-frame {
+      width: 100%; height: 380px;
+      background: rgba(137,164,192,0.25);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .article-img-frame img {
+      width: 100%; height: 100%; object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+    .article-img-caption {
+      margin-top: 12px;
+      font-size: 11px; font-weight: 400; letter-spacing: 0.88px;
+      color: var(--muted);
+    }
+
+    /* 章節標題 */
+    .article-section-title {
+      font-family: var(--font-d); font-size: 22px; font-weight: 700;
+      color: var(--dark); margin: 56px 0 24px;
+    }
+
+    /* 右側 Sidebar */
+    .article-sidebar {
+      padding: 64px 0 80px 48px;
+      display: flex; flex-direction: column; gap: 40px;
+    }
+    .sidebar-block { display: flex; flex-direction: column; gap: 12px; }
+    .sidebar-label {
+      font-size: 9px; font-weight: 500; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+    .sidebar-text {
+      font-size: 13px; font-weight: 300; line-height: 1.8; color: var(--text);
+    }
+    .sidebar-tag-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sidebar-tag {
+      display: inline-flex; align-items: center;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      font-size: 10px; font-weight: 500; letter-spacing: 0.88px;
+      color: var(--dark); background: var(--card-bg);
+    }
+    .sidebar-stat {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .sidebar-stat-num {
+      font-family: var(--font-d); font-size: 32px; font-weight: 700;
+      color: var(--dark); line-height: 1;
+    }
+    .sidebar-stat-desc {
+      font-size: 11px; font-weight: 400; color: var(--muted);
+    }
+
+    /* 全版橫幅圖片 */
+    .article-fullbleed {
+      width: 100%; background: var(--border);
+      margin: 0;
+    }
+    .article-fullbleed-inner {
+      max-width: 1360px; margin: 0 auto; padding: 0 48px;
+    }
+    .fullbleed-frame {
+      height: 480px; width: 100%;
+      background: rgba(137,164,192,0.2);
+      display: flex; align-items: center; justify-content: center;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .fullbleed-frame img {
+      height: 100%; width: 100%; object-fit: contain; mix-blend-mode: multiply;
+    }
+
+    /* 前後導覽 */
+    .article-nav {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .article-nav-inner {
+      max-width: 1360px; margin: 0 auto;
+      display: flex;
+    }
+    .article-nav-prev, .article-nav-next {
+      flex: 1; padding: 32px 48px;
+      display: flex; flex-direction: column; gap: 8px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover {
+      background: rgba(26,26,26,0.03);
+    }
+    .article-nav-dir {
+      font-size: 9px; font-weight: 500; letter-spacing: 2px;
+      color: var(--muted); text-transform: uppercase;
+    }
+    .article-nav-title {
+      font-family: var(--font-d); font-size: 18px; font-weight: 700;
+      color: var(--dark);
+    }
+    .article-nav-sub {
+      font-size: 11px; font-weight: 300; color: var(--muted);
+    }
+
+    /* Contact */
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    /* RWD */
+    @media (max-width: 1024px) {
+      .article-body { grid-template-columns: 1fr; padding: 0 32px; }
+      .article-main { padding: 48px 0; border-right: none; border-bottom: 1px solid var(--border); }
+      .article-sidebar { padding: 40px 0 48px; }
+      .article-hero-content { padding: 0 32px 40px; }
+      .fullbleed-frame { height: 360px; }
+      .article-nav-prev, .article-nav-next { padding: 28px 32px; }
+    }
+    @media (max-width: 768px) {
+      .article-hero { height: 420px; }
+      .article-hero-num { display: none; }
+      .article-meta-inner { flex-wrap: wrap; }
+      .meta-cell { padding: 16px 20px; }
+      .article-body { padding: 0 20px; }
+      .article-main { padding: 36px 0 48px; }
+      .article-lead { font-size: 20px; }
+      .fullbleed-inner { padding: 0 20px; }
+      .fullbleed-frame { height: 260px; border: none; }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Alice <em>Cheng</em></a>
+    <div class="nav-links">
+      <a href="index.html#works">WORKS</a>
+      <a href="index.html#about">ABOUT</a>
+      <a href="index.html#contact">CONTACT ↗</a>
+    </div>
+    <a href="index.html#works" class="nav-back">← ALL WORKS</a>
+  </div>
+</nav>
+
+<!-- ARTICLE HERO — 全版大圖 + 疊字 -->
+<header class="article-hero">
+  <img class="article-hero-img"
+       src="https://www.figma.com/api/mcp/asset/3078810c-c7ac-4fcc-aa72-eb7f0c7ec66c"
+       alt="海葵花">
+  <div class="article-hero-overlay"></div>
+  <div class="article-hero-content">
+    <div class="article-hero-meta">
+      <span class="article-hero-tag">001 &nbsp;·&nbsp; 期待 · Expectation</span>
+      <h1 class="article-hero-title">海葵花<br><em>Anemone</em></h1>
+      <p class="article-hero-subtitle">AI-assisted botanical design experiment</p>
+    </div>
+    <div class="article-hero-num">001</div>
+  </div>
+</header>
+
+<!-- META BAR -->
+<div class="article-meta-bar">
+  <div class="article-meta-inner">
+    <div class="meta-cell">
+      <span class="meta-label">Date</span>
+      <span class="meta-value">2025 / 10 / 30</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">Medium</span>
+      <span class="meta-value">AI + Botanical Illustration</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">Tools</span>
+      <span class="meta-value">Midjourney · Claude Code</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">Theme</span>
+      <span class="meta-value">期待 · Expectation</span>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE BODY — 左寬欄 + 右 Sidebar -->
+<div class="article-body">
+  <!-- 左：主文 -->
+  <main class="article-main">
+    <p class="article-lead">
+      "海葵花的形態，在 AI 的詮釋下，成為一種對「期待」最純粹的視覺隱喻——
+      等待綻放，等待被看見。"
+    </p>
+
+    <p class="article-text">
+      這個系列從一個問題出發：當情感變成 prompt，當語言變成圖像，
+      植物學插圖所承載的文化符號是否能被 AI 忠實再詮釋，
+      還是它會生成一個全新的意義？
+    </p>
+
+    <p class="article-text">
+      海葵花在日本花語中象徵「期待」與「相信」。這個專案以此作為起點，
+      透過多輪 Midjourney 迭代，試圖讓 AI「理解」這朵花不只是植物，
+      而是一種情緒的載體。
+    </p>
+
+    <div class="pull-quote">
+      <p>"I didn't want the AI to draw a flower. I wanted it to draw
+      the feeling of waiting for something beautiful to happen."</p>
+    </div>
+
+    <h2 class="article-section-title">Process — 從 Prompt 到圖像</h2>
+
+    <p class="article-text">
+      第一輪 prompt 嘗試使用直接的植物學描述，結果偏向科學插圖風格，
+      缺乏情感。第二輪引入日本大正時期插圖美學的參考，開始出現
+      我們想要的溫柔與等待感。
+    </p>
+
+    <div class="article-img">
+      <div class="article-img-frame">
+        <img src="https://www.figma.com/api/mcp/asset/3078810c-c7ac-4fcc-aa72-eb7f0c7ec66c" alt="海葵花插圖">
+      </div>
+      <p class="article-img-caption">Figure 01 — Final iteration, Midjourney v6, botanical editorial style</p>
+    </div>
+
+    <p class="article-text">
+      第三輪在 Claude Code 的協助下，將圖像整合進排版系統，
+      測試不同的留白比例與文字配置，最終確定以「植物 + 詩句」
+      的格式呈現每個主題。
+    </p>
+
+    <h2 class="article-section-title">Reflection — AI 的詮釋邊界</h2>
+
+    <p class="article-text">
+      這個實驗讓我意識到：AI 在形式上的精準度遠高於情感的轉譯。
+      它能畫出完美的花瓣結構，但「期待」這種時間性的情感，
+      需要設計者主動注入——透過構圖、留白、色調的決策。
+    </p>
+
+    <p class="article-text">
+      AI 是協作者，不是作者。這個區別，在每一次迭代中都更加清晰。
+    </p>
+  </main>
+
+  <!-- 右：Sidebar -->
+  <aside class="article-sidebar">
+    <div class="sidebar-block">
+      <span class="sidebar-label">About this work</span>
+      <p class="sidebar-text">
+        海葵花是系列的第一件作品，設定情感主題為「期待」，
+        探索 AI 能否在植物形象中注入特定的情緒語境。
+      </p>
+    </div>
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">Keywords</span>
+      <div class="sidebar-tag-list">
+        <span class="sidebar-tag">Botanical</span>
+        <span class="sidebar-tag">AI Art</span>
+        <span class="sidebar-tag">Editorial</span>
+        <span class="sidebar-tag">Emotion</span>
+        <span class="sidebar-tag">Midjourney</span>
+      </div>
+    </div>
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">Iterations</span>
+      <div class="sidebar-stat">
+        <span class="sidebar-stat-num">24</span>
+        <span class="sidebar-stat-desc">Midjourney prompts tested</span>
+      </div>
+    </div>
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">Duration</span>
+      <div class="sidebar-stat">
+        <span class="sidebar-stat-num">3</span>
+        <span class="sidebar-stat-desc">Days from concept to final</span>
+      </div>
+    </div>
+
+    <div class="sidebar-block">
+      <span class="sidebar-label">Series</span>
+      <p class="sidebar-text">
+        Part of "9 Emotions, 9 Flowers" —<br>
+        an ongoing AI design experiment series.
+      </p>
+    </div>
+  </aside>
+</div>
+
+<!-- 全版圖片橫幅 -->
+<div class="article-fullbleed">
+  <div class="article-fullbleed-inner">
+    <div class="fullbleed-frame">
+      <img src="https://www.figma.com/api/mcp/asset/3078810c-c7ac-4fcc-aa72-eb7f0c7ec66c" alt="全版展示">
+    </div>
+  </div>
+</div>
+
+<!-- 前後頁導覽 -->
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="#" class="article-nav-prev">
+      <span class="article-nav-dir">← Previous</span>
+      <span class="article-nav-title">帝王花 King Protea</span>
+      <span class="article-nav-sub">獨特 · Uniqueness · 009</span>
+    </a>
+    <a href="#" class="article-nav-next">
+      <span class="article-nav-dir">Next →</span>
+      <span class="article-nav-title">罌粟 Poppy</span>
+      <span class="article-nav-sub">安慰 · Comfort · 002</span>
+    </a>
+  </div>
+</nav>
+
+<!-- CONTACT + FOOTER -->
+<section class="contact">
+  <div class="contact-inner">
+    <div class="contact-quote"><p>"Let's make something worth remembering."</p></div>
+    <div class="contact-email">
+      <p class="contact-email-label">GET IN TOUCH</p>
+      <a href="mailto:tofu@yahooinc.com">tofu@yahooinc.com</a>
+    </div>
+    <div class="contact-social">
+      <a href="#">LinkedIn ↗</a>
+      <a href="#">Behance ↗</a>
+      <a href="#">Dribbble ↗</a>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="footer-inner">
+    <span>© 2026 Alice Cheng · AI Workflow Design Lab</span>
+    <span>TAIPEI, TAIWAN</span>
+  </div>
+</footer>
+
+</body>
+</html>

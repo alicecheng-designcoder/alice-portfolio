@@ -1,0 +1,35 @@
+完成,平台,階段,確認項目,優先度
+□,Web,Phase A — 探索前,研究 Brief 已整合 Cowork Project，有研究根據,—
+□,Web,Phase A — 探索前,DESIGN.md 最新版本（Claude Design / Google Stitch 讀取品牌 token；Figma Make 確認設計系統 Variables 已更新）,—
+□,Web,Phase A — 探索前,3–5 個方向，每個有一句話設計假設,—
+□,Web,Phase A — 探索前,方向評選：PM + 設計師 + 工程師三方參與,必要
+□,Web,Phase A — 探索前,html.to.design / Anima 移植，圖層可編輯,—
+□,Web,Phase A — 探索前,移植後 hardcode 全部替換為 Variables,必要
+□,Web,Phase A — 探索前,版本快照 v0.1 建立,—
+□,Web,Phase B — Figma 精修,所有 component 使用 Auto Layout,必要
+□,Web,Phase B — Figma 精修,所有色彩/字型/spacing 使用 Variables，覆蓋 100%,必要
+□,Web,Phase B — Figma 精修,Default / Hover / Active / Disabled / Error / Loading 全部建立,必要
+□,Web,Phase B — Figma 精修,Empty state：列表為空 / 無結果 / 錯誤 至少三種,必要
+□,Web,Phase B — Figma 精修,Responsive breakpoint：375 / 768 / 1280 建立,—
+□,Web,Phase B — Figma 精修,動畫 transition 標注 + Annotation 設計決策說明,—
+□,Web,Phase B — Figma 精修,File Health Check：component audit 通過,—
+□,Web,Phase C — Kickoff 前,Cowork Spec：設計決策 + Edge case + Out of scope,必要
+□,Web,Phase C — Kickoff 前,Ready for dev 標記完成，WIP 未標記,必要
+□,Web,Phase C — Kickoff 前,版本快照 v1.0 建立 + QA Checklist 預先生成,—
+□,Web,Phase C — Kickoff 前,Kickoff 議程：設計師不確定邊界提前列出,—
+□,Web,Phase C — Kickoff 前,驗收標準：P0/P1/P2 分類 + 可接受偏差範圍,必要
+□,Web,Phase C — Kickoff 前,探索工具產出的 Prototype 連結附在交付包（Claude Design URL / Figma Make 連結 / Stitch 連結，擇一）,—
+□,iOS,Figma 精修 — iOS 特有規格,4pt 格線建立，所有間距為 4pt 的倍數（4/8/12/16/24/32pt）,必要
+□,iOS,Figma 精修 — iOS 特有規格,Touch target ≥ 44×44pt（視覺可小，padding 延伸觸控區域）,必要
+□,iOS,Figma 精修 — iOS 特有規格,Safe area frame 建立：上方 59pt（Dynamic Island）/ 下方 34pt,必要
+□,iOS,Figma 精修 — iOS 特有規格,Variables 以 iOS 語意命名：label / secondaryLabel / systemBackground / fill,必要
+□,iOS,Figma 精修 — iOS 特有規格,字型使用 SF Pro，設定 Dynamic Type scale（不 hardcode px）,—
+□,iOS,Figma 精修 — iOS 特有規格,iOS 26 Liquid Glass：nav bar / tab bar 透明玻璃效果考量,—
+□,iOS,Figma 精修 — iOS 特有規格,Dark Mode Variables 建立（Light / Dark 兩套 mode）,必要
+□,Android,Figma 精修 — Android 特有規格,8dp 格線建立，所有間距為 8dp 的倍數（4/8/16/24/32dp）,必要
+□,Android,Figma 精修 — Android 特有規格,Touch target ≥ 48×48dp，相鄰觸控區域間距 ≥ 8dp,必要
+□,Android,Figma 精修 — Android 特有規格,System bars 標注：狀態列 24dp / 導航列 48dp（WindowInsets）,必要
+□,Android,Figma 精修 — Android 特有規格,Variables 以 Material 3 語意命名：primary / secondary / surface / error + on 前綴,必要
+□,Android,Figma 精修 — Android 特有規格,字型用 sp 單位（Roboto 或品牌字型），支援無障礙字型縮放,—
+□,Android,Figma 精修 — Android 特有規格,Dark Mode Variables：Light / Dark 兩套 mode,必要
+□,Android,Figma 精修 — Android 特有規格,Foldable 裝置考量：展開 / 折疊兩種佈局 frame 建立,—
