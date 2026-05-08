@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 設計協作知識庫：讓 AI 沒有機會偏離品牌 — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="shared-components.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+      --toc-w:  240px;
+      --hero-bg:           #cfd5da;
+      --hero-ghost:        rgba(26,26,26,0.04);
+      --hero-badge-border: rgba(26,26,26,0.16);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      height: 56px; width: 100%;
+      background: rgba(245,240,232,0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1360px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 48px;
+    }
+    .nav-logo { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); text-decoration: none; }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a {
+      display: flex; align-items: center; padding: 0 22px; height: 56px;
+      border-left: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.32px;
+      color: var(--text); text-decoration: none; transition: background 0.15s;
+    }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── HERO ──────────────────────────────────── */
+    .article-hero {
+      background: var(--hero-bg, #f5f0e8);
+      border-bottom: 1px solid var(--border);
+      transition: background 1.2s ease;
+    }
+    .article-hero-inner {
+      max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--toc-w) 1fr;
+      min-height: 400px;
+    }
+    .hero-left {
+      border-right: 1px solid var(--border);
+      padding: 48px 32px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.8px;
+      color: var(--muted);
+      width: fit-content; margin-bottom: 40px;
+    }
+    .hero-date-badge {
+      background: var(--dark); border: 1px solid var(--dark);
+      padding: 12px 16px;
+      font-family: var(--font-d); font-size: 20px; font-weight: 700;
+      color: #fff; line-height: 24px; width: fit-content;
+    }
+    .hero-meta-list {
+      display: flex; flex-direction: column; gap: 16px;
+      margin-top: auto;
+    }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .hero-meta-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .hero-meta-value { font-size: 13px; font-weight: 400; color: var(--text); }
+
+    .hero-right {
+      padding: 64px 48px 64px 64px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .hero-index {
+      font-family: var(--font-d); font-size: clamp(88px, 12vw, 177px);
+      font-weight: 700; color: rgba(26,26,26,0.06);
+      line-height: 1; user-select: none; margin-bottom: -16px;
+    }
+    .hero-title-en {
+      font-family: var(--font-d); font-size: clamp(53px, 6vw, 97px);
+      font-weight: 700; font-style: italic; color: var(--dark); line-height: 1;
+    }
+    .hero-title-zh {
+      font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px);
+      font-weight: 700; color: var(--muted); line-height: 1.3;
+      margin-top: 12px; margin-bottom: 32px;
+    }
+    .hero-tagline {
+      font-size: 14px; font-weight: 300; line-height: 1.7;
+      color: var(--text); max-width: 560px;
+    }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .page-layout {
+      max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--toc-w) 1fr;
+      align-items: start;
+    }
+
+    /* ── STICKY TOC ──────────────────────────────── */
+    .toc {
+      position: sticky; top: 56px;
+      border-right: 1px solid var(--border);
+      min-height: calc(100vh - 56px);
+      padding: 48px 32px;
+      display: flex; flex-direction: column; gap: 32px;
+    }
+    .toc-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .toc-list { display: flex; flex-direction: column; gap: 0; }
+    .toc-item { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s; }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-item:hover .toc-item-title { color: var(--dark); }
+    .toc-num { font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
+    .toc-item-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+    .toc-item.active .toc-item-title { color: var(--dark); font-weight: 700; }
+    .toc-item.active .toc-num { color: var(--dark); }
+
+    .toc-info-card {
+      margin-top: auto;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+    .toc-info-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .toc-info-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .toc-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .toc-info-key { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .toc-info-val { font-size: 13px; font-weight: 500; color: var(--dark); }
+
+    /* ── CONTENT BLOCKS ──────────────────────────── */
+    .content-blocks { padding: 0 48px; }
+    .block { border-bottom: 1px solid var(--border); padding: 64px 0; }
+    .block:last-child { border-bottom: none; }
+
+    .block-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 32px; }
+    .block-num { font-size: 11px; font-weight: 500; letter-spacing: 2px; color: var(--muted); }
+    .block-title { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--dark); }
+
+    .block-sub { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: var(--dark); margin: 28px 0 10px; }
+    .block-text { font-size: 17px; font-weight: 300; line-height: 1.9; color: var(--text); margin-bottom: 20px; }
+    .block-text:last-child { margin-bottom: 0; }
+    .block-text strong { color: var(--dark); font-weight: 500; }
+
+    /* Stats */
+    .block-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--border); margin: 32px 0; }
+    .block-stat { padding: 28px 24px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .block-stat:last-child { border-right: none; }
+    .stat-big { font-family: var(--font-d); font-size: 49px; font-weight: 700; color: var(--dark); line-height: 1; }
+    .stat-label { font-size: 11px; font-weight: 500; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
+
+    /* Quote */
+    .block-quote { padding: 32px; background: var(--dark); margin: 32px 0; }
+    .block-quote p { font-family: var(--font-d); font-size: clamp(18px, 1.8vw, 22px); font-style: italic; line-height: 1.55; color: #fff; }
+    .block-quote-attr { margin-top: 16px; font-size: 12px; letter-spacing: 1.2px; color: rgba(255,255,255,0.4); }
+
+    /* Callout */
+    .callout-box { padding: 20px 24px; border-left: 3px solid; margin: 24px 0; }
+    .callout-box.blue { background: rgba(20,50,224,0.05); border-color: var(--blue); }
+    .callout-box.red  { background: rgba(192,48,48,0.05); border-color: var(--red); }
+    .callout-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 1.8px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .callout-box.blue .callout-label { color: var(--blue); }
+    .callout-box.red  .callout-label { color: var(--red); }
+    .callout-box p { font-size: 14px; font-weight: 400; line-height: 1.7; color: var(--text); }
+    .callout-box p strong { color: var(--dark); font-weight: 500; }
+
+    /* Code block */
+    .code-block {
+      background: var(--dark); padding: 24px 28px; margin: 20px 0;
+      font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.75;
+      color: rgba(255,255,255,0.85); overflow-x: auto; border: 1px solid rgba(255,255,255,0.06);
+    }
+    .code-block .code-comment { color: rgba(255,255,255,0.35); }
+    .code-block .code-key { color: #7dd3fc; }
+    .code-block .code-val { color: #86efac; }
+    .code-block .code-bad { color: #fca5a5; }
+    .code-block .code-good { color: #86efac; }
+
+    /* Compare table */
+    .compare-wrap { overflow-x: auto; margin: 24px 0; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+    .compare-table th {
+      padding: 10px 14px; background: var(--dark); color: #fff;
+      text-align: left; font-size: 10px; font-weight: 500;
+      letter-spacing: 1.5px; font-family: var(--font-b); text-transform: uppercase;
+    }
+    .compare-table th:not(:first-child) { border-left: 1px solid rgba(255,255,255,0.1); }
+    .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .compare-table td:not(:first-child) { border-left: 1px solid var(--border); }
+    .compare-table .row-label { font-weight: 500; color: var(--dark); }
+    .compare-table .tag-good { display: inline-block; padding: 2px 8px; background: rgba(20,50,224,0.08); color: var(--blue); font-size: 11px; font-weight: 500; }
+    .compare-table .tag-warn { display: inline-block; padding: 2px 8px; background: rgba(192,48,48,0.08); color: var(--red); font-size: 11px; font-weight: 500; }
+
+    /* Principle cards */
+    .principle-set { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin: 24px 0; }
+    .principle-card { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+    .principle-card:last-child { border-bottom: none; }
+    .principle-num { font-family: var(--font-d); font-size: 24px; font-weight: 700; color: var(--border); line-height: 1.2; padding-top: 2px; }
+    .principle-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+    .principle-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .principle-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Process steps */
+    .process-steps { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+    .process-step { display: grid; grid-template-columns: 48px 1fr; border: 1px solid var(--border); border-bottom: none; }
+    .process-step:last-child { border-bottom: 1px solid var(--border); }
+    .step-num { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); font-family: var(--font-d); font-size: 14px; font-weight: 700; color: var(--muted); }
+    .step-body { padding: 20px 24px; }
+    .step-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .step-text { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .step-text strong { color: var(--dark); font-weight: 500; }
+
+    /* Checklist */
+    .checklist-block { border: 1px solid var(--border); margin: 20px 0; }
+    .checklist-header {
+      padding: 10px 16px; font-size: 11px; font-weight: 500;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .checklist-header.blue  { background: rgba(20,50,224,0.07); color: var(--blue); }
+    .checklist-header.red   { background: rgba(192,48,48,0.07); color: var(--red); }
+    .checklist-header.dark  { background: var(--dark); color: #fff; }
+    .checklist-header.neutral { background: rgba(26,26,26,0.04); color: var(--muted); }
+    .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--border); font-size: 14px; color: var(--text); line-height: 1.55; }
+    .check-box { width: 14px; height: 14px; border: 1.5px solid var(--border); flex-shrink: 0; margin-top: 2px; }
+    .must-badge { margin-left: auto; flex-shrink: 0; font-size: 10px; font-weight: 500; letter-spacing: 0.5px; padding: 3px 8px; background: rgba(192,48,48,0.1); color: var(--red); white-space: nowrap; }
+    .checklist-item strong { color: var(--dark); font-weight: 500; }
+    .checklist-item .sub-text { font-size: 12px; color: var(--muted); margin-top: 3px; display: block; }
+
+    /* Tags */
+    .block-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .block-tag { display: inline-flex; align-items: center; padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 0.88px; color: var(--dark); background: var(--card-bg); }
+    .block-tag.blue { background: rgba(20,50,224,0.07); border-color: rgba(20,50,224,0.2); color: var(--blue); }
+    .block-tag.red  { background: rgba(192,48,48,0.07); border-color: rgba(192,48,48,0.2); color: var(--red); }
+
+    /* Health meter */
+    .health-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+    .health-card { padding: 24px; background: var(--card-bg); display: flex; flex-direction: column; gap: 10px; }
+    .health-label { font-size: 11px; font-weight: 500; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
+    .health-bar-wrap { height: 6px; background: rgba(26,26,26,0.08); width: 100%; }
+    .health-bar { height: 100%; }
+    .health-bar.high { background: var(--blue); }
+    .health-bar.mid  { background: var(--muted); }
+    .health-bar.low  { background: var(--red); }
+    .health-pct { font-family: var(--font-d); font-size: 32px; font-weight: 700; color: var(--dark); line-height: 1; }
+    .health-note { font-size: 12px; font-weight: 300; color: var(--text); line-height: 1.5; }
+
+    /* Problem badge */
+    .problem-badge { display: inline-block; padding: 2px 8px; font-size: 10px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-right: 8px; }
+    .problem-badge.p0 { background: rgba(192,48,48,0.12); color: var(--red); }
+    .problem-badge.p1 { background: rgba(20,50,224,0.08); color: var(--blue); }
+    .problem-badge.p2 { background: rgba(26,26,26,0.06); color: var(--muted); }
+
+    /* Article nav */
+    .article-nav { border-top: 1px solid var(--border); }
+    .article-nav-inner { max-width: 1360px; margin: 0 auto; display: flex; }
+    .article-nav-prev, .article-nav-next { flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: background 0.15s; }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover { background: rgba(26,26,26,0.03); }
+    .article-nav-dir { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .article-nav-title { font-family: var(--font-d); font-size: 20px; font-weight: 700; color: var(--dark); }
+    .article-nav-sub { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+    /* Contact + Footer */
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    /* ── RWD ─────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      :root { --toc-w: 200px; }
+      .content-blocks { padding: 0 32px; }
+      .hero-right { padding: 48px 32px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-hero-inner { grid-template-columns: 1fr; }
+      .hero-left { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 20px; }
+      .hero-index { display: none; }
+      .hero-right { padding: 40px 20px; }
+      .page-layout { grid-template-columns: 1fr; }
+      .toc { display: none; }
+      .content-blocks { padding: 0 20px; }
+      .block { padding: 40px 0; }
+      .block-stats { grid-template-columns: 1fr; }
+      .block-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .block-stat:last-child { border-bottom: none; }
+      .health-grid { grid-template-columns: 1fr; }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .article-nav-next { padding: 24px 20px; }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<site-nav></site-nav>
+
+<header class="article-hero" id="articleHero">
+  <div class="article-hero-inner">
+    <div class="hero-left">
+      <div>
+        <div class="hero-badge">KNOWLEDGE BASE &nbsp;·&nbsp; 2025 &nbsp;·&nbsp; DESIGN × AI</div>
+        <div class="hero-date-badge"><p>20</p><p>25</p></div>
+      </div>
+      <div class="hero-meta-list">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Date</span>
+          <span class="hero-meta-value">2025</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Type</span>
+          <span class="hero-meta-value">AI 協作知識庫</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Tools</span>
+          <span class="hero-meta-value">Claude.ai · Claude Code · Figma · Token Studio</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <p class="hero-index">Token</p>
+      <h1 class="hero-title-en">AI × Brand</h1>
+      <p class="hero-title-zh">讓 AI 沒有機會偏離品牌的設計協作知識庫</p>
+      <p class="hero-tagline">
+        AI 腦補視覺風格，不是工具的問題，是給 AI 的資訊不夠精確。
+        從 Design Token 健檢到七條協作原則，建立系統性的約束框架，讓 AI 精準執行而不是自由發揮。
+      </p>
+    </div>
+  </div>
+</header>
+
+<div class="page-layout">
+
+  <aside class="toc">
+    <p class="toc-label">Contents</p>
+    <nav class="toc-list">
+      <a href="#preface" class="toc-item active">
+        <span class="toc-num">00</span>
+        <span class="toc-item-title">前言：腦補的根本原因</span>
+      </a>
+      <a href="#principles" class="toc-item">
+        <span class="toc-num">01</span>
+        <span class="toc-item-title">七條 AI 協作原則</span>
+      </a>
+      <a href="#token-audit" class="toc-item">
+        <span class="toc-num">02</span>
+        <span class="toc-item-title">Design Token 健檢結果</span>
+      </a>
+      <a href="#token-todo" class="toc-item">
+        <span class="toc-num">03</span>
+        <span class="toc-item-title">Token 優化待辦清單</span>
+      </a>
+      <a href="#ai-docs" class="toc-item">
+        <span class="toc-num">04</span>
+        <span class="toc-item-title">AI 執行文件製作</span>
+      </a>
+      <a href="#prompt-templates" class="toc-item">
+        <span class="toc-num">05</span>
+        <span class="toc-item-title">Prompt 撰寫範本</span>
+      </a>
+    </nav>
+    <div class="toc-info-card">
+      <p class="toc-info-label">About</p>
+      <div class="toc-info-row">
+        <span class="toc-info-key">閱讀時間</span>
+        <span class="toc-info-val">約 25 分鐘</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">適合對象</span>
+        <span class="toc-info-val">產品設計師</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">適用工具</span>
+        <span class="toc-info-val">Claude.ai / Claude Code</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content-blocks">
+
+    <!-- Block 00 — 前言 -->
+    <section class="block" id="preface">
+      <div class="block-header">
+        <span class="block-num">前言</span>
+        <h2 class="block-title">AI 為什麼會「腦補」視覺風格？</h2>
+      </div>
+
+      <p class="block-text">
+        你給了 AI 你的 design token，描述了品牌風格，甚至貼上了截圖——但 AI 生成的結果仍然充滿 Material Design 的影子，或者莫名出現漸層。這不是 AI 工具的問題，而是<strong>我們給 AI 的資訊類型根本不對</strong>。
+      </p>
+
+      <p class="block-text">
+        AI 的腦補行為來自兩個根本原因：
+      </p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">A</span>
+          <div class="step-body">
+            <p class="step-title">Token 的語意距離</p>
+            <p class="step-text">你提供了 design token 的數值，但 AI 無法「感知」這些數值背後的視覺意圖。當約束不夠精確時，模型會用訓練資料中的視覺慣例——Material Design、Fluent UI、通用 SaaS 風格——<strong>填補空白</strong>。</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">B</span>
+          <div class="step-body">
+            <p class="step-title">負向約束不足</p>
+            <p class="step-text">告訴 AI「用這些顏色」，但沒告訴它「不能用這些顏色」。AI 會在已知範圍和訓練資料之間做混合，<strong>而不是嚴格限制在你的品牌範圍內</strong>。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>現在給 AI 的</th>
+              <th>AI 需要的</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">截圖（視覺印象）</td>
+              <td>結構化數值（可執行規則）</td>
+            </tr>
+            <tr>
+              <td class="row-label">設計文件截圖</td>
+              <td>元件對應清單（組裝指令）</td>
+            </tr>
+            <tr>
+              <td class="row-label">口頭描述風格</td>
+              <td>禁止清單（負向約束）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="block-quote">
+        <p>「不要期待 AI 理解品牌，要讓 AI 沒有機會偏離品牌。」</p>
+      </div>
+
+      <div class="block-stats">
+        <div class="block-stat">
+          <span class="stat-big">494</span>
+          <span class="stat-label">Design Token 總數</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">7</span>
+          <span class="stat-label">AI 協作核心原則</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">3</span>
+          <span class="stat-label">AI 執行文件類型</span>
+        </div>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag blue">Design Token</span>
+        <span class="block-tag blue">AI 約束框架</span>
+        <span class="block-tag">Figma Variables</span>
+        <span class="block-tag">Claude Code</span>
+      </div>
+    </section>
+
+    <!-- Block 01 — 七條原則 -->
+    <section class="block" id="principles">
+      <div class="block-header">
+        <span class="block-num">01</span>
+        <h2 class="block-title">七條 AI 協作工作原則</h2>
+      </div>
+
+      <p class="block-text">
+        這七條原則不是使用技巧，而是根本性的工作思維轉換。
+        每一條都對應一個 AI 腦補的具體來源，從描述型改為約束型，
+        從頁面優先改為元件優先，從截圖輸入改為結構化數值。
+      </p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num">P1</div>
+          <div>
+            <p class="principle-title">Prompt 從「描述型」改為「約束型」</p>
+            <p class="principle-desc">
+              <span style="color:var(--red);">✗ 不要寫：</span>「幫我設計一個符合品牌風格的登入頁面」<br>
+              <span style="color:var(--blue);">✓ 要這樣寫：</span>「背景色只能用 <code>surface/basic/level1</code>。按鈕只能用 Button/Primary 元件規格。不得新增任何未在 token 清單中的顏色。若不確定某元素的視覺處理，標註 <code>[NEEDS DESIGN]</code>，不要自行填補。」<br><br>
+              <strong>最後一句最重要：教 AI 承認不確定，而不是腦補。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P2</div>
+          <div>
+            <p class="principle-title">元件優先，不是頁面優先</p>
+            <p class="principle-desc">
+              舊順序（容易腦補）：AI 想像整個頁面 → 套用 token<br>
+              新順序（精準執行）：從元件庫組裝 → 只有佈局層需要新決策<br><br>
+              Prompt 範例：「這個頁面由以下現有元件組成：Header（已有）、Card/Product（已有）、Button/Primary（已有）。你的工作<strong>只是決定這些元件的佈局排列與間距</strong>。間距只能使用 spacing token 清單中的數值。」
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P3</div>
+          <div>
+            <p class="principle-title">每次 Prompt 前段貼入 Token 約束清單</p>
+            <p class="principle-desc">
+              不要只說「請參考設計系統」，而是把約束清單直接貼進 prompt 的最前段作為 system context。每次對話都需要重新貼入（<strong>AI 沒有跨對話記憶</strong>）。<br><br>
+              Claude Code 的做法：在專案的 <code>CLAUDE.md</code> 加入設計系統規則，Claude Code 每次執行前會自動讀取，不需要每次手動貼入。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P4</div>
+          <div>
+            <p class="principle-title">建立品牌反模式清單（負向約束）</p>
+            <p class="principle-desc">
+              在設計系統文件中加入「不是什麼」比「是什麼」更有效。明確告訴 AI 禁止參考的視覺風格：不是 Material Design、不是 Fluent UI、不使用漸層作為主視覺、icon 只用 outline 不用 filled、不使用投影作為卡片區隔用 border 替代、<strong>圓角最大值為 radius/xl（24px）</strong>，不超過此值。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P5</div>
+          <div>
+            <p class="principle-title">要求 AI 產出自我稽核表</p>
+            <p class="principle-desc">
+              在每次 prompt 結尾加上稽核要求：使用了哪些顏色 token（逐一列出）、有無任何不在清單內的視覺決策、標記為 <code>[NEEDS DESIGN]</code> 的項目。<br><br>
+              <strong>這樣 review 時只需看稽核表，不用逐一核對整份設計。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P6</div>
+          <div>
+            <p class="principle-title">分階段產出，不要一次要求完整頁面</p>
+            <p class="principle-desc">
+              完整頁面的 prompt 給 AI 太多自由空間。改為四輪分階段產出：<br>
+              第一輪 → 頁面資訊架構（IA），不含任何視覺樣式<br>
+              第二輪 → 確認 IA 後，套用元件對應<br>
+              第三輪 → 佈局與間距 token<br>
+              第四輪 → <strong>最終視覺 QA，對照 token 稽核</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">P7</div>
+          <div>
+            <p class="principle-title">Figma Variables 轉化為 AI 可讀格式</p>
+            <p class="principle-desc">
+              Figma variables 是給人看的，需要轉化成 AI 可精準執行的格式。安裝 <strong>Variables to JSON</strong> 或 <strong>Token Studio</strong> plugin，匯出 JSON 檔案，再基於 JSON 製作三份 AI 執行文件（見第 04 節）。<br><br>
+              截圖給 AI 的問題：AI 看截圖是「用眼睛判斷顏色」而不是「讀取 token 名稱」，<strong>每次都在猜，無法精準繼承</strong>。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">Claude Code 專案設定</p>
+        <p>在專案根目錄建立 <code>CLAUDE.md</code>，加入 Design System Rules 區塊，告訴 Claude Code 每次執行前先讀取 <code>design-system-rules.md</code>，遇到不確定的視覺決策時輸出 <code>[NEEDS DESIGN: reason]</code> 而不是自行猜測。<strong>這樣 Claude Code 每次執行前會自動讀取設計系統規則，不需要每次手動貼入。</strong></p>
+      </div>
+    </section>
+
+    <!-- Block 02 — Token 健檢 -->
+    <section class="block" id="token-audit">
+      <div class="block-header">
+        <span class="block-num">02</span>
+        <h2 class="block-title">Design Token 健檢結果</h2>
+      </div>
+
+      <p class="block-text">
+        以下是針對五份 token 檔案的健檢結果——Component_tokens.json、Mode_1_tokens.json、dark_tokens.json、light_tokens.json、value_tokens.json，共 494 個 token。
+        這份健檢的目的不是評分，而是找出 <strong>AI 腦補最嚴重的缺口在哪裡</strong>。
+      </p>
+
+      <p class="block-sub">做得好的地方</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>說明</th>
+              <th>AI 可讀性</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">三層架構完整</td>
+              <td>Primitive → Semantic → Component，AI 可以沿層追蹤語意</td>
+              <td><span class="tag-good">優</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">Light / Dark 完全對稱</td>
+              <td>131 個 semantic token 兩模式完全對應，無缺漏</td>
+              <td><span class="tag-good">優</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">Radius 有情境描述</td>
+              <td>每個 radius token 都有 $description 說明適用元件</td>
+              <td><span class="tag-good">優</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">Component token 命名語意佳</td>
+              <td>button/surface/primary-default 結構清楚，AI 可直接對應 CSS 屬性</td>
+              <td><span class="tag-good">優</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="block-sub">需要優化的地方</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num" style="color:var(--red); font-size:11px; letter-spacing:0;">P0</span>
+          <div class="step-body">
+            <p class="step-title"><span class="problem-badge p0">嚴重</span> Typography token 幾乎缺失</p>
+            <p class="step-text">Mode_1 只有 font-size 數值（10–48px），缺少 font-weight、line-height。Semantic 層沒有任何 type token（heading/lg、body/md 等）。<strong>影響：AI 在建置頁面時字型規格完全靠猜，這是腦補最嚴重的來源。</strong></p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num" style="color:var(--red); font-size:11px; letter-spacing:0;">P0</span>
+          <div class="step-body">
+            <p class="step-title"><span class="problem-badge p0">嚴重</span> Spacing token 完全缺失</p>
+            <p class="step-text">整個系統沒有任何 spacing / padding / gap token。<strong>影響：AI 建置元件時無法知道標準間距，畫面「密度感」與品牌不符。</strong></p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num" style="color:var(--blue); font-size:11px; letter-spacing:0;">P1</span>
+          <div class="step-body">
+            <p class="step-title"><span class="problem-badge p1">重要</span> Component token 覆蓋率只有 6 個元件</p>
+            <p class="step-text">現有：button / tag / tab-chips / pagination / toast / searchbox。缺少：input field、card、modal、navigation、form 等常用元件。<strong>影響：AI 遇到這些元件只能回退到 semantic token，容易腦補視覺細節。</strong></p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num" style="color:var(--muted); font-size:11px; letter-spacing:0;">P2</span>
+          <div class="step-body">
+            <p class="step-title"><span class="problem-badge p2">次要</span> Semantic token 命名夾雜特殊符號</p>
+            <p class="step-text"><code>text--icon</code>（雙 dash）、<code>divider--border</code> 在 CSS variable 轉換時需特殊處理。<strong>影響：AI 直接生成 CSS 時容易產生無效的 var(--text--icon) 變數名。</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-sub">各類型 Token 的 AI 可讀性評估</p>
+
+      <div class="health-grid">
+        <div class="health-card">
+          <p class="health-label">顏色 Token</p>
+          <p class="health-pct">90%</p>
+          <div class="health-bar-wrap"><div class="health-bar high" style="width:90%"></div></div>
+          <p class="health-note">三層架構完整，Light/Dark 對稱，AI 可精準引用</p>
+        </div>
+        <div class="health-card">
+          <p class="health-label">圓角 Token</p>
+          <p class="health-pct">92%</p>
+          <div class="health-bar-wrap"><div class="health-bar high" style="width:92%"></div></div>
+          <p class="health-note">有 $description 說明適用情境，AI 可對應元件</p>
+        </div>
+        <div class="health-card">
+          <p class="health-label">字型 Token</p>
+          <p class="health-pct">20%</p>
+          <div class="health-bar-wrap"><div class="health-bar low" style="width:20%"></div></div>
+          <p class="health-note">缺少 weight、line-height，semantic 層完全缺失</p>
+        </div>
+        <div class="health-card">
+          <p class="health-label">間距 Token</p>
+          <p class="health-pct">5%</p>
+          <div class="health-bar-wrap"><div class="health-bar low" style="width:5%"></div></div>
+          <p class="health-note">系統內完全沒有 spacing token，AI 只能全靠猜</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 03 — Token 優化清單 -->
+    <section class="block" id="token-todo">
+      <div class="block-header">
+        <span class="block-num">03</span>
+        <h2 class="block-title">Design Token 優化待辦清單</h2>
+      </div>
+
+      <p class="block-text">
+        優化順序以「對 AI 腦補的影響程度」為依據，不是以「設計完整性」為依據。
+        P0 的兩項直接決定了 AI 能否產出可用的字型和間距規格；P1 決定高頻元件的精準度；P2 是長期系統品質。
+      </p>
+
+      <p class="block-sub">P0：立即執行（影響最大）</p>
+
+      <div class="checklist-block">
+        <div class="checklist-header red">Typography — 補充 Primitive</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>在 Mode_1_tokens.json 的 type 群組加入 font-weight</span>
+            <span class="sub-text">regular → 400 ／ medium → 500 ／ bold → 700</span>
+          </div>
+          <div class="must-badge">立即</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>加入 line-height primitive</span>
+            <span class="sub-text">tight → 1.2（標題）／ normal → 1.5（body）／ loose → 1.75（中文 body 建議 1.6–1.7）</span>
+          </div>
+          <div class="must-badge">立即</div>
+        </div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header red">Typography — 建立 Semantic Token</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>新增 type_tokens.json，建立 Heading 語意 token</span>
+            <span class="sub-text">xl / lg / md / sm，各含 size + weight + line-height，加上 $description 和 mobile-fontSize 備註</span>
+          </div>
+          <div class="must-badge">立即</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>建立 Body / Label / Caption 語意 token</span>
+            <span class="sub-text">Body lg/md/md-strong/sm ／ Label md/sm（互動元素）／ Caption md/sm（說明文字）</span>
+          </div>
+          <div class="must-badge">立即</div>
+        </div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header red">Spacing — 建立完整系統</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>在 value_tokens.json 加入 spacing primitive（與 radius 同層）</span>
+            <span class="sub-text">基礎單位 4px，scale：4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48</span>
+          </div>
+          <div class="must-badge">立即</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>建立 Spacing Semantic Token</span>
+            <span class="sub-text">spacing/component/xs~lg（元件內距 4/8/12/16px）／ spacing/layout/xs~xl（版面間距 8/16/24/32/48px）</span>
+          </div>
+          <div class="must-badge">立即</div>
+        </div>
+      </div>
+
+      <p class="block-sub">P1：近期執行（高頻元件）</p>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">Input Field Component Token</div>
+        <div class="checklist-item"><div class="check-box"></div><span>input/surface/default・focus・error</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>input/border/default・focus・error・disable</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>input/text/default・placeholder・disable</span></div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">Card Component Token</div>
+        <div class="checklist-item"><div class="check-box"></div><span>card/surface/default・elevated</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>card/border/default ／ card/radius（參考 radius/md）</span></div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">Navigation Component Token</div>
+        <div class="checklist-item"><div class="check-box"></div><span>nav/surface/default</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>nav/text/active・inactive ／ nav/indicator/active</span></div>
+      </div>
+
+      <p class="block-sub">P2：中期執行（完整性補齊）</p>
+
+      <div class="checklist-block">
+        <div class="checklist-header neutral">長期完善項目</div>
+        <div class="checklist-item"><div class="check-box"></div><span>補充 Modal / Bottom Sheet Component Token</span></div>
+        <div class="checklist-item"><div class="check-box"></div><span>補充 Form Component Token（checkbox、radio、switch）</span></div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>評估 text--icon 雙 dash 命名是否需要修正</span>
+            <span class="sub-text">若修正需同步更新所有引用，建議與工程師確認 CSS variable 轉換規則後再決定</span>
+          </div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <div>
+            <span>中文字型注意事項確認</span>
+            <span class="sub-text">font-weight: 700 是否為真實 weight（非系統合成粗體）／ 中文 line-height：body 建議 1.6–1.7，heading 建議 1.3–1.4 ／ 不需要 letter-spacing token（中文等寬字元）</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 04 — AI 執行文件 -->
+    <section class="block" id="ai-docs">
+      <div class="block-header">
+        <span class="block-num">04</span>
+        <h2 class="block-title">AI 可讀文件製作：三份執行文件</h2>
+      </div>
+
+      <p class="block-text">
+        設計系統完善後，需要製作三份「AI 執行文件」供 prompt 使用。
+        這三份文件的核心邏輯是：把設計系統的視覺語言轉化成 AI 可以精準執行的指令語言。
+      </p>
+
+      <p class="block-sub">文件 A：Token 約束清單（最重要）</p>
+      <p class="block-text">
+        純文字格式，每次 prompt 前段貼入。包含強制使用清單（所有可用 token 名稱與數值）和禁止清單（不得自創的顏色、樣式、行為）。這份文件的存在，讓 AI 的工作從「視覺決策」縮減到「Token 選擇」。
+      </p>
+
+      <p class="block-sub">文件 B：元件對應速查表</p>
+      <p class="block-text">
+        說明每種 UI 需求要用哪個元件，以及該元件的關鍵規格。
+      </p>
+
+      <div class="code-block">
+<span class="code-comment">當頁面需要「主要操作按鈕」→ 使用 Button/Primary</span>
+  └ 高度: 44px, 圓角: radius/2xl, 色: surface/element/action/brand
+
+<span class="code-comment">當頁面需要「內容卡片」→ 使用 Card/Default</span>
+  └ 邊框: divider--border/basic/default, 圓角: radius/md, 無陰影
+
+<span class="code-comment">當頁面需要「文字輸入欄」→ 使用 Input/Default</span>
+  └ 高度: 48px, 圓角: radius/sm, border: input/border/default
+      </div>
+
+      <p class="block-sub">文件 C：品牌反模式說明</p>
+      <p class="block-text">
+        列出 AI 禁止參考的視覺風格，搭配正面描述。「不是什麼」的清單有時比「是什麼」更有效——它直接堵住 AI 最常走的偏離路徑。
+      </p>
+
+      <div class="code-block">
+<span class="code-bad">品牌反模式（AI 禁止參考）：</span>
+✗ 不是 Material Design 風格
+✗ 不是 Fluent UI 風格
+✗ 不使用漸層作為主視覺（品牌色是純色系）
+✗ icon 不使用 filled 風格，只用 outline
+✗ 不使用投影作為卡片區隔，用 border 替代
+✗ 圓角最大值為 radius/xl（24px），不超過此值
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">一次性建立步驟</p>
+        <p>安裝 <strong>Variables to JSON</strong> 或 <strong>Token Studio</strong> plugin → 匯出 JSON 檔案（設計系統更新時重新匯出）→ 基於 JSON 製作三份 AI 執行文件。之後只需在設計系統更新時同步匯出，不需要每次手動維護。</p>
+      </div>
+    </section>
+
+    <!-- Block 05 — Prompt 範本 -->
+    <section class="block" id="prompt-templates" style="border-bottom: none;">
+      <div class="block-header">
+        <span class="block-num">05</span>
+        <h2 class="block-title">Prompt 撰寫範本與 Claude Code 設定</h2>
+      </div>
+
+      <p class="block-text">
+        以下是可以直接複製使用的 Prompt 結構，以及 Claude Code 專案的設定方式。
+        這些範本的核心邏輯：<strong>把 AI 的工作定義得愈窄，結果的精準度愈高。</strong>
+      </p>
+
+      <p class="block-sub">標準新頁面 Prompt 結構</p>
+
+      <div class="code-block">
+<span class="code-comment">── 系統規範（強制執行，不得偏離）────────────</span>
+（貼上 Token 約束清單 / ai_design_spec.md 完整內容）
+
+<span class="code-comment">── 元件清單 ──────────────────────────────────</span>
+本頁面使用以下現有元件（不需重新設計樣式）：
+- [元件名稱 1]
+- [元件名稱 2]
+
+<span class="code-comment">── 任務 ───────────────────────────────────────</span>
+請根據以上規範，建置 [頁面名稱]，包含：
+- [功能區塊 1]
+- [功能區塊 2]
+
+佈局：[描述排版方向與欄位數]
+平台：[Mobile / Desktop / 兩者]
+
+<span class="code-comment">── 稽核要求 ───────────────────────────────────</span>
+產出後請附上稽核表：
+1. 使用了哪些顏色 token
+2. 使用了哪些間距 token
+3. 有無任何不在清單內的視覺決策
+4. 標記為 [NEEDS DESIGN] 的項目
+      </div>
+
+      <p class="block-sub">Claude Code 專案設定</p>
+      <p class="block-text">
+        在專案根目錄建立 <code>CLAUDE.md</code>，讓 Claude Code 每次執行前自動讀取設計系統規則：
+      </p>
+
+      <div class="code-block">
+<span class="code-comment">## Design System Rules</span>
+- Always read `design-system-rules.md` before generating any UI component or page
+- Never deviate from token values defined in that file
+- When uncertain about a visual decision, output [NEEDS DESIGN: reason] instead of guessing
+- Component assembly takes priority over visual creation
+      </div>
+
+      <p class="block-text">
+        在同目錄建立 <code>design-system-rules.md</code>，放入 Token 約束清單（文件 A）、元件對應速查表（文件 B）、品牌反模式說明（文件 C）的完整內容。
+        <strong>這樣設定後，不需要每次對話手動貼入約束，Claude Code 會自動讀取。</strong>
+      </p>
+
+      <div class="block-quote">
+        <p>「給 AI 的資訊不是愈多愈好，而是愈精確愈好。一份清晰的禁止清單，比十頁品牌故事更有效。」</p>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">維護節奏建議</p>
+        <p>本知識庫應隨 design token 更新同步維護。<strong>建議每季檢視 AI 協作原則是否需要根據工具更新調整</strong>——AI 工具每季都在演進，今天有效的約束方法，半年後可能需要調整。</p>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag blue">Claude Code CLAUDE.md</span>
+        <span class="block-tag blue">Token 約束清單</span>
+        <span class="block-tag">品牌反模式</span>
+        <span class="block-tag">自我稽核表</span>
+        <span class="block-tag red">Typography P0</span>
+        <span class="block-tag red">Spacing P0</span>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="2026-04-21-ios-android-native-design-tools.html" class="article-nav-prev">
+      <span class="article-nav-dir">← Previous</span>
+      <span class="article-nav-title">Native Design Tools</span>
+      <span class="article-nav-sub">iOS · Android · 設計工具指南</span>
+    </a>
+    <a href="index.html" class="article-nav-next">
+      <span class="article-nav-dir">Back to Home →</span>
+      <span class="article-nav-title">Alice Cheng</span>
+      <span class="article-nav-sub">Product Designer Portfolio</span>
+    </a>
+  </div>
+</nav>
+
+<site-footer></site-footer>
+
+<script>
+  const heroThemes = [
+    'rgb(207,213,218)',
+    'rgb(243,220,221)',
+    'rgb(245,237,207)',
+    'rgb(227,216,228)',
+    'rgb(220,232,221)',
+    'rgb(216,208,206)',
+    'rgb(248,234,235)',
+    'rgb(235,185,181)',
+    'rgb(245,236,185)',
+  ];
+
+  const _stored = localStorage.getItem('heroTheme');
+  localStorage.removeItem('heroTheme');
+  let currentTheme = (_stored !== null && !isNaN(+_stored))
+    ? Math.abs(+_stored) % heroThemes.length
+    : Math.floor(Math.random() * heroThemes.length);
+
+  function applyHeroTheme(bg) {
+    document.documentElement.style.setProperty('--hero-bg', bg);
+  }
+
+  applyHeroTheme(heroThemes[currentTheme]);
+
+  setInterval(() => {
+    currentTheme = (currentTheme + 1) % heroThemes.length;
+    applyHeroTheme(heroThemes[currentTheme]);
+  }, 5000);
+
+  const sections = document.querySelectorAll('.block[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocItems.forEach(item => item.classList.remove('active'));
+        const active = document.querySelector(`.toc-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
