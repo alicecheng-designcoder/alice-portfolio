@@ -289,6 +289,8 @@
       transition: box-shadow 0.2s, transform 0.2s; cursor: pointer;
     }
     .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); transform: translateY(-2px); }
+    div.card { opacity: 0.42; cursor: default; }
+    div.card:hover { box-shadow: none; transform: none; }
 
     .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
     .card-title-group { display: flex; flex-direction: column; gap: 2px; }
@@ -302,6 +304,19 @@
       flex-shrink: 0;
     }
     .card-image img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+
+    /* Card cover: background colour + 2-line centered typography */
+    .card-cover {
+      flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+    }
+    .card-cover-title {
+      font-family: var(--font-d); font-style: italic; font-size: 30px; font-weight: 700;
+      color: rgba(26,26,26,0.72); line-height: 1.15; text-align: center;
+    }
+    .card-cover-sub {
+      font-size: 10px; font-weight: 400; letter-spacing: 2.2px;
+      text-transform: uppercase; color: rgba(26,26,26,0.48); text-align: center;
+    }
 
     .card-footer { display: flex; flex-direction: column; gap: 3px; flex: 1; }
     .card-name-zh { font-family: var(--font-d); font-size: 18px; font-weight: 700; color: var(--dark); }
@@ -616,64 +631,67 @@
           <p class="card-date">2026/04/21</p>
         </div>
       </a>
-      <div class="card">
+      <a href="2026-05-20-figma-brief-basics.html" class="card" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;" onclick="localStorage.setItem('heroTheme','2')">
         <div class="card-header">
           <div class="card-title-group">
             <p class="card-theme">祝福 · Blessing</p>
-            <p class="card-project">coming soon</p>
+            <p class="card-project">AI 設計協作指南 · Part 1</p>
           </div>
           <span class="card-num">003</span>
         </div>
-        <div class="card-image" style="background:rgba(240,230,140,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/4bac848d-ef13-488e-bae6-468a5e7a6f0c" alt="鬱金香" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(240,230,140,0.35)">
+          <p class="card-cover-title">AI × Figma</p>
+          <span class="card-cover-sub">Brief Basics</span>
         </div>
         <div class="card-footer">
-          <p class="card-name-zh">鬱金香</p>
-          <p class="card-name-en">Tulip</p>
+          <p class="card-name-zh">Brief 寫作基礎</p>
+          <p class="card-name-en">Brief Basics</p>
           <div class="card-divider"></div>
-          <p class="card-date">2025/10/30</p>
+          <p class="card-date">2026/05/20</p>
         </div>
-      </div>
+      </a>
     </div>
 
     <!-- Row 2 -->
     <div class="card-row">
-      <div class="card">
+      <a href="2026-05-20-figma-journey-brief.html" class="card" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;" onclick="localStorage.setItem('heroTheme','3')">
         <div class="card-header">
           <div class="card-title-group">
             <p class="card-theme">珍惜 · Cherish</p>
-            <p class="card-project">coming soon</p>
+            <p class="card-project">AI 設計協作指南 · Part 2</p>
           </div>
           <span class="card-num">004</span>
         </div>
-        <div class="card-image" style="background:rgba(200,162,200,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/d256a515-4740-48c5-b61f-7ee13f8db3ae" alt="相思樹" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(200,162,200,0.35)">
+          <p class="card-cover-title">AI × Figma</p>
+          <span class="card-cover-sub">Journey Brief</span>
         </div>
         <div class="card-footer">
-          <p class="card-name-zh">相思樹</p>
-          <p class="card-name-en">Mimosoideae</p>
+          <p class="card-name-zh">旅程 Brief</p>
+          <p class="card-name-en">Journey Brief</p>
           <div class="card-divider"></div>
-          <p class="card-date">2025/10/30</p>
+          <p class="card-date">2026/05/20</p>
         </div>
-      </div>
-      <div class="card">
+      </a>
+      <a href="2026-05-20-figma-quality-check.html" class="card" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;" onclick="localStorage.setItem('heroTheme','4')">
         <div class="card-header">
           <div class="card-title-group">
             <p class="card-theme">感謝 · Gratitude</p>
-            <p class="card-project">coming soon</p>
+            <p class="card-project">AI 設計協作指南 · Part 3</p>
           </div>
           <span class="card-num">005</span>
         </div>
-        <div class="card-image" style="background:rgba(177,217,181,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/6240105b-af4d-48a0-a040-fba200af53cd" alt="風鈴花" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(177,217,181,0.35)">
+          <p class="card-cover-title">AI × Figma</p>
+          <span class="card-cover-sub">Quality Check</span>
         </div>
         <div class="card-footer">
-          <p class="card-name-zh">風鈴花</p>
-          <p class="card-name-en">Campanula</p>
+          <p class="card-name-zh">建置品質確認</p>
+          <p class="card-name-en">Quality Check</p>
           <div class="card-divider"></div>
-          <p class="card-date">2025/10/30</p>
+          <p class="card-date">2026/05/20</p>
         </div>
-      </div>
+      </a>
       <div class="card">
         <div class="card-header">
           <div class="card-title-group">
@@ -682,8 +700,9 @@
           </div>
           <span class="card-num">006</span>
         </div>
-        <div class="card-image" style="background:rgba(161,134,125,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/ed1f489f-a2fc-4df5-b3be-88aa2aaa67b7" alt="風尾花" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(161,134,125,0.35)">
+          <p class="card-cover-title">風尾花</p>
+          <span class="card-cover-sub">Eremurus</span>
         </div>
         <div class="card-footer">
           <p class="card-name-zh">風尾花</p>
@@ -704,8 +723,9 @@
           </div>
           <span class="card-num">007</span>
         </div>
-        <div class="card-image" style="background:rgba(254,223,225,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/d17e9a81-ff36-4505-906c-53c14708a131" alt="櫻花" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(254,223,225,0.35)">
+          <p class="card-cover-title">櫻花</p>
+          <span class="card-cover-sub">Cherry Blossom</span>
         </div>
         <div class="card-footer">
           <p class="card-name-zh">櫻花</p>
@@ -722,8 +742,9 @@
           </div>
           <span class="card-num">008</span>
         </div>
-        <div class="card-image" style="background:rgba(215,84,85,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/7cb7a53e-0380-4974-a96d-5070b0e53020" alt="山茶花" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(215,84,85,0.35)">
+          <p class="card-cover-title">山茶花</p>
+          <span class="card-cover-sub">Camellia</span>
         </div>
         <div class="card-footer">
           <p class="card-name-zh">山茶花</p>
@@ -740,8 +761,9 @@
           </div>
           <span class="card-num">009</span>
         </div>
-        <div class="card-image" style="background:rgba(245,222,29,0.35)">
-          <img src="https://www.figma.com/api/mcp/asset/e9969085-6d07-4678-a833-ee4218d2b71c" alt="帝王花" loading="lazy">
+        <div class="card-image card-cover" style="background:rgba(245,222,29,0.35)">
+          <p class="card-cover-title">帝王花</p>
+          <span class="card-cover-sub">King Protea</span>
         </div>
         <div class="card-footer">
           <p class="card-name-zh">帝王花</p>

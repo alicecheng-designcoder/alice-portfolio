@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>設計提案跨多個畫面時，旅程 Brief 這樣寫 — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="shared-components.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+      --toc-w:  240px;
+      --hero-bg: #f5f0e8;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    /* NAV */
+    .nav { position: sticky; top: 0; z-index: 200; height: 56px; width: 100%; background: rgba(245,240,232,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 1360px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 48px; }
+    .nav-logo { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); text-decoration: none; }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a { display: flex; align-items: center; padding: 0 22px; height: 56px; border-left: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--text); text-decoration: none; transition: background 0.15s; }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-back:hover { color: var(--dark); }
+
+    /* HERO */
+    .article-hero { background: var(--hero-bg, #f5f0e8); border-bottom: 1px solid var(--border); transition: background 1.2s ease; }
+    .article-hero-inner { max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: var(--toc-w) 1fr; min-height: 400px; }
+    .hero-left { border-right: 1px solid var(--border); padding: 48px 32px; display: flex; flex-direction: column; justify-content: space-between; }
+    .hero-badge { display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); width: fit-content; margin-bottom: 40px; }
+    .hero-date-badge { background: var(--dark); border: 1px solid var(--dark); padding: 12px 16px; font-family: var(--font-d); font-size: 20px; font-weight: 700; color: #fff; line-height: 24px; width: fit-content; }
+    .hero-meta-list { display: flex; flex-direction: column; gap: 16px; margin-top: auto; }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .hero-meta-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .hero-meta-value { font-size: 13px; font-weight: 400; color: var(--text); }
+    .hero-right { padding: 64px 48px 64px 64px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .hero-index { font-family: var(--font-d); font-size: clamp(88px, 12vw, 177px); font-weight: 700; color: rgba(26,26,26,0.06); line-height: 1; user-select: none; margin-bottom: -16px; }
+    .hero-title-en { font-family: var(--font-d); font-size: clamp(53px, 6vw, 97px); font-weight: 700; font-style: italic; color: var(--dark); line-height: 1; }
+    .hero-title-zh { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--muted); line-height: 1.3; margin-top: 12px; margin-bottom: 32px; }
+    .hero-tagline { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); max-width: 560px; }
+
+    /* LAYOUT */
+    .page-layout { max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: var(--toc-w) 1fr; align-items: start; }
+
+    /* TOC */
+    .toc { position: sticky; top: 56px; border-right: 1px solid var(--border); min-height: calc(100vh - 56px); padding: 48px 32px; display: flex; flex-direction: column; gap: 32px; }
+    .toc-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .toc-list { display: flex; flex-direction: column; gap: 0; }
+    .toc-item { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s; }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-item:hover .toc-item-title { color: var(--dark); }
+    .toc-num { font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
+    .toc-item-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+    .toc-item.active .toc-item-title { color: var(--dark); font-weight: 700; }
+    .toc-item.active .toc-num { color: var(--dark); }
+    .toc-info-card { margin-top: auto; padding: 20px; background: var(--card-bg); border: 1px solid var(--border); }
+    .toc-info-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .toc-info-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .toc-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .toc-info-key { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .toc-info-val { font-size: 13px; font-weight: 500; color: var(--dark); }
+
+    /* CONTENT BLOCKS */
+    .content-blocks { padding: 0 48px; }
+    .block { border-bottom: 1px solid var(--border); padding: 64px 0; }
+    .block:last-child { border-bottom: none; }
+    .block-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 32px; }
+    .block-num { font-size: 11px; font-weight: 500; letter-spacing: 2px; color: var(--muted); }
+    .block-title { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--dark); }
+    .block-sub { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: var(--dark); margin: 28px 0 10px; }
+    .block-text { font-size: 17px; font-weight: 300; line-height: 1.9; color: var(--text); margin-bottom: 20px; }
+    .block-text:last-child { margin-bottom: 0; }
+    .block-text strong { color: var(--dark); font-weight: 500; }
+
+    /* Quote */
+    .block-quote { padding: 32px; background: var(--dark); margin: 32px 0; }
+    .block-quote p { font-family: var(--font-d); font-size: clamp(18px, 1.8vw, 22px); font-style: italic; line-height: 1.55; color: #fff; }
+
+    /* Callout */
+    .callout-box { padding: 20px 24px; border-left: 3px solid; margin: 24px 0; }
+    .callout-box.blue { background: rgba(20,50,224,0.05); border-color: var(--blue); }
+    .callout-box.red  { background: rgba(192,48,48,0.05); border-color: var(--red); }
+    .callout-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout-box.blue .callout-label { color: var(--blue); }
+    .callout-box.red  .callout-label { color: var(--red); }
+    .callout-box p { font-size: 14px; font-weight: 400; line-height: 1.7; color: var(--text); }
+    .callout-box p strong { color: var(--dark); font-weight: 500; }
+
+    /* Tool grid */
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+    .tool-card { padding: 24px; background: var(--card-bg); border-top: 3px solid; }
+    .tool-card.blue   { border-top-color: var(--blue); }
+    .tool-card.dark   { border-top-color: var(--dark); }
+    .tool-card.red    { border-top-color: var(--red); }
+    .tool-card.muted  { border-top-color: var(--muted); }
+    .tool-card.full   { grid-column: 1 / -1; }
+    .tool-name { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .tool-role { font-size: 11px; font-weight: 500; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+    .tool-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .tool-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Compare table */
+    .compare-wrap { overflow-x: auto; margin: 24px 0; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+    .compare-table th { padding: 10px 14px; background: var(--dark); color: #fff; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; font-family: var(--font-b); text-transform: uppercase; }
+    .compare-table th:not(:first-child) { border-left: 1px solid rgba(255,255,255,0.1); }
+    .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .compare-table td:not(:first-child) { border-left: 1px solid var(--border); }
+    .compare-table .row-label { font-weight: 500; color: var(--dark); }
+
+    /* Principle cards */
+    .principle-set { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin: 24px 0; }
+    .principle-card { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+    .principle-card:last-child { border-bottom: none; }
+    .principle-num { font-family: var(--font-d); font-size: 24px; font-weight: 700; color: var(--border); line-height: 1.2; padding-top: 2px; }
+    .principle-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+    .principle-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .principle-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Process steps */
+    .process-steps { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+    .process-step { display: grid; grid-template-columns: 48px 1fr; border: 1px solid var(--border); border-bottom: none; }
+    .process-step:last-child { border-bottom: 1px solid var(--border); }
+    .step-num { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); font-family: var(--font-d); font-size: 14px; font-weight: 700; color: var(--muted); }
+    .step-body { padding: 20px 24px; }
+    .step-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .step-text { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+
+    /* Flow diagram */
+    .flow-diagram { padding: 24px; background: var(--card-bg); border: 1px solid var(--border); margin: 24px 0; }
+    .flow-caption { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0; row-gap: 8px; }
+    .flow-node { padding: 8px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .flow-node.blue    { background: rgba(20,50,224,0.08); color: var(--blue); }
+    .flow-node.dark    { background: var(--dark); color: #fff; }
+    .flow-node.neutral { background: rgba(26,26,26,0.06); color: var(--text); }
+    .flow-arrow { padding: 0 6px; color: var(--muted); font-size: 12px; }
+
+    /* Code block (monospace) */
+    .code-block { background: var(--dark); margin: 24px 0; overflow-x: auto; }
+    .code-bar { background: rgba(255,255,255,0.06); padding: 8px 16px; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+    .code-body { padding: 20px 24px; font-family: monospace; font-size: 13px; line-height: 1.85; color: rgba(255,255,255,0.85); white-space: pre-wrap; word-break: break-word; }
+    .code-key   { color: #c4b8ff; font-weight: 600; }
+    .code-val   { color: #a5f3c4; }
+    .code-mute  { color: rgba(255,255,255,0.3); font-style: italic; }
+    .code-head  { color: rgba(255,255,255,0.95); font-weight: 600; }
+    .code-ok    { color: #a5f3c4; }
+    .code-warn  { color: #fbbf24; }
+
+    /* Block image / screenshot */
+    .block-image { margin: 32px 0; border: 1px solid var(--border); }
+    .block-image img { width: 100%; height: auto; display: block; }
+    .block-image figcaption { padding: 12px 16px; font-size: 12px; letter-spacing: 0.3px; color: var(--muted); border-top: 1px solid var(--border); }
+    .img-placeholder { display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; background: rgba(26,26,26,0.02); padding: 56px 32px; text-align: center; }
+    .img-placeholder p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .img-placeholder code { background: rgba(26,26,26,0.06); padding: 1px 5px; font-family: monospace; font-size: 11px; }
+
+    /* Screen inventory grid */
+    .screen-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+    .screen-card { background: var(--card-bg); padding: 20px; }
+    .screen-num { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .screen-name { font-family: var(--font-d); font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .screen-role { font-size: 12px; font-weight: 300; line-height: 1.6; color: var(--text); }
+    .screen-card.has-screenshot { padding: 0; overflow: hidden; }
+    .screen-card.has-screenshot .screen-inner { padding: 20px; }
+
+    /* Tags */
+    .block-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .block-tag { display: inline-flex; align-items: center; padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 0.88px; color: var(--dark); background: var(--card-bg); }
+    .block-tag.blue { background: rgba(20,50,224,0.07); border-color: rgba(20,50,224,0.2); color: var(--blue); }
+
+    /* Article nav */
+    .article-nav { border-top: 1px solid var(--border); }
+    .article-nav-inner { max-width: 1360px; margin: 0 auto; display: flex; }
+    .article-nav-prev, .article-nav-next { flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: background 0.15s; }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover { background: rgba(26,26,26,0.03); }
+    .article-nav-dir { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .article-nav-title { font-family: var(--font-d); font-size: 20px; font-weight: 700; color: var(--dark); }
+    .article-nav-sub { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+    /* Contact + Footer */
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    /* RWD */
+    @media (max-width: 1024px) {
+      :root { --toc-w: 200px; }
+      .content-blocks { padding: 0 32px; }
+      .hero-right { padding: 48px 32px; }
+      .screen-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-hero-inner { grid-template-columns: 1fr; }
+      .hero-left { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 20px; }
+      .hero-index { display: none; }
+      .hero-right { padding: 40px 20px; }
+      .page-layout { grid-template-columns: minmax(0,1fr); }
+      .toc { display: none; }
+      .content-blocks { padding: 0 20px; min-width: 0; max-width: 100%; }
+      .block { padding: 40px 0; min-width: 0; max-width: 100%; }
+      .tool-grid { grid-template-columns: 1fr; gap: 0; }
+      .principle-card { grid-template-columns: 40px 1fr; }
+      .screen-grid { grid-template-columns: repeat(2, 1fr); }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .article-nav-next { padding: 24px 20px; }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<site-nav></site-nav>
+
+<header class="article-hero" id="articleHero">
+  <div class="article-hero-inner">
+    <div class="hero-left">
+      <div>
+        <div class="hero-badge">GUIDE &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; FIGMA × CLAUDE CODE</div>
+        <div class="hero-date-badge"><p>20</p><p>26</p></div>
+      </div>
+      <div class="hero-meta-list">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Date</span>
+          <span class="hero-meta-value">2026 / 05 / 20</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Type</span>
+          <span class="hero-meta-value">AI 設計協作指南</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Series</span>
+          <span class="hero-meta-value">Part 2 of 3</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Tools</span>
+          <span class="hero-meta-value">Claude Code · Figma MCP · Journey Brief</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <p class="hero-index">2026</p>
+      <h1 class="hero-title-en">Journey Brief</h1>
+      <p class="hero-title-zh">設計提案跨多個畫面時，旅程 Brief 這樣寫</p>
+      <p class="hero-tagline">
+        單一畫面的 Brief 行不通了——當你的提案橫跨首頁、商品頁、購物車到訂單確認，
+        AI 需要理解的不只是「這個畫面長什麼樣」，而是「使用者從哪來、往哪去、每個畫面承擔什麼責任」。
+      </p>
+    </div>
+  </div>
+</header>
+
+<div class="page-layout">
+
+  <aside class="toc">
+    <p class="toc-label">Contents</p>
+    <nav class="toc-list">
+      <a href="#preface" class="toc-item active">
+        <span class="toc-num">00</span>
+        <span class="toc-item-title">前言</span>
+      </a>
+      <a href="#difference" class="toc-item">
+        <span class="toc-num">01</span>
+        <span class="toc-item-title">旅程 Brief 多了什麼</span>
+      </a>
+      <a href="#inventory" class="toc-item">
+        <span class="toc-num">02</span>
+        <span class="toc-item-title">畫面清單結構</span>
+      </a>
+      <a href="#flow" class="toc-item">
+        <span class="toc-num">03</span>
+        <span class="toc-item-title">流程邏輯原則</span>
+      </a>
+      <a href="#principles" class="toc-item">
+        <span class="toc-num">04</span>
+        <span class="toc-item-title">五條旅程設計原則</span>
+      </a>
+      <a href="#template" class="toc-item">
+        <span class="toc-num">05</span>
+        <span class="toc-item-title">旅程 Brief 模板</span>
+      </a>
+      <a href="#example" class="toc-item">
+        <span class="toc-num">06</span>
+        <span class="toc-item-title">完整填寫範例</span>
+      </a>
+    </nav>
+    <div class="toc-info-card">
+      <p class="toc-info-label">About</p>
+      <div class="toc-info-row">
+        <span class="toc-info-key">閱讀時間</span>
+        <span class="toc-info-val">約 14 分鐘</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">適合對象</span>
+        <span class="toc-info-val">產品設計師</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">系列</span>
+        <span class="toc-info-val">Part 2 / 3</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content-blocks">
+
+    <!-- 00 前言 -->
+    <section class="block" id="preface">
+      <div class="block-header">
+        <span class="block-num">前言</span>
+        <h2 class="block-title">當提案跨越多個畫面，Brief 的結構必須升級</h2>
+      </div>
+
+      <p class="block-text">
+        你已經學會用 Part 1 的單一畫面 Brief 告訴 AI「這個購物車頁面長什麼樣」。
+        現在你的提案變複雜了：你想展示的不是一個畫面，而是一段完整的購買旅程——
+        從首頁看到促銷，點進商品頁確認規格，加入購物車後結帳，最後抵達訂單確認頁。
+      </p>
+
+      <div class="block-quote">
+        <p>「旅程 Brief 的核心問題不是『每個畫面長什麼樣』，而是『使用者從哪來、現在有什麼動機、這個畫面的任務是讓他往哪去』。」</p>
+      </div>
+
+      <p class="block-text">
+        四個畫面分別送出四份單一畫面 Brief，AI 會建置出四個互不相關的畫面。
+        它不知道首頁的 Banner 文案要與購物車的商品呼應，不知道商品頁的「加入購物車」CTA
+        決定了購物車頁的進入動機，更不知道訂單確認頁應該強化剛才整段旅程的購買決策。
+        <strong>跨畫面的敘事連貫性，必須在 Brief 裡明確建立。</strong>
+      </p>
+
+      <div class="block-tags">
+        <span class="block-tag blue">Journey Brief</span>
+        <span class="block-tag blue">Screen Inventory</span>
+        <span class="block-tag">Flow Logic</span>
+        <span class="block-tag">多畫面設計提案</span>
+      </div>
+    </section>
+
+    <!-- 01 旅程 Brief 多了什麼 -->
+    <section class="block" id="difference">
+      <div class="block-header">
+        <span class="block-num">01</span>
+        <h2 class="block-title">旅程 Brief 比單一畫面 Brief 多了什麼</h2>
+      </div>
+
+      <p class="block-text">
+        單一畫面 Brief 的七個欄位（概念、假說、差異化、主要行動、Section 清單、內容細節、設計約束）
+        在旅程 Brief 裡全部保留。旅程 Brief 在此基礎上新增了三個層次，
+        專門處理多畫面提案特有的資訊需求。
+      </p>
+
+      <div class="tool-grid">
+        <div class="tool-card blue">
+          <p class="tool-name">旅程範疇（Journey Scope）</p>
+          <p class="tool-role">新增層次 · 第一個填</p>
+          <p class="tool-desc">這段旅程從哪個畫面開始、到哪個畫面結束。
+          <strong>明確邊界讓 AI 知道哪些畫面需要建置、哪些是上下文參考。</strong>
+          同時說明旅程的設計目標：整段旅程想讓使用者完成什麼任務。</p>
+        </div>
+        <div class="tool-card dark">
+          <p class="tool-name">畫面清單（Screen Inventory）</p>
+          <p class="tool-role">新增層次 · 第二個填</p>
+          <p class="tool-desc">依序列出所有畫面，每個畫面說明三件事：<strong>① 使用者從哪來（Entry）
+          ② 這個畫面的核心任務（Task）③ 使用者往哪去（Exit）。</strong>
+          這是旅程 Brief 最重要的欄位。</p>
+        </div>
+        <div class="tool-card muted full">
+          <p class="tool-name">流程邏輯（Flow Logic）</p>
+          <p class="tool-role">新增層次 · 第三個填</p>
+          <p class="tool-desc">說明畫面之間的過渡邏輯：哪些元素必須在畫面間保持一致
+          （商品名稱、圖片、價格），哪些畫面有條件分支（登入 vs. 訪客結帳），
+          以及哪個畫面是整段旅程的情感高點。
+          <strong>流程邏輯告訴 AI 連貫性的邊界在哪裡。</strong></p>
+        </div>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>欄位</th>
+              <th>單一畫面 Brief</th>
+              <th>旅程 Brief（新增）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">設計目標</td>
+              <td>這個畫面的主要行動</td>
+              <td>整段旅程的完成任務</td>
+            </tr>
+            <tr>
+              <td class="row-label">畫面說明</td>
+              <td>單一畫面的 Section 清單</td>
+              <td>每個畫面的 Entry / Task / Exit</td>
+            </tr>
+            <tr>
+              <td class="row-label">跨畫面一致性</td>
+              <td>不需要</td>
+              <td>必須列出哪些元素需保持一致</td>
+            </tr>
+            <tr>
+              <td class="row-label">條件分支</td>
+              <td>不需要</td>
+              <td>需說明有哪些路徑分歧</td>
+            </tr>
+            <tr>
+              <td class="row-label">情感節拍</td>
+              <td>不需要</td>
+              <td>哪個畫面是旅程的情感高點</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 02 畫面清單結構 -->
+    <section class="block" id="inventory">
+      <div class="block-header">
+        <span class="block-num">02</span>
+        <h2 class="block-title">畫面清單：每個畫面的三個必答問題</h2>
+      </div>
+
+      <p class="block-text">
+        畫面清單（Screen Inventory）是旅程 Brief 的核心結構。
+        每個畫面都必須回答三個問題，缺少任何一個，AI 就只能猜測這個畫面在旅程中的位置。
+      </p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="step-num">E</div>
+          <div class="step-body">
+            <p class="step-title">Entry — 使用者從哪來</p>
+            <p class="step-text">使用者是從哪個畫面或哪個行動進入這個畫面的？
+            這決定了使用者進入時的認知狀態和動機強度。
+            「從首頁 Banner 點擊進入」和「從搜尋結果點擊進入」是完全不同的進入情境，
+            應有不同的畫面設計重點。</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">T</div>
+          <div class="step-body">
+            <p class="step-title">Task — 這個畫面的核心任務</p>
+            <p class="step-text">這個畫面在整段旅程中承擔什麼責任？使用者需要在這裡完成什麼認知或行動，
+            才能繼續往下走？Task 不是「展示商品資訊」，而是「讓使用者從『好奇』變成『確認想買』」——
+            描述的是認知轉換，而不是功能清單。</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <div class="step-num">X</div>
+          <div class="step-body">
+            <p class="step-title">Exit — 使用者往哪去</p>
+            <p class="step-text">使用者完成這個畫面的任務後，前往哪個畫面？
+            Exit 決定了這個畫面的主要 CTA 是什麼、放在哪裡。
+            如果 Exit 有多個（如購物車頁可以繼續購物或直接結帳），
+            需要說明哪個是主要 Exit、哪個是次要 Exit。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">寫法提示</p>
+        <p>Entry / Task / Exit 的描述要具體到<strong>使用者的動機和認知狀態</strong>，
+        不是功能描述。「使用者看到今日特賣 Banner，帶著明確的特價意識點擊進入」
+        比「從首頁進入商品頁」給 AI 更有用的設計資訊。</p>
+      </div>
+
+      <p class="block-sub">旅程範圍示例：今日特賣 × 快速購買旅程</p>
+
+      <p class="block-text">
+        以下是一個四畫面旅程的 Screen Inventory 示意，展示 Entry / Task / Exit 的填寫方式。
+        這也是 Part 2 完整範例的旅程架構。
+      </p>
+
+      <div class="screen-grid">
+        <div class="screen-card">
+          <p class="screen-num">Screen 01</p>
+          <p class="screen-name">首頁</p>
+          <p class="screen-role">
+            <strong>Entry：</strong>App 開啟，使用者尚未有明確意圖<br>
+            <strong>Task：</strong>發現今日特賣，建立購買動機<br>
+            <strong>Exit →</strong> 點擊 Banner 進入 PDP
+          </p>
+        </div>
+        <div class="screen-card">
+          <p class="screen-num">Screen 02</p>
+          <p class="screen-name">商品頁 PDP</p>
+          <p class="screen-role">
+            <strong>Entry：</strong>帶著特賣意識，評估商品是否值得<br>
+            <strong>Task：</strong>確認規格、讀取價差，決定加入購物車<br>
+            <strong>Exit →</strong> 點擊「加入購物車」
+          </p>
+        </div>
+        <div class="screen-card">
+          <p class="screen-num">Screen 03</p>
+          <p class="screen-name">購物車</p>
+          <p class="screen-role">
+            <strong>Entry：</strong>加入成功，進入最後確認階段<br>
+            <strong>Task：</strong>確認商品 + 金額，降低結帳猶豫<br>
+            <strong>Exit →</strong> 點擊「前往結帳」
+          </p>
+        </div>
+        <div class="screen-card">
+          <p class="screen-num">Screen 04</p>
+          <p class="screen-name">訂單確認</p>
+          <p class="screen-role">
+            <strong>Entry：</strong>完成結帳，需要安心確認<br>
+            <strong>Task：</strong>強化購買決策，提供後續行動<br>
+            <strong>Exit →</strong> 繼續購物 / 查看訂單
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 03 流程邏輯原則 -->
+    <section class="block" id="flow">
+      <div class="block-header">
+        <span class="block-num">03</span>
+        <h2 class="block-title">流程邏輯：讓 AI 理解畫面之間的連貫規則</h2>
+      </div>
+
+      <p class="block-text">
+        Screen Inventory 告訴 AI 每個畫面「是什麼」。流程邏輯（Flow Logic）告訴 AI
+        畫面與畫面之間「怎麼連」——哪些資訊必須在多個畫面保持一致，
+        哪些地方有路徑分歧，以及整段旅程在哪個節點達到情感高點。
+      </p>
+
+      <div class="flow-diagram">
+        <p class="flow-caption">旅程結構 · 今日特賣 × 快速購買</p>
+        <div class="flow-row">
+          <div class="flow-node blue">首頁<br><small>發現</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">PDP<br><small>評估</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">購物車<br><small>確認</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node dark">訂單確認<br><small>完成 ✓</small></div>
+        </div>
+      </div>
+
+      <p class="block-sub">三類流程邏輯需要在 Brief 中說明</p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue)">L1</div>
+          <div>
+            <p class="principle-title">跨畫面一致性元素</p>
+            <p class="principle-desc">
+              哪些資訊在整段旅程中必須完全相同？通常包括商品名稱、主圖、特賣價與原價。
+              <strong>在 Brief 中明確列出這些元素，AI 才不會在不同畫面使用略有差異的版本，
+              讓使用者懷疑「是同一個商品嗎？」</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue)">L2</div>
+          <div>
+            <p class="principle-title">條件分支與替代路徑</p>
+            <p class="principle-desc">
+              旅程中有哪些畫面可能有不同路徑？例如購物車可以直接結帳，也可以繼續購物；
+              訂單確認可以返回首頁，也可以查看訂單細節。
+              <strong>說明哪條是主要路徑（Primary Path），哪條是次要路徑（Secondary Path），
+              Primary Path 的 CTA 視覺層次應高於 Secondary。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue)">L3</div>
+          <div>
+            <p class="principle-title">情感節拍（Emotional Beat）</p>
+            <p class="principle-desc">
+              哪個畫面是整段旅程的情感高點？在購買旅程中，訂單確認頁通常是最高情感強度的節點——
+              使用者剛做完一個消費決策，需要強化「這個決定是對的」的感受。
+              <strong>指定情感節拍，讓 AI 知道哪個畫面可以在視覺設計上增加慶祝感或儀式感，
+              而哪些畫面應該保持功能性的冷靜。</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 五條旅程設計原則 -->
+    <section class="block" id="principles">
+      <div class="block-header">
+        <span class="block-num">04</span>
+        <h2 class="block-title">五條旅程設計原則</h2>
+      </div>
+
+      <p class="block-text">
+        這五條原則是從多畫面 AI 協作提案過程中提煉的設計判斷原則，
+        每一條都對應旅程 Brief 中一種常見的資訊缺口。
+      </p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num">J1</div>
+          <div>
+            <p class="principle-title">每個畫面的「任務」用認知轉換描述，不用功能清單</p>
+            <p class="principle-desc">
+              「展示商品規格、評分和評論」是功能清單。
+              「讓使用者從『好奇』轉為『確認要買』，關鍵因素是規格確認和特賣價差的視覺強度」是認知轉換描述。
+              <strong>後者讓 AI 知道哪個元素的視覺強度應該最高，而不是均等呈現所有資訊。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">J2</div>
+          <div>
+            <p class="principle-title">一致性元素必須明確列出，不能依賴 AI 猜測</p>
+            <p class="principle-desc">
+              「商品名稱和圖片在各畫面保持一致」看起來是常識，但 AI 在四個畫面分開建置時，
+              很可能因為 Brief 語境不同而使用略有差異的版本。
+              <strong>在流程邏輯欄位明確列出一致性清單：商品名稱、主圖、特賣價 NT$X,XXX、原價 NT$X,XXX。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">J3</div>
+          <div>
+            <p class="principle-title">Primary Path 的 CTA 必須在視覺層次上勝出</p>
+            <p class="principle-desc">
+              每個畫面的 Primary Exit 對應最重要的 CTA，Secondary Exit 對應次要行動。
+              在 Brief 中說明「『前往結帳』是 Primary Path，全寬深色按鈕；
+              『繼續購物』是 Secondary Path，使用文字連結即可」。
+              <strong>明確的視覺層次指示比描述按鈕樣式更有效。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">J4</div>
+          <div>
+            <p class="principle-title">情感節拍畫面給 AI 更大的設計發揮空間</p>
+            <p class="principle-desc">
+              訂單確認頁是情感節拍，可以在設計約束的「探索」欄位給 AI 更大的空間：
+              「確認動畫風格（建議：輕量 checkmark 動畫）」「慶祝文案語氣」「品牌色強調方式」。
+              <strong>情感節拍是旅程中最適合 AI 嘗試設計創意的節點，因為功能責任相對簡單。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">J5</div>
+          <div>
+            <p class="principle-title">旅程 Brief 整體提交，不要分批發送</p>
+            <p class="principle-desc">
+              把旅程 Brief 整份一次交給 Claude Code，而不是「先建首頁，確認後再建商品頁」。
+              <strong>整份提交讓 AI 從一開始就理解整段旅程的連貫邏輯，
+              比分批提交更能產出跨畫面一致的設計系統。</strong>
+              分批建置的代價是每個畫面都需要補充前後文，費時且容易遺漏。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 旅程 Brief 模板 -->
+    <section class="block" id="template">
+      <div class="block-header">
+        <span class="block-num">05</span>
+        <h2 class="block-title">旅程 Brief 模板</h2>
+      </div>
+
+      <p class="block-text">
+        以下是完整的旅程 Brief 模板。前半段與單一畫面 Brief 相同（概念基本資訊、假說、差異化）；
+        後半段新增旅程範疇、畫面清單（Entry/Task/Exit 三欄）和流程邏輯三個層次。
+        每個畫面仍然保留自己的 Section 清單和內容細節。
+      </p>
+
+      <div class="code-block">
+        <div class="code-bar">Journey Brief Template</div>
+        <div class="code-body"><span class="code-head">### 設計概念基本資訊</span>
+概念名稱：[一句話描述這段旅程的設計概念]
+裝置：Mobile 375px / Tablet / Desktop
+旅程目標：[使用者完成這段旅程後達到的最終狀態]
+
+<span class="code-head">### 設計假說</span>
+[這段旅程的整體設計解決什麼問題 → 為什麼這個方向有效]
+
+<span class="code-head">### 差異化</span>
+[與現有旅程設計的不同之處，尤其是跨畫面的差異化重點]
+
+<span class="code-head">### 旅程範疇（Journey Scope）</span>
+起點畫面：[第一個畫面]
+終點畫面：[最後一個畫面]
+畫面數量：[N 個畫面]
+
+<span class="code-head">### 畫面清單（Screen Inventory）</span>
+<span class="code-mute">← 每個畫面填寫 Entry / Task / Exit + Section 清單</span>
+
+Screen 01：[畫面名稱]
+  Entry：[使用者從哪個畫面或動作進入，帶著什麼動機]
+  Task：[這個畫面的核心認知轉換任務]
+  Exit →：[主要 CTA 指向哪個畫面]
+  Sections：
+    1. [Section 名稱] — [功能說明]
+    2. ...
+  內容細節：[真實的商品名稱、文案、數字]
+
+Screen 02：[畫面名稱]
+  Entry：...
+  Task：...
+  Exit →：...
+  ...
+
+<span class="code-head">### 流程邏輯（Flow Logic）</span>
+<span class="code-ok">跨畫面一致性元素：</span>
+- [需在所有畫面保持完全相同的元素清單]
+
+<span class="code-ok">條件分支：</span>
+- [哪個畫面有多條路徑，Primary / Secondary 各是什麼]
+
+<span class="code-ok">情感節拍：</span>
+- Screen XX（[畫面名稱]）是旅程的情感高點，設計上可加強[方向]
+
+<span class="code-head">### 設計約束（整體旅程）</span>
+<span class="code-ok">固定（不可更改）：</span>
+- [跨旅程的品牌規範、必須遵守的規格]
+
+<span class="code-warn">探索（可嘗試多種做法）：</span>
+- [可以由 AI 發揮的設計空間，尤其是情感節拍畫面]</div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">與 Part 1 的關係</p>
+        <p>旅程 Brief 是單一畫面 Brief 的超集，不是替代品。
+        對於旅程中<strong>設計複雜度較高的關鍵畫面</strong>（如含有 AI 推薦功能的購物車頁），
+        可以在 Screen Inventory 的 Section 清單中補充 Part 1 的詳細 Brief 結構。
+        其餘標準畫面則用旅程 Brief 的精簡格式即可。</p>
+      </div>
+    </section>
+
+    <!-- 06 完整填寫範例 -->
+    <section class="block" id="example" style="border-bottom:none">
+      <div class="block-header">
+        <span class="block-num">06</span>
+        <h2 class="block-title">完整填寫範例：今日特賣 × 快速購買旅程</h2>
+      </div>
+
+      <p class="block-text">
+        以下是針對「今日特賣 × 快速購買旅程」的完整旅程 Brief，
+        涵蓋四個畫面：首頁 → 商品頁（PDP）→ 購物車 → 訂單確認。
+        商品為 Sony WH-1000XM5 藍牙降噪耳機，特賣價 NT$2,490（原價 NT$3,490）。
+      </p>
+
+      <div class="code-block">
+        <div class="code-bar">範例 Brief · 今日特賣 × 快速購買旅程</div>
+        <div class="code-body"><span class="code-head">### 設計概念基本資訊</span>
+概念名稱：今日特賣 × 快速購買旅程
+裝置：Mobile 375px
+旅程目標：使用者從首頁發現特賣商品，到完成結帳並看到訂單確認，全程不超過 4 個畫面
+
+<span class="code-head">### 設計假說</span>
+今日特賣的時間壓力是購買驅動力，但傳統購買旅程的摩擦點太多，
+使用者在「有意願購買」和「實際完成結帳」之間流失。
+透過在每個畫面強化特賣倒數 + 價差視覺，並壓縮每個畫面的決策步驟，
+讓使用者在單一動機的驅動下快速完成購買。
+
+<span class="code-head">### 差異化</span>
+價差對比（NT$3,490 → NT$2,490）在旅程前三個畫面持續出現，而非只在 PDP 顯示，
+強化「現在買才合算」的時間價值感。訂單確認頁強調「已省下 NT$1,000」而非只顯示訂單編號。
+
+<span class="code-head">### 旅程範疇</span>
+起點：首頁（Today's Deal Banner 曝光）
+終點：訂單確認頁（購買完成確認）
+畫面數量：4 個畫面
+
+<span class="code-head">### 畫面清單</span>
+
+Screen 01：首頁
+  Entry：App 開啟，使用者尚未有明確購物意圖
+  Task：Today's Deal Banner 建立「特賣 + 限時」的購買動機
+  Exit → 點擊 Banner 進入 Sony WH-1000XM5 的 PDP
+  Sections：
+    1. 全寬 Today's Deal Banner — 商品主圖 + 特賣價 NT$2,490 + 倒數計時（今日結束）
+    2. 標準分類列 — 維持 App UH 標準，不修改
+  內容細節：
+    Banner 商品：Sony WH-1000XM5 藍牙降噪耳機，黑色
+    特賣價：NT$2,490  原價：NT$3,490  倒數：今日 23:59 結束
+
+Screen 02：商品頁 PDP
+  Entry：帶著「今日特賣」意識，評估是否值得購買
+  Task：確認規格 + 強化價差，讓使用者從「考慮中」轉為「確定要買」
+  Exit → 點擊「加入購物車」進入購物車頁
+  Sections：
+    1. 商品圖區 — 大圖輪播，黑色主圖優先
+    2. 商品資訊 — 名稱 + 規格 + 特賣價（醒目）+ 原價（刪除線）+ 省下金額
+    3. 今日特賣倒數 — 帶進度條的時間壓力元素（bg: neutral-50）
+    4. 規格確認 — 降噪等級、電池續航、連線方式（折疊式，預設收合）
+    5. 加入購物車 CTA — 全寬主要按鈕，固定於畫面底部
+  內容細節：
+    商品：Sony WH-1000XM5 藍牙降噪耳機，黑色
+    特賣價：NT$2,490  原價：NT$3,490  省下：NT$1,000（29% off）
+    規格：主動降噪 / 30 小時電池 / 藍牙 5.2
+
+Screen 03：購物車
+  Entry：剛加入商品成功，進入結帳前最後確認
+  Task：確認商品與金額，消除最後猶豫，推進至結帳
+  Exit → 點擊「前往結帳」（Primary）/ 繼續購物（Secondary）
+  Sections：
+    1. 購物車商品列 — 商品卡 × 1（主圖 + 名稱 + 特賣價 + 數量控制）
+    2. 今日特賣提醒 — 輕量橫條：「特賣價於今日 23:59 截止，已鎖定 NT$2,490」
+    3. 小計 + 結帳 CTA — 合計 NT$2,490 + 已省 NT$1,000 + 全寬結帳按鈕
+  內容細節：
+    商品：Sony WH-1000XM5，黑色，數量 1
+    特賣價：NT$2,490  原價：NT$3,490
+
+Screen 04：訂單確認
+  Entry：完成結帳，需要心理安慰和確認
+  Task：強化「這個決定是對的」，告知使用者已省下金額，提供後續行動
+  Exit → 繼續購物（Primary）/ 查看訂單（Secondary）
+  Sections：
+    1. 確認動畫 — checkmark icon + 「訂單已確認」標題
+    2. 省下金額強調 — 「你省下了 NT$1,000」獨立區塊，視覺強調
+    3. 訂單摘要 — 商品名稱 + 數量 + 金額 + 預計出貨
+    4. 後續行動 — 繼續購物（Primary）/ 查看訂單詳情（Secondary）
+  內容細節：
+    訂單號：#TW-20260520-XXXXX
+    商品：Sony WH-1000XM5 × 1  NT$2,490
+    預計出貨：1–2 個工作天
+
+<span class="code-head">### 流程邏輯</span>
+<span class="code-ok">跨畫面一致性元素：</span>
+- 商品名稱：Sony WH-1000XM5 藍牙降噪耳機，黑色（在所有畫面完全一致）
+- 特賣價：NT$2,490 / 原價 NT$3,490（在 Screen 01–03 持續顯示）
+- 省下金額：NT$1,000 / 29% off（在 Screen 02–04 持續出現，Screen 04 最強調）
+
+<span class="code-ok">條件分支：</span>
+- Screen 03（購物車）：Primary Path → 結帳；Secondary Path → 繼續購物
+  Primary 使用全寬深色按鈕；Secondary 使用文字連結，不使用 Button 元件
+- Screen 04（確認頁）：Primary Path → 繼續購物；Secondary Path → 查看訂單詳情
+
+<span class="code-ok">情感節拍：</span>
+- Screen 04（訂單確認）是整段旅程的情感高點
+  重點：「已省下 NT$1,000」的視覺強調，checkmark 動畫，慶祝語氣文案
+
+<span class="code-head">### 設計約束</span>
+<span class="code-ok">固定：</span>
+- App UH 的 Navigation Bar 和 Bottom Tab Bar 維持標準（不修改）
+- 所有 Token 引用不得使用 hex 值
+- 結帳 CTA 在 Screen 03 必須在第一屏可見
+
+<span class="code-warn">探索：</span>
+- Screen 01 Banner 的版面比例（全寬 vs. 卡片式）
+- Screen 04 checkmark 動畫的風格（輕量 vs. 有慶祝感）
+- Screen 04「已省下 NT$1,000」的視覺表現方式（大字 vs. 標籤 vs. highlight）</div>
+      </div>
+
+      <!-- Overview screenshot -->
+      <figure class="block-image">
+        <img src="images/screenshot-overview.png"
+             alt="今日特賣 × 快速購買旅程 — 四個畫面總覽，從首頁、商品頁、購物車到訂單確認的完整流程"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="img-placeholder">
+          <p>Figma 建置結果截圖（<code>images/screenshot-overview.png</code>）</p>
+        </div>
+        <figcaption>▲ 四畫面旅程總覽：Claude Code 依旅程 Brief 建置的完整流程。從左至右——首頁 Today's Deal Banner、Sony WH-1000XM5 商品頁、購物車確認、訂單完成頁。跨畫面的特賣價差標示保持一致，訂單確認頁突出「已省 NT$1,000」作為情感節拍。</figcaption>
+      </figure>
+
+      <div class="callout-box blue">
+        <p class="callout-label">建置執行提示</p>
+        <p>將旅程 Brief 整份一次提交給 Claude Code，指定：<strong>「請依序建置四個畫面，每個畫面建置完成後截圖確認，確認跨畫面一致性元素（商品名稱、特賣價差）無誤後再繼續下一個畫面。」</strong>
+        整份提交讓 AI 從一開始就掌握旅程全局，而截圖確認節點讓你在過程中保有設計主控權。</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- 系列前後導覽 -->
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="2026-05-20-figma-brief-basics.html" class="article-nav-prev" onclick="localStorage.setItem('heroTheme','2')">
+      <span class="article-nav-dir">← Prev</span>
+      <span class="article-nav-title">Brief Basics</span>
+      <span class="article-nav-sub">先理解設計系統的邊界，再寫 Brief · Part 1</span>
+    </a>
+    <a href="2026-05-20-figma-quality-check.html" class="article-nav-next" onclick="localStorage.setItem('heroTheme','4')">
+      <span class="article-nav-dir">Next →</span>
+      <span class="article-nav-title">Quality Check</span>
+      <span class="article-nav-sub">AI 在 Figma 建置時，設計師這樣做品質確認 · Part 3</span>
+    </a>
+  </div>
+</nav>
+
+<site-footer></site-footer>
+
+<script>
+  const heroThemes = [
+    'rgb(207,213,218)', 'rgb(243,220,221)', 'rgb(245,237,207)',
+    'rgb(227,216,228)', 'rgb(220,232,221)', 'rgb(216,208,206)',
+    'rgb(248,234,235)', 'rgb(235,185,181)', 'rgb(245,236,185)',
+  ];
+  const _stored = localStorage.getItem('heroTheme');
+  localStorage.removeItem('heroTheme');
+  let currentTheme = (_stored !== null && !isNaN(+_stored))
+    ? Math.abs(+_stored) % heroThemes.length
+    : 3; // default: Lavender (Card 004)
+  function applyHeroTheme(bg) {
+    document.documentElement.style.setProperty('--hero-bg', bg);
+  }
+  applyHeroTheme(heroThemes[currentTheme]);
+  setInterval(() => {
+    currentTheme = (currentTheme + 1) % heroThemes.length;
+    applyHeroTheme(heroThemes[currentTheme]);
+  }, 5000);
+
+  /* ToC scroll spy */
+  const sections = document.querySelectorAll('.block[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocItems.forEach(i => i.classList.remove('active'));
+        const active = document.querySelector(`.toc-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
