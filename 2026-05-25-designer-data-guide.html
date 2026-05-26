@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>設計概念串接真實商品資料——設計師工作指南 — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="shared-components.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+      --toc-w:  240px;
+      --hero-bg:           #1a1a1a;
+      --hero-ghost:        rgba(255,255,255,0.05);
+      --hero-badge-border: rgba(255,255,255,0.2);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    /* ── NAV ─────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 200;
+      height: 56px; width: 100%;
+      background: rgba(245,240,232,0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1360px; margin: 0 auto; height: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px 0 48px;
+    }
+    .nav-logo { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); text-decoration: none; }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a {
+      display: flex; align-items: center; padding: 0 22px; height: 56px;
+      border-left: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.32px;
+      color: var(--text); text-decoration: none; transition: background 0.15s;
+    }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── HERO ──────────────────────────────────── */
+    .article-hero {
+      background: var(--hero-bg, #f5f0e8);
+      border-bottom: 1px solid var(--border);
+      transition: background 1.2s ease;
+    }
+    .article-hero-inner {
+      max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--toc-w) 1fr;
+      min-height: 400px;
+    }
+    .hero-left {
+      border-right: 1px solid var(--border);
+      padding: 48px 32px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      font-size: 11px; font-weight: 500; letter-spacing: 1.8px;
+      color: var(--muted);
+      width: fit-content; margin-bottom: 40px;
+    }
+    .hero-date-badge {
+      background: var(--dark); border: 1px solid var(--dark);
+      padding: 12px 16px;
+      font-family: var(--font-d); font-size: 20px; font-weight: 700;
+      color: #fff; line-height: 24px; width: fit-content;
+    }
+    .hero-meta-list {
+      display: flex; flex-direction: column; gap: 16px;
+      margin-top: auto;
+    }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .hero-meta-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .hero-meta-value { font-size: 13px; font-weight: 400; color: var(--text); }
+
+    .hero-right {
+      padding: 64px 48px 64px 64px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .hero-index {
+      font-family: var(--font-d); font-size: clamp(88px, 12vw, 177px);
+      font-weight: 700; color: rgba(26,26,26,0.06);
+      line-height: 1; user-select: none; margin-bottom: -16px;
+    }
+    .hero-title-en {
+      font-family: var(--font-d); font-size: clamp(53px, 6vw, 97px);
+      font-weight: 700; font-style: italic; color: var(--dark); line-height: 1;
+    }
+    .hero-title-zh {
+      font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px);
+      font-weight: 700; color: var(--muted); line-height: 1.3;
+      margin-top: 12px; margin-bottom: 32px;
+    }
+    .hero-tagline {
+      font-size: 14px; font-weight: 300; line-height: 1.7;
+      color: var(--text); max-width: 560px;
+    }
+
+    /* ── LAYOUT ──────────────────────────────────── */
+    .page-layout {
+      max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: var(--toc-w) 1fr;
+      align-items: start;
+    }
+
+    /* ── STICKY TOC ──────────────────────────────── */
+    .toc {
+      position: sticky; top: 56px;
+      border-right: 1px solid var(--border);
+      min-height: calc(100vh - 56px);
+      padding: 48px 32px;
+      display: flex; flex-direction: column; gap: 32px;
+    }
+    .toc-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .toc-list { display: flex; flex-direction: column; gap: 0; }
+    .toc-item { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s; }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-item:hover .toc-item-title { color: var(--dark); }
+    .toc-num { font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
+    .toc-item-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+    .toc-item.active .toc-item-title { color: var(--dark); font-weight: 700; }
+    .toc-item.active .toc-num { color: var(--dark); }
+
+    .toc-info-card {
+      margin-top: auto;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+    .toc-info-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .toc-info-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .toc-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .toc-info-key { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .toc-info-val { font-size: 13px; font-weight: 500; color: var(--dark); }
+
+    /* ── CONTENT BLOCKS ──────────────────────────── */
+    .content-blocks { padding: 0 48px; }
+    .block { border-bottom: 1px solid var(--border); padding: 64px 0; }
+    .block:last-child { border-bottom: none; }
+
+    .block-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 32px; }
+    .block-num { font-size: 11px; font-weight: 500; letter-spacing: 2px; color: var(--muted); }
+    .block-title { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--dark); }
+
+    .block-sub { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: var(--dark); margin: 28px 0 10px; }
+    .block-text { font-size: 17px; font-weight: 300; line-height: 1.9; color: var(--text); margin-bottom: 20px; }
+    .block-text:last-child { margin-bottom: 0; }
+    .block-text strong { color: var(--dark); font-weight: 500; }
+
+    /* Stats */
+    .block-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--border); margin: 32px 0; }
+    .block-stat { padding: 28px 24px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .block-stat:last-child { border-right: none; }
+    .stat-big { font-family: var(--font-d); font-size: 49px; font-weight: 700; color: var(--dark); line-height: 1; }
+    .stat-label { font-size: 11px; font-weight: 500; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
+
+    /* Quote */
+    .block-quote { padding: 32px; background: var(--dark); margin: 32px 0; }
+    .block-quote p { font-family: var(--font-d); font-size: clamp(18px, 1.8vw, 22px); font-style: italic; line-height: 1.55; color: #fff; }
+
+    /* Callout */
+    .callout-box { padding: 20px 24px; border-left: 3px solid; margin: 24px 0; }
+    .callout-box.blue { background: rgba(20,50,224,0.05); border-color: var(--blue); }
+    .callout-box.red  { background: rgba(192,48,48,0.05); border-color: var(--red); }
+    .callout-label {
+      font-size: 10px; font-weight: 500; letter-spacing: 1.8px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .callout-box.blue .callout-label { color: var(--blue); }
+    .callout-box.red  .callout-label { color: var(--red); }
+    .callout-box p { font-size: 14px; font-weight: 400; line-height: 1.7; color: var(--text); }
+    .callout-box p strong { color: var(--dark); font-weight: 500; }
+
+    /* Tool grid */
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+    .tool-card { padding: 24px; background: var(--card-bg); border-top: 3px solid; }
+    .tool-card.blue   { border-top-color: var(--blue); }
+    .tool-card.dark   { border-top-color: var(--dark); }
+    .tool-card.red    { border-top-color: var(--red); }
+    .tool-card.muted  { border-top-color: var(--muted); }
+    .tool-card.full   { grid-column: 1 / -1; }
+    .tool-name { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .tool-role { font-size: 11px; font-weight: 500; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+    .tool-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .tool-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Compare table */
+    .compare-wrap { overflow-x: auto; margin: 24px 0; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+    .compare-table th {
+      padding: 10px 14px; background: var(--dark); color: #fff;
+      text-align: left; font-size: 10px; font-weight: 500;
+      letter-spacing: 1.5px; font-family: var(--font-b); text-transform: uppercase;
+    }
+    .compare-table th:not(:first-child) { border-left: 1px solid rgba(255,255,255,0.1); }
+    .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .compare-table td:not(:first-child) { border-left: 1px solid var(--border); }
+    .compare-table .row-label { font-weight: 500; color: var(--dark); }
+
+    /* Principle cards */
+    .principle-set { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin: 24px 0; }
+    .principle-card { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+    .principle-card:last-child { border-bottom: none; }
+    .principle-num { font-family: var(--font-d); font-size: 24px; font-weight: 700; color: var(--border); line-height: 1.2; padding-top: 2px; }
+    .principle-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+    .principle-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .principle-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Process steps */
+    .process-steps { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+    .process-step { display: grid; grid-template-columns: 48px 1fr; border: 1px solid var(--border); border-bottom: none; }
+    .process-step:last-child { border-bottom: 1px solid var(--border); }
+    .step-num { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); font-family: var(--font-d); font-size: 14px; font-weight: 700; color: var(--muted); }
+    .step-body { padding: 20px 24px; }
+    .step-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .step-text { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+
+    /* Flow diagram */
+    .flow-diagram { padding: 24px; background: var(--card-bg); border: 1px solid var(--border); margin: 24px 0; }
+    .flow-caption { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0; row-gap: 8px; }
+    .flow-node { padding: 8px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .flow-node.blue  { background: rgba(20,50,224,0.08); color: var(--blue); }
+    .flow-node.dark  { background: var(--dark); color: #fff; }
+    .flow-node.red   { background: rgba(192,48,48,0.08); color: var(--red); }
+    .flow-node.neutral { background: rgba(26,26,26,0.06); color: var(--text); }
+    .flow-arrow { padding: 0 6px; color: var(--muted); font-size: 12px; }
+    .flow-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+    /* Checklist */
+    .checklist-block { border: 1px solid var(--border); margin: 20px 0; }
+    .checklist-header {
+      padding: 10px 16px; font-size: 11px; font-weight: 500;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .checklist-header.blue  { background: rgba(20,50,224,0.07); color: var(--blue); }
+    .checklist-header.red   { background: rgba(192,48,48,0.07); color: var(--red); }
+    .checklist-header.dark  { background: var(--dark); color: #fff; }
+    .checklist-header.neutral { background: rgba(26,26,26,0.04); color: var(--muted); }
+    .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--border); font-size: 14px; color: var(--text); line-height: 1.55; cursor: pointer; transition: background 0.1s; }
+    .checklist-item:hover { background: rgba(26,26,26,0.02); }
+    .check-box { width: 14px; height: 14px; border: 1.5px solid var(--border); flex-shrink: 0; margin-top: 2px; transition: background 0.15s, border-color 0.15s; }
+    .check-box.checked { background: var(--dark); border-color: var(--dark); }
+    .item-checked { color: var(--muted); text-decoration: line-through; }
+    .must-badge { margin-left: auto; flex-shrink: 0; font-size: 10px; font-weight: 500; letter-spacing: 0.5px; padding: 3px 8px; background: rgba(192,48,48,0.1); color: var(--red); white-space: nowrap; }
+    .checklist-item strong { color: var(--dark); font-weight: 500; }
+
+    /* Code block */
+    .code-block { background: var(--dark); padding: 24px; margin: 24px 0; overflow-x: auto; }
+    .code-block pre { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.85); white-space: pre; }
+    .code-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 12px; }
+    .code-comment { color: rgba(255,255,255,0.35); }
+    .code-attr { color: #7dd3fc; }
+    .code-val { color: #86efac; }
+    .code-tag { color: #fca5a5; }
+
+    /* Tags */
+    .block-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .block-tag { display: inline-flex; align-items: center; padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 0.88px; color: var(--dark); background: var(--card-bg); }
+    .block-tag.blue { background: rgba(20,50,224,0.07); border-color: rgba(20,50,224,0.2); color: var(--blue); }
+    .block-tag.red  { background: rgba(192,48,48,0.07); border-color: rgba(192,48,48,0.2); color: var(--red); }
+
+    /* Article nav */
+    .article-nav { border-top: 1px solid var(--border); }
+    .article-nav-inner { max-width: 1360px; margin: 0 auto; display: flex; }
+    .article-nav-prev, .article-nav-next { flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: background 0.15s; }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover { background: rgba(26,26,26,0.03); }
+    .article-nav-dir { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .article-nav-title { font-family: var(--font-d); font-size: 20px; font-weight: 700; color: var(--dark); }
+    .article-nav-sub { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+    /* Contact + Footer */
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    /* Phase badges */
+    .phase-badge { display: inline-flex; align-items: center; padding: 3px 10px; font-size: 10px; font-weight: 500; letter-spacing: 1.2px; margin-left: 8px; vertical-align: middle; }
+    .phase-badge.design { background: rgba(26,26,26,0.08); color: var(--muted); }
+    .phase-badge.once   { background: rgba(20,50,224,0.08); color: var(--blue); }
+    .phase-badge.daily  { background: rgba(192,48,48,0.08); color: var(--red); }
+
+    /* ── RWD ─────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      :root { --toc-w: 200px; }
+      .content-blocks { padding: 0 32px; }
+      .hero-right { padding: 48px 32px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-hero-inner { grid-template-columns: minmax(0,1fr); }
+      .hero-left { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 20px; }
+      .hero-index { display: none; }
+      .hero-right { padding: 40px 20px; }
+      .page-layout { grid-template-columns: minmax(0,1fr); }
+      .toc { display: none; }
+      .content-blocks { padding: 0 20px; min-width: 0; max-width: 100%; }
+      .block { padding: 40px 0; min-width: 0; max-width: 100%; }
+      .block-header { flex-wrap: wrap; gap: 8px; }
+      .block-title { font-size: 20px; word-break: break-word; }
+      .block-text { word-break: break-word; }
+      .block-stats { grid-template-columns: 1fr; }
+      .block-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .block-stat:last-child { border-bottom: none; }
+      .tool-grid { grid-template-columns: 1fr; gap: 0; }
+      .principle-card { grid-template-columns: 40px 1fr; }
+      .process-step { grid-template-columns: 40px 1fr; }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .article-nav-next { padding: 24px 20px; }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+      .checklist-item { flex-wrap: wrap; }
+      .checklist-item > span { flex: 1 1 0; min-width: 0; word-break: break-word; }
+      .code-block { padding: 16px; }
+      .code-block pre { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<site-nav></site-nav>
+
+<header class="article-hero" id="articleHero">
+  <div class="article-hero-inner">
+    <div class="hero-left">
+      <div>
+        <div class="hero-badge">GUIDE &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; DESIGN SYSTEM</div>
+        <div class="hero-date-badge"><p>20</p><p>26</p></div>
+      </div>
+      <div class="hero-meta-list">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Date</span>
+          <span class="hero-meta-value">2026 / 05 / 25</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Type</span>
+          <span class="hero-meta-value">AI 設計協作指南 · Part 4</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Tools</span>
+          <span class="hero-meta-value">Claude Code · Google Sheets · Apps Script</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <p class="hero-index">2026</p>
+      <h1 class="hero-title-en">Real Data</h1>
+      <p class="hero-title-zh">設計概念串接真實商品資料——設計師工作指南</p>
+      <p class="hero-tagline">
+        從 Wireframe IA 到 Google Sheets 資料建構，到 HTML 建置，到評審前資料更新——
+        真實商品資料貫穿整個設計概念生命週期。
+        掌握這份工作地圖，不管面對多複雜的設計情境（包含 tab 切換、時段資料），你都知道從哪裡開始。
+      </p>
+    </div>
+  </div>
+</header>
+
+<div class="page-layout">
+
+  <aside class="toc">
+    <p class="toc-label">Contents</p>
+    <nav class="toc-list">
+      <a href="#why" class="toc-item active">
+        <span class="toc-num">00</span>
+        <span class="toc-item-title">為什麼需要真實資料</span>
+      </a>
+      <a href="#designer-workflow" class="toc-item">
+        <span class="toc-num">01</span>
+        <span class="toc-item-title">設計師的工作地圖</span>
+      </a>
+      <a href="#planning" class="toc-item">
+        <span class="toc-num">02</span>
+        <span class="toc-item-title">規劃：Wireframe 到資料規劃</span>
+      </a>
+      <a href="#sheets-guide" class="toc-item">
+        <span class="toc-num">03</span>
+        <span class="toc-item-title">Google Sheets 情境指南</span>
+      </a>
+      <a href="#architecture" class="toc-item">
+        <span class="toc-num">04</span>
+        <span class="toc-item-title">資料架構速覽</span>
+      </a>
+      <a href="#three-rules" class="toc-item">
+        <span class="toc-num">05</span>
+        <span class="toc-item-title">三條核心 HTML 規則</span>
+      </a>
+      <a href="#filter" class="toc-item">
+        <span class="toc-num">06</span>
+        <span class="toc-item-title">data-filter 語法速查</span>
+      </a>
+      <a href="#module-binding" class="toc-item">
+        <span class="toc-num">07</span>
+        <span class="toc-item-title">section 多模組完整參考</span>
+      </a>
+      <a href="#mistakes" class="toc-item">
+        <span class="toc-num">08</span>
+        <span class="toc-item-title">常見錯誤與禁區</span>
+      </a>
+      <a href="#workflow" class="toc-item">
+        <span class="toc-num">09</span>
+        <span class="toc-item-title">每日更新流程</span>
+      </a>
+      <a href="#checklist" class="toc-item">
+        <span class="toc-num">10</span>
+        <span class="toc-item-title">完成前驗收清單</span>
+      </a>
+    </nav>
+    <div class="toc-info-card">
+      <p class="toc-info-label">About</p>
+      <div class="toc-info-row">
+        <span class="toc-info-key">閱讀時間</span>
+        <span class="toc-info-val">約 20 分鐘</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">適合對象</span>
+        <span class="toc-info-val">設計師</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">前提條件</span>
+        <span class="toc-info-val">熟悉 HTML 基礎</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content-blocks">
+
+    <!-- Block 00 — 為什麼 -->
+    <section class="block" id="why">
+      <div class="block-header">
+        <span class="block-num">前言</span>
+        <h2 class="block-title">設計概念裡的商品資料，不應該是假的</h2>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">閱讀前提：這篇與前三篇的關係</p>
+        <p>
+          AI 設計協作指南 Part 1–3 聚焦在 <strong>Figma 設計階段</strong>——如何寫 Brief 讓 Claude Code 在 Figma 裡建置設計，以及如何做 QA。
+          Part 4 覆蓋的是另一個工作情境：<strong>HTML 設計概念（design concept）</strong>。
+          這不是 Figma 建置的替代方案，而是在正式建 Figma 前，用 HTML prototype 做快速視覺探索的流程。
+          在 SHP 電商設計系統裡，這個 HTML 環境有一套串接真實商品資料的機制——這篇就是這套機制的完整說明。
+        </p>
+      </div>
+
+      <p class="block-sub">這篇文章在整個設計流程的哪個位置</p>
+
+      <div class="flow-diagram">
+        <p class="flow-caption">FIG.00 · 產品設計流程全覽</p>
+        <div class="flow-row">
+          <div class="flow-node neutral">設計需求<br><small>Brief / 發想</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node dark">設計概念 HTML<br><small>本篇 · Part 4</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">三方評選<br><small>選定方向</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node blue">Figma 正式建置<br><small>Part 1–3</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">QA & 交付<br><small>工程師接手</small></div>
+        </div>
+        <p class="flow-note">本篇聚焦在「設計概念 HTML」這個階段——評選時讓所有人看到真實商品在不同版型下的樣子，才能做有根據的設計決策</p>
+      </div>
+
+      <p class="block-sub">什麼是「設計概念」？</p>
+
+      <p class="block-text">
+        在 SHP 設計系統的工作流程裡，<strong>設計概念（design concept）</strong>是指以 HTML + CSS 建立的可互動 prototype，
+        用於探索不同的頁面方向、驗證視覺構想、以及在正式 Figma 建置前讓相關人員評選。
+        它不是最終交付物，而是一個「快速低成本的思考工具」。
+      </p>
+
+      <p class="block-text">
+        SHP 設計系統已預先建立了完整的元件庫（商品卡、導覽列、底部 Tab Bar 等）和資料串接機制——
+        設計師不需要從零設計，只需要組合元件、定義版型，然後讓商品資料自動填入。
+        <strong>product-loader.js 就是這個資料串接機制的核心。</strong>
+        它負責讀取每日更新的 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data/products.json</code>，
+        並自動把商品資料渲染成設計系統規格的商品卡。
+      </p>
+
+      <p class="block-text">
+        設計師在建立 prototype 時，最常見的做法是手動填入假商品名稱、隨便寫一個價格、
+        用佔位圖取代實際圖片。這個習慣在靜態設計稿沒有問題，
+        但在可互動的設計概念裡，它會造成兩個根本性問題：
+      </p>
+
+      <div class="tool-grid">
+        <div class="tool-card red">
+          <p class="tool-name">視覺評估失真</p>
+          <p class="tool-role">假資料遮蔽真實排版問題</p>
+          <p class="tool-desc">商品名稱長度不一，有的 8 個字，有的 30 個字。假資料通常是精心挑選過的「剛好合適」長度。<strong>真實資料才能暴露排版的邊界情況。</strong></p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">維護成本爆炸</p>
+          <p class="tool-role">每次更新要改兩個地方</p>
+          <p class="tool-desc">商品資料每天都在變——價格調整、優惠券更新、新商品上架。假資料讓設計概念永遠滯後於真實狀態，<strong>每次 review 前都要手動更新一遍。</strong></p>
+        </div>
+      </div>
+
+      <p class="block-text">
+        解決方案是讓設計概念直接讀取 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data/products.json</code>——
+        這份資料每天由 Google Sheets + Apps Script 自動更新。
+        設計師只需要學會三條規則，就能讓自己的概念永遠顯示最新商品資料，
+        完全不需要手動維護。
+      </p>
+
+      <div class="block-stats">
+        <div class="block-stat">
+          <span class="stat-big">3</span>
+          <span class="stat-label">核心規則</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">0</span>
+          <span class="stat-label">行 JS 需要手寫</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">∞</span>
+          <span class="stat-label">概念自動更新</span>
+        </div>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag blue">設計系統</span>
+        <span class="block-tag blue">真實商品資料</span>
+        <span class="block-tag">Claude Code 協作</span>
+        <span class="block-tag">SHP Design System</span>
+      </div>
+    </section>
+
+    <!-- Block 01 — 設計師工作流程 -->
+    <section class="block" id="designer-workflow">
+      <div class="block-header">
+        <span class="block-num">01</span>
+        <h2 class="block-title">設計師的工作流程：四個階段</h2>
+      </div>
+
+      <p class="block-text">
+        設計概念的真實資料串接，<strong>不是做完 HTML 再回頭補的工作，而是貫穿整個設計概念生命週期的四個階段</strong>。
+        清楚哪些事情只需要做一次、哪些需要每天重複，是這份工作的核心分工。
+      </p>
+
+      <div class="block-stats">
+        <div class="block-stat">
+          <span class="stat-big">2</span>
+          <span class="stat-label">一次性設定階段</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">1</span>
+          <span class="stat-label">每日重複操作</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">→</span>
+          <span class="stat-label">三方評選交付</span>
+        </div>
+      </div>
+
+      <p class="block-sub">四個工作階段拆解</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">Wireframe IA 與資料規劃 <span class="phase-badge design">設計決策</span></p>
+            <p class="step-text">
+              在 Wireframe 階段決定頁面的資訊架構——包含哪些模組、每個模組的商業邏輯、資料故事要說什麼。
+              同步在 Wireframe 標注上為每個商品模組決定 section 標籤代碼（例如「降價」、「相機」、「秒殺10點」）。
+              這些代碼後續會同時出現在 Google Sheets Staging 欄值和 HTML 的 data-filter 裡——先想清楚，後面執行才不會亂。
+              <br><br>
+              <em>輸出：模組清單 + section 標籤代碼對照表。完整流程見 <strong>02 — 規劃階段</strong>。</em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">Google Sheets 資料建構 <span class="phase-badge once">一次性設定</span></p>
+            <p class="step-text">
+              在 Google Sheets Staging tab 新增 section 欄位（欄位標題必須是英文 <code style="font-family:monospace;font-size:13px;">section</code>，全小寫），
+              為每個商品填入對應的 section 標籤值。完成後執行 📤 匯出 JSON，更新本機 <code style="font-family:monospace;font-size:13px;">data/products.json</code>。
+              <br><br>
+              <em>關鍵原則：Apps Script 強制重新匯入不會覆蓋 section 欄——這個設定只需要做一次，之後每日更新不會被清掉。
+              複雜情境（Tab 切換、時段資料）的資料建構方式見 <strong>03 — Google Sheets 情境指南</strong>。</em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">HTML 建置 <span class="phase-badge once">一次性設定</span></p>
+            <p class="step-text">
+              引入 product-loader.js，為每個模組容器加上 <code style="font-family:monospace;font-size:13px;">data-api</code>、<code style="font-family:monospace;font-size:13px;">data-filter="section:xxx"</code>、
+              視需要加 <code style="font-family:monospace;font-size:13px;">data-max</code> 和 <code style="font-family:monospace;font-size:13px;">data-label</code>。
+              在瀏覽器確認每個模組都正確載入預期數量的商品，排版在真實資料下沒有破版。
+              <br><br>
+              <em>HTML 設定完成後即固定，不需要每天重新設定。三條核心規則見 <strong>05</strong>，data-filter 語法速查見 <strong>06</strong>。</em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">④</span>
+          <div class="step-body">
+            <p class="step-title">評審前資料更新 <span class="phase-badge daily">每日重複</span></p>
+            <p class="step-text">
+              每次想讓設計概念顯示最新商品資料（價格、優惠券、圖片）：
+              Apps Script <strong>🔄 強制重新匯入全部</strong> → 📤 匯出 JSON → 貼入本機 products.json → 瀏覽器 <code style="font-family:monospace;font-size:13px;">Cmd+Shift+R</code>。
+              整個流程約 5–7 分鐘。
+              <br><br>
+              <em>⚠️ 一定要用 🔄 強制重新匯入，而不是 📥 匯入——後者只處理 name 欄空白的商品，無法更新已有名稱的商品價格。</em>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">評選完成後的下一步</p>
+        <p>
+          設計概念通過三方評選、選定方向後，進入 <strong>Figma 正式建置</strong>階段。
+          建置流程請參照 AI 設計協作指南 Part 1（Brief 撰寫）、Part 2（Figma 建置）、Part 3（品質確認）。
+          <strong>設計概念的工作到這裡結束</strong>——不同的工具、不同的精確度標準、相輔相成的兩個階段。
+        </p>
+      </div>
+    </section>
+
+    <!-- Block 02 — 規劃階段 -->
+    <section class="block" id="planning">
+      <div class="block-header">
+        <span class="block-num">02</span>
+        <h2 class="block-title">規劃階段：在 Wireframe 時就開始想資料</h2>
+      </div>
+
+      <p class="block-text">
+        大多數設計師的習慣是：先把 HTML 建好，再回頭想要放什麼資料。這個順序是倒過來的。
+        <strong>資料規劃應該在 Wireframe IA 階段就完成</strong>——你在動手建 HTML 時，每個模組的資料需求已經清楚，
+        不需要中途停下來補；在 Google Sheets 裡準備好資料後，你可以在 HTML 建置同時就看到真實商品，立即確認排版沒有破版。
+      </p>
+
+      <p class="block-sub">2-A　每個模組在問一個資料問題</p>
+
+      <p class="block-text">
+        設計概念裡的每個商品模組，都在對使用者說一個故事——「這些是最便宜的」、「這些是最近有降價的」、「這些是你可能喜歡的」。
+        在 Wireframe 的時候，你已經決定了每個模組的商業邏輯。
+        <strong>資料規劃就是把這個商業邏輯翻譯成 Google Sheets 能理解的語言。</strong>
+      </p>
+
+      <p class="block-text">
+        每個商品容器在 Wireframe 階段只需要回答一個問題：
+        <strong>「這個模組的商品，在 Google Sheets 裡應該有什麼共同特徵？」</strong>
+        這個共同特徵就是你的 section 代碼——它是 Google Sheets Staging 欄值和 HTML data-filter 的共同語言。
+      </p>
+
+      <p class="block-sub">2-B　從 Wireframe 標注到 section 代碼：三步驟</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">在 Wireframe 上標記每個商品容器的「資料意圖」</p>
+            <p class="step-text">
+              Wireframe 完成後，為每個商品容器加一個標注，說明它的商業語意。
+              不需要特別工具，Figma annotation、便利貼備注、或設計規格表都行。
+              重點是在視覺設計開始前，先確認每個模組的資料邏輯——<strong>而不是等 HTML 建好才想。</strong>
+              <br><br>
+              標注範例：「最新降價商品區」→ 資料意圖：近期售價下降的商品，預計 6–8 筆
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">列出模組清單，決定 section 標籤代碼</p>
+            <p class="step-text">
+              為設計概念的所有商品模組列一份清單，每個模組決定一個 section 代碼。
+              這個代碼之後要填進 Google Sheets 的 section 欄，也要寫進 HTML 的 data-filter——<strong>兩個地方的值必須完全一致，包含大小寫。</strong>
+              <br><br>
+              推薦用中文代碼（如 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">降價</code>、<code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">相機</code>、<code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">秒殺10點</code>）——可讀性好，維護直覺。英文也可以，但選一種格式統一，不要混用。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">確認「這個 section，哪些商品應該有它？數量夠嗎？」</p>
+            <p class="step-text">
+              有了 section 代碼後，想一下你能找到多少商品可以被標為這個代碼。
+              如果「相機精選」這個 section 在 Staging 裡只有 1 件商品，版面就會塌陷——<strong>及早在 Wireframe 階段發現，調整設計或更換商品，比 HTML 建好才發現便宜得多。</strong>
+              <br><br>
+              特別是 tab 切換情境（如秒殺時時樂的 4 個時段 tab），每個 tab 至少需要 3–4 筆商品，共需準備 12–16 筆。
+              商品數量可行性要在 Wireframe 階段就確認。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-sub">2-C　Wireframe 資料標注對照表（範例）</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Wireframe 模組名稱</th>
+              <th>資料意圖</th>
+              <th>Section 代碼</th>
+              <th>預計商品數</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">最新降價</td>
+              <td>近期售價有調降的商品</td>
+              <td><code style="font-family:monospace;font-size:13px;">降價</code></td>
+              <td>6–8 筆</td>
+            </tr>
+            <tr>
+              <td class="row-label">相機精選</td>
+              <td>相機類別主力商品</td>
+              <td><code style="font-family:monospace;font-size:13px;">相機</code></td>
+              <td>4 筆（+ data-max="4"）</td>
+            </tr>
+            <tr>
+              <td class="row-label">你可能會喜歡</td>
+              <td>AI 推薦 / 個人化商品</td>
+              <td><code style="font-family:monospace;font-size:13px;">推薦</code></td>
+              <td>6 筆（+ data-max="6"）</td>
+            </tr>
+            <tr>
+              <td class="row-label">秒殺 10:00 時段</td>
+              <td>早上 10 點的限時特賣商品</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺10點</code></td>
+              <td>4 筆 / tab，共 4 tab = 16 筆</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">什麼時候開始動 Google Sheets？</p>
+        <p>
+          Wireframe 完成、模組清單確認、section 代碼決定——這三件事完成後，就可以開始動 Google Sheets。
+          <strong>不需要等 HTML 建好，不需要等設計稿定稿。</strong>
+          Google Sheets 的資料準備越早完成，你在建 HTML 時就能即時看到真實商品的排版效果，減少後期的 debug 循環。
+          <br><br>
+          特別是複雜情境（Tab 切換、時段資料），<strong>資料結構一定要在 Google Sheets 裡先跑通，再寫 HTML</strong>——
+          否則你很容易建了一整套 tab UI，最後才發現資料根本無法支撐這個設計，白費時間。
+        </p>
+      </div>
+    </section>
+
+    <!-- Block 03 — Google Sheets 情境指南 -->
+    <section class="block" id="sheets-guide">
+      <div class="block-header">
+        <span class="block-num">03</span>
+        <h2 class="block-title">Google Sheets 資料建構：從情境到執行</h2>
+      </div>
+
+      <p class="block-text">
+        section 欄位是設計師在 Google Sheets 裡的「分類語言」——你決定哪些商品屬於哪個模組，
+        products.json 忠實記錄這些分類，HTML 按照分類篩選顯示。
+        無論面對多複雜的設計概念，都能用這個機制找到對應的資料建構方式。
+      </p>
+
+      <p class="block-sub">3-A　第一次使用：在 Staging 建立 section 欄位</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">在 Staging tab 標題列找一個空白欄，填入欄位名稱</p>
+            <p class="step-text">
+              欄位標題輸入 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">section</code>（全英文小寫）。
+              <strong>不能改成中文「模組」或其他名稱</strong>——這個名稱直接對應 products.json 的 key，系統要靠它識別欄位。
+              位置在哪一欄都可以。這個步驟只需要做一次。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">為每件商品填入 section 標籤值</p>
+            <p class="step-text">
+              對應你的 Wireframe 模組清單，為每件商品填入對應的 section 代碼。
+              一件商品可同時屬於多個 section，用逗號分隔（不加空格）：<code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">降價,推薦</code>。
+              不屬於任何設計概念模組的商品，section 欄留空。
+              <br><br>
+              <em>⚠️ Apps Script 🔄 強制重新匯入不會覆蓋 section 欄——設定一次後，每日資料更新都不需要重填。</em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">執行 📤 匯出 JSON，更新本機 data/products.json</p>
+            <p class="step-text">
+              商品管理 → 📤 匯出商品 JSON → 開啟 _JSON_Export 工作表 → 點 A1 → 全選複製 → 貼入本機 data/products.json（完整取代整個檔案）。
+              section 欄的值會自動包含在每筆商品資料裡，例如 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">"section": "相機,降價"</code>。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block-quote">
+        <p>「section 欄是 Apps Script 不會碰的地方。<br>它是設計師的分類語言，只有設計師決定它的值。」</p>
+      </div>
+
+      <p class="block-sub">情境 A — 基礎多模組：同頁三個垂直商品區</p>
+
+      <p class="block-text">
+        最常見的設計概念場景：同一頁面有多個垂直排列的商品區塊，每個區塊顯示不同語意的商品。
+        這是 section 機制最直接的應用，也是所有設計師最先需要掌握的情境。
+      </p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>商品</th>
+              <th>Staging section 欄值</th>
+              <th>出現在哪個模組</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">FUJIFILM X-HF1</td>
+              <td><code style="font-family:monospace;font-size:13px;">相機,推薦</code></td>
+              <td>相機精選 + 你可能會喜歡（兩個模組同時出現）</td>
+            </tr>
+            <tr>
+              <td class="row-label">SONY RX100VII</td>
+              <td><code style="font-family:monospace;font-size:13px;">相機,降價</code></td>
+              <td>相機精選 + 最新降價</td>
+            </tr>
+            <tr>
+              <td class="row-label">Sony WH-1000XM5</td>
+              <td><code style="font-family:monospace;font-size:13px;">推薦</code></td>
+              <td>你可能會喜歡</td>
+            </tr>
+            <tr>
+              <td class="row-label">LG 4K 電視</td>
+              <td><code style="font-family:monospace;font-size:13px;">降價</code></td>
+              <td>最新降價</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <p class="code-label">情境 A — HTML 結構（三模組，各自 section 篩選）</p>
+        <pre><span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+     <span class="code-attr">data-filter</span>=<span class="code-val">"section:降價"</span>
+     <span class="code-attr">data-label</span>=<span class="code-val">"最新降價"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+
+<span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+     <span class="code-attr">data-filter</span>=<span class="code-val">"section:相機"</span>
+     <span class="code-attr">data-max</span>=<span class="code-val">"4"</span>
+     <span class="code-attr">data-label</span>=<span class="code-val">"相機精選"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+
+<span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+     <span class="code-attr">data-filter</span>=<span class="code-val">"section:推薦"</span>
+     <span class="code-attr">data-max</span>=<span class="code-val">"6"</span>
+     <span class="code-attr">data-label</span>=<span class="code-val">"你可能會喜歡"</span><span class="code-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+
+      <p class="block-sub">情境 B — 複雜情境：秒殺時時樂（Tab 切換 × 時段資料）</p>
+
+      <p class="block-text">
+        電商首頁的「秒殺時時樂」模組有 4 個橫向 tab，對應一天內 4 個不同時段的特賣商品（10:00、12:00、14:00、18:00）。
+        使用者點擊 tab 可以瀏覽不同時段的優惠，商品內容每天早上 10 點更新。
+        <strong>這個複雜互動在設計概念裡要如何處理？</strong>
+      </p>
+
+      <div class="callout-box blue">
+        <p class="callout-label">設計概念的「資料誠實」原則</p>
+        <p>
+          設計概念不需要呈現真實的時間觸發邏輯（10 點時才顯示 10 點的商品，14 點後才開放 14 點 tab）。
+          <strong>你的目標是讓評審看到：每個 tab 的商品樣貌是什麼、tab 切換的互動感、時段標籤的視覺呈現。</strong>
+          真實的時間觸發是工程師在正式上線時實作的——設計概念只需要靜態地呈現「每個 tab 是什麼樣子」。
+          <br><br>
+          因此，你需要為每個 tab 準備一組代表性商品：每組 3–4 筆，4 個時段共需 12–16 筆商品（分別標入不同 section 代碼）。
+        </p>
+      </div>
+
+      <p class="block-text">
+        <strong>Google Sheets 建構方式</strong>：為每個時段 tab 建立一個獨立的 section 代碼。
+        每件商品通常只屬於一個時段（除非同一商品確實在多個時段出現，再用逗號分隔）。
+      </p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Tab 名稱</th>
+              <th>Section 代碼</th>
+              <th>所需商品數</th>
+              <th>設計代表的商業邏輯</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">10:00 時段</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺10點</code></td>
+              <td>4 筆</td>
+              <td>早間限時特賣</td>
+            </tr>
+            <tr>
+              <td class="row-label">12:00 時段</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺12點</code></td>
+              <td>4 筆</td>
+              <td>午間限時特賣</td>
+            </tr>
+            <tr>
+              <td class="row-label">14:00 時段</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺14點</code></td>
+              <td>4 筆</td>
+              <td>下午限時特賣</td>
+            </tr>
+            <tr>
+              <td class="row-label">18:00 時段</td>
+              <td><code style="font-family:monotto;font-size:13px;">秒殺18點</code></td>
+              <td>4 筆</td>
+              <td>晚間限時特賣</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="block-sub">情境 B 的 Staging 設定範例</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>商品名稱</th>
+              <th>section 欄值</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">Apple Watch Ultra</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺10點</code></td>
+              <td>只出現在早間 tab</td>
+            </tr>
+            <tr>
+              <td class="row-label">Dyson V15 吸塵器</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺12點</code></td>
+              <td>只出現在午間 tab</td>
+            </tr>
+            <tr>
+              <td class="row-label">Sony WH-1000XM5</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺14點,降價</code></td>
+              <td>出現在下午 tab + 另一個降價模組</td>
+            </tr>
+            <tr>
+              <td class="row-label">Samsung Galaxy S25</td>
+              <td><code style="font-family:monospace;font-size:13px;">秒殺18點</code></td>
+              <td>只出現在晚間 tab</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <p class="code-label">情境 B — HTML 結構（Tab UI + 各時段各自的 data-filter）</p>
+        <pre><span class="code-comment">&lt;!-- 秒殺時時樂：Tab 切換列 --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">class</span>=<span class="code-val">"flash-tabs"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;button</span> <span class="code-attr">class</span>=<span class="code-val">"tab active"</span> <span class="code-attr">data-tab</span>=<span class="code-val">"tab-10"</span><span class="code-tag">&gt;</span>10:00<span class="code-tag">&lt;/button&gt;</span>
+  <span class="code-tag">&lt;button</span> <span class="code-attr">class</span>=<span class="code-val">"tab"</span>        <span class="code-attr">data-tab</span>=<span class="code-val">"tab-12"</span><span class="code-tag">&gt;</span>12:00<span class="code-tag">&lt;/button&gt;</span>
+  <span class="code-tag">&lt;button</span> <span class="code-attr">class</span>=<span class="code-val">"tab"</span>        <span class="code-attr">data-tab</span>=<span class="code-val">"tab-14"</span><span class="code-tag">&gt;</span>14:00<span class="code-tag">&lt;/button&gt;</span>
+  <span class="code-tag">&lt;button</span> <span class="code-attr">class</span>=<span class="code-val">"tab"</span>        <span class="code-attr">data-tab</span>=<span class="code-val">"tab-18"</span><span class="code-tag">&gt;</span>18:00<span class="code-tag">&lt;/button&gt;</span>
+<span class="code-tag">&lt;/div&gt;</span>
+
+<span class="code-comment">&lt;!-- 各時段商品容器：每個 panel 各自用 data-filter 載入對應 section --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">id</span>=<span class="code-val">"tab-10"</span> <span class="code-attr">class</span>=<span class="code-val">"tab-panel active"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+       <span class="code-attr">data-filter</span>=<span class="code-val">"section:秒殺10點"</span>
+       <span class="code-attr">data-max</span>=<span class="code-val">"4"</span> <span class="code-attr">data-label</span>=<span class="code-val">"秒殺10點"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+<span class="code-tag">&lt;/div&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">id</span>=<span class="code-val">"tab-12"</span> <span class="code-attr">class</span>=<span class="code-val">"tab-panel"</span> <span class="code-attr">hidden</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+       <span class="code-attr">data-filter</span>=<span class="code-val">"section:秒殺12點"</span>
+       <span class="code-attr">data-max</span>=<span class="code-val">"4"</span> <span class="code-attr">data-label</span>=<span class="code-val">"秒殺12點"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+<span class="code-tag">&lt;/div&gt;</span>
+<span class="code-comment">&lt;!-- 14點、18點 panel 結構相同，section 代碼對應替換 --&gt;</span></pre>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">Tab 切換的 JavaScript：設計概念允許的例外</p>
+        <p>
+          Tab 切換的互動邏輯（點擊哪個 tab 就顯示對應 panel）需要幾行 JavaScript——這是 UI 互動邏輯，<strong>不是商品資料邏輯，所以被允許。</strong>
+          <br><br>
+          區分的原則很簡單：<strong>「控制哪個 panel 顯示」的 JS 是 UI 互動，可以寫；「控制商品資料如何載入」的 JS 禁止自己寫，交給 product-loader.js。</strong>
+          <br><br>
+          Tab 切換範例：<code style="font-family:monospace;font-size:13px;">document.querySelectorAll('.tab').forEach(btn => btn.addEventListener('click', () => { /* show/hide panels */ }))</code>
+        </p>
+      </div>
+
+      <p class="block-sub">Do &amp; Don't — 複雜情境資料規劃原則</p>
+
+      <div class="tool-grid">
+        <div class="tool-card blue">
+          <p class="tool-name">✓ Do</p>
+          <p class="tool-role">先確認每個 tab 都有足夠商品再動手</p>
+          <p class="tool-desc">4 個 tab × 4 筆商品 = 至少需要 16 筆商品標入各時段 section。先在 Staging 確認數量可行，再開始建 HTML tab UI。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">✕ Don't</p>
+          <p class="tool-role">同一批商品重複標入所有時段</p>
+          <p class="tool-desc">為了讓每個 tab 有商品，把同樣 4 件商品同時標成 <code style="font-family:monospace;font-size:12px;">秒殺10點,秒殺12點,秒殺14點,秒殺18點</code>——4 個 tab 顯示一樣的商品，讓評審看不出 tab 切換的設計意義。</p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">✓ Do</p>
+          <p class="tool-role">Tab 互動做靜態切換就夠了</p>
+          <p class="tool-desc">設計概念的 tab 只需要「點哪個就顯示哪個 panel」。評審不需要看到「10 點前 tab 要 disabled」這種時間邏輯——那是工程師的工作，設計概念不需要這個精確度。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">✕ Don't</p>
+          <p class="tool-role">花時間實作時間觸發邏輯</p>
+          <p class="tool-desc">在設計概念 JS 裡寫「10 點之後才能點這個 tab」——這是正式上線的功能實作，不是設計概念的工作範圍，花時間寫這個等於在錯誤的地方投資。</p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">✓ Do</p>
+          <p class="tool-role">每次評審前做一次每日更新</p>
+          <p class="tool-desc">section 標籤設定好後，每天評審前用 🔄 強制重新匯入更新商品資料，tab 裡的商品就是最新的價格和優惠——不需要修改任何 HTML。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">✕ Don't</p>
+          <p class="tool-role">資料不夠就在 HTML 硬編碼商品</p>
+          <p class="tool-desc">「Staging 裡 18 點時段商品不夠，我直接在 HTML 裡補幾筆假的」——一旦硬編碼，這個模組就永遠顯示假資料，評審無法對它的商業邏輯做有效判斷。資料不夠時，調整設計或多找商品，不是補假資料。</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Block 04 — 資料架構 -->
+    <section class="block" id="architecture">
+      <div class="block-header">
+        <span class="block-num">04</span>
+        <h2 class="block-title">先搞懂這件事：資料從哪裡來？</h2>
+      </div>
+
+      <p class="block-text">
+        在動手之前，先理解整個資料流。知道資料的來源和流向，
+        才知道設計師的工作邊界在哪裡——什麼需要你做，什麼已經有人負責。
+      </p>
+
+      <div class="flow-diagram">
+        <p class="flow-caption">FIG.01 · 商品資料流架構</p>
+        <div class="flow-row">
+          <div class="flow-node blue">Google Sheets<br><small>Staging tab</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">Apps Script<br><small>自動抓取</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">_JSON_Export<br><small>工作表 A1</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node dark">data/products.json<br><small>本機檔案</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node blue">examples/*.html<br><small>商品卡渲染</small></div>
+        </div>
+        <p class="flow-note">↑ 設計師只需要知道最後兩個節點：products.json 是資料來源，HTML 是使用端</p>
+      </div>
+
+      <p class="block-text">
+        從 Yahoo 商品頁面抓取到 Google Sheets，再匯出為 JSON 存到本機——
+        這整個流程由 Apps Script 自動完成。<strong>設計師不需要碰這個流程，
+        只需要假設 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data/products.json</code> 永遠是最新的。</strong>
+      </p>
+
+      <p class="block-sub">product-loader.js 是什麼？從哪裡來？</p>
+
+      <p class="block-text">
+        <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">scripts/product-loader.js</code> 是 SHP 設計系統的一部分，
+        已經預先存在於 codebase 的 scripts 目錄下。<strong>設計師不需要自己建立這個檔案，也不應該修改它。</strong>
+        你只需要在 HTML 裡引入它，它就會自動偵測頁面上有 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data-api</code> 屬性的容器，
+        讀取 products.json，並把商品卡渲染進去。
+      </p>
+
+      <p class="block-text">
+        product-loader.js 內建了三個設計師不需要關心但需要知道的機制：
+        <strong>stale-while-revalidate 快取</strong>（避免每次重整都重新 fetch）、
+        <strong>圖片載入失敗的 fallback</strong>（顯示 purple-50 背景 + 灰色 icon，不會出現破圖）、
+        以及<strong>資料格式驗證</strong>（JSON 格式錯誤時在 console 輸出警告而非靜默失敗）。
+      </p>
+
+      <p class="block-sub">products.json 的欄位結構</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>欄位</th>
+              <th>說明</th>
+              <th>範例值</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">id</td>
+              <td>商品唯一識別碼</td>
+              <td>P001</td>
+            </tr>
+            <tr>
+              <td class="row-label">name</td>
+              <td>商品名稱（從頁面 h1 擷取）</td>
+              <td>Sony WH-1000XM5 無線降噪耳機</td>
+            </tr>
+            <tr>
+              <td class="row-label">price</td>
+              <td>當前售價（純數字）</td>
+              <td>8990</td>
+            </tr>
+            <tr>
+              <td class="row-label">original_price</td>
+              <td>原價（有折扣時顯示）</td>
+              <td>11900</td>
+            </tr>
+            <tr>
+              <td class="row-label">image_url</td>
+              <td>商品主圖 URL</td>
+              <td>https://…</td>
+            </tr>
+            <tr>
+              <td class="row-label">rating</td>
+              <td>評分（最高 5.0）</td>
+              <td>4.8</td>
+            </tr>
+            <tr>
+              <td class="row-label">reviews</td>
+              <td>評論數量</td>
+              <td>1,243</td>
+            </tr>
+            <tr>
+              <td class="row-label">sales</td>
+              <td>月銷量文字</td>
+              <td>已售出 500+</td>
+            </tr>
+            <tr>
+              <td class="row-label">tag1 / tag2</td>
+              <td>優惠券標籤（pink 或 red 前綴）</td>
+              <td>pink:折 $200</td>
+            </tr>
+            <tr>
+              <td class="row-label">category</td>
+              <td>商品分類</td>
+              <td>audio</td>
+            </tr>
+            <tr>
+              <td class="row-label">section</td>
+              <td>模組分類標籤（設計師手動維護，逗號分隔多值）</td>
+              <td>camera, price-drop</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Block 05 — 三核心規則 -->
+    <section class="block" id="three-rules">
+      <div class="block-header">
+        <span class="block-num">05</span>
+        <h2 class="block-title">三條核心規則：背起來，少出錯</h2>
+      </div>
+
+      <p class="block-text">
+        這三條規則是這份工作流程的核心。違反任何一條，
+        要嘛會造成資料不更新，要嘛會讓多個概念的行為不一致，要嘛會在 code review 時被退件。
+      </p>
+
+      <div class="block-quote">
+        <p>「三條規則的核心邏輯只有一個：<br>讓 product-loader.js 做它該做的事，不要跟它搶工作。」</p>
+      </div>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);">R1</div>
+          <div>
+            <p class="principle-title">一律引入 product-loader.js，禁止重新實作載入邏輯</p>
+            <p class="principle-desc">
+              所有設計概念一律在 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">&lt;head&gt;</code> 或 body 底部加上這行：
+              <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">&lt;script src="../scripts/product-loader.js"&gt;&lt;/script&gt;</code>。
+              <strong>禁止自己重寫 buildCard()、快取邏輯、或 fetch 載入機制。</strong>
+              product-loader.js 已經處理了 stale-while-revalidate 快取、錯誤處理、圖片 fallback——
+              你重寫一遍只會比它差，而且每次更新都要同步修改兩個地方。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);">R2</div>
+          <div>
+            <p class="principle-title">商品容器只加 data-api 屬性，不寫任何 JS</p>
+            <p class="principle-desc">
+              商品卡的容器元素只需要一個屬性：<code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">data-api="../data/products.json"</code>。
+              product-loader.js 會自動偵測這個屬性、讀取資料、渲染商品卡。
+              <strong>不需要、也不應該在 HTML 裡寫任何 JavaScript 來控制商品載入。</strong>
+              如果你發現自己在 HTML 裡寫 <code style="font-family:monospace;font-size:13px;">fetch()</code> 或 <code style="font-family:monospace;font-size:13px;">buildCard()</code>，代表你走錯了路。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--red);">R3</div>
+          <div>
+            <p class="principle-title">禁止在 HTML 內硬編碼任何商品資料</p>
+            <p class="principle-desc">
+              商品名稱、價格、圖片 URL、標籤文字——這些全部禁止硬寫在 HTML 裡。
+              <strong>一旦硬編碼，你的概念就永遠卡在那個時間點的資料。</strong>
+              商品下架、價格調整、圖片更新，你的 prototype 都不會知道。
+              評審時看到的就是一份「說謊」的設計概念。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-sub">正確的 HTML 結構</p>
+
+      <div class="code-block">
+        <p class="code-label">正確示範 — 只需要這樣</p>
+        <pre><span class="code-comment">&lt;!-- 1. 引入 loader（一次，通常在 body 底部）--&gt;</span>
+<span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-val">"../scripts/product-loader.js"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
+
+<span class="code-comment">&lt;!-- 2. 商品容器只加 data-api 屬性 --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">class</span>=<span class="code-val">"product-grid"</span>
+     <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span><span class="code-tag">&gt;</span>
+<span class="code-comment">  &lt;!-- product-loader.js 會自動填入商品卡 --&gt;</span>
+<span class="code-tag">&lt;/div&gt;</span></pre>
+      </div>
+    </section>
+
+    <!-- Block 06 — data-filter 速查 -->
+    <section class="block" id="filter">
+      <div class="block-header">
+        <span class="block-num">06</span>
+        <h2 class="block-title">data-filter 與 data-max：語法速查</h2>
+      </div>
+
+      <p class="block-text">
+        product-loader.js 透過兩個獨立屬性讓你控制每個模組的顯示內容：
+        <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data-filter</code> 負責篩選哪些商品，
+        <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data-max</code> 負責限制顯示數量。
+        兩個屬性分開寫、分開管——沒有 sort、category、has 等其他語法，也不要把數量寫進 data-filter。
+      </p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>使用情境</th>
+              <th>語法</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">指定模組資料來源</td>
+              <td><code style="font-family:monospace;font-size:13px;">data-filter="section:price-drop"</code></td>
+              <td>只顯示 section 欄位含有 <code style="font-family:monospace;font-size:13px;">price-drop</code> 的商品</td>
+            </tr>
+            <tr>
+              <td class="row-label">限制顯示數量</td>
+              <td><code style="font-family:monospace;font-size:13px;">data-max="6"</code></td>
+              <td>最多顯示 6 筆（獨立屬性，不是寫在 data-filter 裡）</td>
+            </tr>
+            <tr>
+              <td class="row-label">模組篩選 + 數量限制</td>
+              <td><code style="font-family:monospace;font-size:13px;">data-filter="section:camera"</code><br><code style="font-family:monospace;font-size:13px;">data-max="4"</code></td>
+              <td>相機模組，最多顯示 4 筆</td>
+            </tr>
+            <tr>
+              <td class="row-label">AND 條件（同時符合）</td>
+              <td><code style="font-family:monospace;font-size:13px;">data-filter="section:camera section:price-drop"</code></td>
+              <td>同時帶有兩個 section 標籤的商品（空格分隔，兩條件都要符合）</td>
+            </tr>
+            <tr>
+              <td class="row-label">不篩選（預設）</td>
+              <td>不加 data-filter</td>
+              <td>顯示 products.json 裡的所有商品</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-box red">
+        <p class="callout-label">不存在的語法——請勿使用</p>
+        <p>
+          以下語法<strong>不存在於 product-loader.js</strong>。寫了不會報錯，篩選條件會被靜默忽略，導致顯示全部商品：<br><br>
+          <code style="font-family:monospace;font-size:13px;">data-filter="limit:4"</code>　→　數量要用獨立的 <code style="font-family:monospace;font-size:13px;">data-max="4"</code><br>
+          <code style="font-family:monospace;font-size:13px;">data-filter="category:mobile"</code>　→　沒有 category 語法，要用 section<br>
+          <code style="font-family:monospace;font-size:13px;">data-filter="has:discount"</code>　→　沒有 has: 語法<br>
+          <code style="font-family:monospace;font-size:13px;">data-filter="sort:rating-desc"</code>　→　沒有 sort: 語法
+        </p>
+      </div>
+
+      <div class="code-block">
+        <p class="code-label">data-filter + data-max 正確用法</p>
+        <pre><span class="code-comment">&lt;!-- ✅ 正確：section 篩選 + data-max 限制數量 --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+     <span class="code-attr">data-filter</span>=<span class="code-val">"section:camera"</span>
+     <span class="code-attr">data-max</span>=<span class="code-val">"4"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+
+<span class="code-comment">&lt;!-- ❌ 錯誤：limit 不可寫在 data-filter 內 --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">data-filter</span>=<span class="code-val">"section:camera,limit:4"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+
+<span class="code-comment">&lt;!-- AND 條件：空格分隔，同時符合兩個 section --&gt;</span>
+<span class="code-tag">&lt;div</span> <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+     <span class="code-attr">data-filter</span>=<span class="code-val">"section:camera section:price-drop"</span><span class="code-tag">&gt;&lt;/div&gt;</span></pre>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">section 值從哪裡來？命名規則是什麼？</p>
+        <p>
+          <code style="font-family:monospace;font-size:13px;">data-filter="section:xxx"</code> 裡的 <code style="font-family:monospace;font-size:13px;">xxx</code>，
+          對應 Google Sheets Staging tab 的 <strong>section 欄位值</strong>。
+          這個欄位由設計師手動維護——Apps Script 強制重新匯入時<strong>不會覆蓋</strong>它。
+          <br><br>
+          <strong>命名規則：欄位標題必須是英文 <code style="font-family:monospace;font-size:13px;">section</code>（全小寫）</strong>，這個名稱會直接成為 products.json 的 key，不能改成中文或其他名稱。
+          但欄位的<strong>值可以是中文</strong>（例如 <code style="font-family:monospace;font-size:13px;">降價</code>、<code style="font-family:monospace;font-size:13px;">相機</code>、<code style="font-family:monospace;font-size:13px;">推薦</code>）——只要 HTML 的 data-filter 值與 Staging 欄值完全一致即可。
+          中文值對設計師來說可讀性更好，是日常作業的推薦方式。
+          <br><br>
+          下一章（04）說明完整的 Staging 設定流程與多模組設計概念的建置方式。
+        </p>
+      </div>
+    </section>
+
+    <!-- Block 07 — 多模組頁面的資料指定 -->
+    <section class="block" id="module-binding">
+      <div class="block-header">
+        <span class="block-num">07</span>
+        <h2 class="block-title">section 標籤：多模組資料指定</h2>
+      </div>
+
+      <p class="block-text">
+        一個設計概念頁面通常不只有一個商品區塊。
+        首頁可能同時有「最新降價」、「相機精選」、「你可能會喜歡」三個模組，
+        每個模組需要不同的商品集合。
+        這一章說明如何在 Google Sheets Staging 建立 section 欄位，
+        讓 HTML 裡的每個模組都能精準指定自己的資料來源。
+      </p>
+
+      <div class="callout-box blue">
+        <p class="callout-label">先搞清楚：哪些事只做一次，哪些事每天重複</p>
+        <p>
+          多模組資料串接有兩類工作，性質完全不同，混淆了就會做重複的事或搞錯順序：<br><br>
+          <strong>一次性（設定好後不需重做）：</strong><br>
+          → HTML 的 <code style="font-family:monospace;font-size:13px;">data-filter</code> 屬性 — 設計概念完成後就不用動<br>
+          → Google Sheets Staging 的 section 欄填值 — Apps Script 強制重新匯入<strong>不會覆蓋</strong>這個欄<br><br>
+          <strong>每日重複（每次想看最新商品資料都要做）：</strong><br>
+          → Apps Script 🔄 強制重新匯入 → 📤 匯出 JSON → 貼入本機 products.json → 瀏覽器 <code style="font-family:monospace;font-size:13px;">Cmd+Shift+R</code><br>
+          這四步是每日例行，約 5–7 分鐘。
+        </p>
+      </div>
+
+      <div class="block-quote">
+        <p>「一份 products.json，N 個模組——<br>section 欄位是設計師的分類語言，HTML 用它來聆聽。」</p>
+      </div>
+
+      <!-- 4-A 概念圖 -->
+      <p class="block-sub">4-A　全流程架構：從 Staging 到頁面模組</p>
+
+      <p class="block-text">
+        多模組資料指定的全流程由三個環節組成：
+        設計師在 Google Sheets Staging 裡填入 section 標籤，
+        匯出後 section 值進入 products.json，
+        HTML 的 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">data-filter="section:xxx"</code> 再依此篩選。
+      </p>
+
+      <div class="flow-diagram">
+        <p class="flow-caption">FIG.02 · 多模組資料指定全流程</p>
+        <div class="flow-row">
+          <div class="flow-node blue">Staging<br><small>section 欄填入「camera」</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">📤 匯出 JSON<br><small>section 值進入 products.json</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node dark">products.json<br><small>section: "camera,price-drop"</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node blue">data-filter=<br><small>"section:camera"</small></div>
+        </div>
+        <p class="flow-note">同一份 products.json，不同模組各自用不同的 section 值篩選，互不干擾</p>
+      </div>
+
+      <!-- 4-B Google Sheets Staging 設定 -->
+      <p class="block-sub">4-B　Google Sheets Staging：section 欄位設定步驟</p>
+
+      <p class="block-text">
+        section 欄位是設計師手動維護的標籤系統，
+        第一次使用前需要在 Staging tab 新增這個欄位。
+        Apps Script 的強制重新匯入<strong>不會覆蓋</strong> section 欄位——
+        設定一次，之後每次資料更新都不會被清掉。
+      </p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">在 Staging tab 新增 section 欄位（一次性設定）</p>
+            <p class="step-text">
+              在 Google Sheets Staging tab 的標題列找一個空白欄，輸入欄位標題 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">section</code>（全英文小寫）。
+              <strong>欄位標題不能改成中文或其他名稱</strong>——這個名稱會直接成為 products.json 的 key，必須跟系統對得起來。
+              位置在哪一欄都可以。
+              <br><br>
+              這個步驟只需要做一次。之後 Apps Script 強制重新匯入時，<strong>section 欄的值不會被覆蓋</strong>——這正是 section 欄的設計意圖：讓設計師有一個 Apps Script 不會碰的自訂分類空間。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">為每個商品填入 section 標籤值</p>
+            <p class="step-text">
+              決定每個商品屬於哪個設計概念模組，在 section 欄填入對應的標籤值。<strong>值可以是中文，推薦用中文——可讀性好，設計師日常維護更直覺。</strong><br><br>
+              <strong>單一模組：</strong>直接填入，例如 <code style="font-family:monospace;font-size:13px;">相機</code> 或 <code style="font-family:monospace;font-size:13px;">降價</code><br>
+              <strong>屬於多個模組：</strong>逗號分隔（不加空格），例如 <code style="font-family:monospace;font-size:13px;">相機,降價</code><br>
+              <strong>不屬於任何模組：</strong>留空即可，不影響其他商品<br><br>
+              <em>填入範例：FUJIFILM X-HF1 → <code style="font-family:monospace;font-size:13px;">相機,推薦</code>　SONY RX100VII → <code style="font-family:monospace;font-size:13px;">相機,降價</code></em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">匯出 JSON（section 值會一起帶出）</p>
+            <p class="step-text">
+              section 欄填完後，執行正常的匯出流程：
+              商品管理 → 📤 匯出商品 JSON → 複製 _JSON_Export A1 內容 → 貼入本機 data/products.json。
+              section 欄的值會自動包含在每筆商品資料裡，例如：
+              <code style="font-family:monospace;font-size:13px;">"section": "camera,price-drop"</code>。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">④</span>
+          <div class="step-body">
+            <p class="step-title">在 HTML 用 data-filter="section:xxx" 篩選</p>
+            <p class="step-text">
+              products.json 更新後，HTML 裡的 <code style="font-family:monospace;font-size:13px;">data-filter="section:camera"</code> 就能正確篩選出有 camera 標籤的商品。
+              product-loader.js 使用<strong>包含比對（contains）</strong>——
+              section 值為 <code style="font-family:monospace;font-size:13px;">camera,price-drop</code> 的商品，用 <code style="font-family:monospace;font-size:13px;">section:camera</code> 篩選時也會被篩到。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Staging section 欄值</th>
+              <th>會被哪些 data-filter 篩到</th>
+              <th>說明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label"><code style="font-family:monospace;font-size:13px;">camera</code></td>
+              <td><code style="font-family:monospace;font-size:13px;">section:camera</code></td>
+              <td>只屬於 camera 模組</td>
+            </tr>
+            <tr>
+              <td class="row-label"><code style="font-family:monospace;font-size:13px;">camera,price-drop</code></td>
+              <td><code style="font-family:monospace;font-size:13px;">section:camera</code>、<code style="font-family:monospace;font-size:13px;">section:price-drop</code>、AND 條件 <code style="font-family:monospace;font-size:13px;">section:camera section:price-drop</code></td>
+              <td>同時屬於兩個模組</td>
+            </tr>
+            <tr>
+              <td class="row-label">（空白）</td>
+              <td>任何 section 篩選都篩不到</td>
+              <td>沒有 section 標籤的商品只出現在無 data-filter 的全量容器</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4-C 完整程式碼範例 -->
+      <p class="block-sub">4-C　多模組設計概念 — 完整程式碼範例</p>
+
+      <div class="code-block">
+        <p class="code-label">正確示範 — 一頁三模組，各自指定 section（中文值）</p>
+        <pre><span class="code-comment">&lt;!-- ① 引入 loader（一次即可，放在 body 底部）--&gt;</span>
+<span class="code-tag">&lt;script</span> <span class="code-attr">src</span>=<span class="code-val">"../scripts/product-loader.js"</span><span class="code-tag">&gt;&lt;/script&gt;</span>
+
+<span class="code-comment">&lt;!-- ② 模組 A：最新降價（Staging section 欄填「降價」）--&gt;</span>
+<span class="code-tag">&lt;section</span> <span class="code-attr">class</span>=<span class="code-val">"section-price-drop"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;h2&gt;</span>最新降價<span class="code-tag">&lt;/h2&gt;</span>
+  <span class="code-tag">&lt;div</span> <span class="code-attr">class</span>=<span class="code-val">"product-grid"</span>
+       <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+       <span class="code-attr">data-filter</span>=<span class="code-val">"section:降價"</span>
+       <span class="code-attr">data-label</span>=<span class="code-val">"最新降價"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-comment">&lt;!-- ③ 模組 B：相機精選（Staging section 欄填「相機」，最多 4 筆）--&gt;</span>
+<span class="code-tag">&lt;section</span> <span class="code-attr">class</span>=<span class="code-val">"section-camera"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;h2&gt;</span>相機精選<span class="code-tag">&lt;/h2&gt;</span>
+  <span class="code-tag">&lt;div</span> <span class="code-attr">class</span>=<span class="code-val">"product-grid"</span>
+       <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+       <span class="code-attr">data-filter</span>=<span class="code-val">"section:相機"</span>
+       <span class="code-attr">data-max</span>=<span class="code-val">"4"</span>
+       <span class="code-attr">data-label</span>=<span class="code-val">"相機精選"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-comment">&lt;!-- ④ 模組 C：你可能會喜歡（Staging section 欄填「推薦」，最多 6 筆）--&gt;</span>
+<span class="code-tag">&lt;section</span> <span class="code-attr">class</span>=<span class="code-val">"section-recommended"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;h2&gt;</span>你可能會喜歡<span class="code-tag">&lt;/h2&gt;</span>
+  <span class="code-tag">&lt;div</span> <span class="code-attr">class</span>=<span class="code-val">"product-grid"</span>
+       <span class="code-attr">data-api</span>=<span class="code-val">"../data/products.json"</span>
+       <span class="code-attr">data-filter</span>=<span class="code-val">"section:推薦"</span>
+       <span class="code-attr">data-max</span>=<span class="code-val">"6"</span>
+       <span class="code-attr">data-label</span>=<span class="code-val">"你可能會喜歡"</span><span class="code-tag">&gt;&lt;/div&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-comment">&lt;!-- 📌 Staging section 欄對應填入：  --&gt;</span>
+<span class="code-comment">&lt;!--    FUJIFILM X-HF1    → 相機,推薦     --&gt;</span>
+<span class="code-comment">&lt;!--    SONY RX100VII     → 相機,降價     --&gt;</span>
+<span class="code-comment">&lt;!--    某款耳機         → 推薦          --&gt;</span></pre>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">兩個獨立 JSON 的情境（邊界案例）</p>
+        <p>
+          絕大多數設計概念只需要一份 products.json。
+          只有商品真的來自兩個完全不同的資料來源時（例如不同 BU 各自維護的 Google Sheets），才需要用兩個 data-api：<br><br>
+          <code style="font-family:monospace;font-size:13px;">&lt;div data-api="../data/products-camera.json" data-filter="section:camera"&gt;&lt;/div&gt;</code><br>
+          <code style="font-family:monospace;font-size:13px;">&lt;div data-api="../data/products-glasses.json" data-filter="section:sunglasses"&gt;&lt;/div&gt;</code><br><br>
+          <strong>如果只是想分模組顯示，用同一份 JSON + 不同 section 標籤就夠了。</strong>
+          不要為了分模組而分 JSON 檔——那會讓匯出和維護的成本翻倍。
+        </p>
+      </div>
+
+      <!-- 4-D 設計工作流程 -->
+      <p class="block-sub">4-D　多模組頁面的建置流程</p>
+
+      <p class="block-text">
+        多模組頁面最常見的失敗模式：HTML 都寫好了，才發現某個模組因為 Staging 的 section 欄是空的而沒有資料。
+        正確的流程是先完成兩件一次性的工作（決定 section 標籤代碼、在 Staging 填入值），再寫 HTML 的 data-filter——資料先行，HTML 跟上。
+      </p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">定義模組與 section 標籤代碼（動手前）</p>
+            <p class="step-text">
+              列出設計概念的所有模組，為每個模組決定一個 section 標籤代碼。
+              例如：最新降價 → <code style="font-family:monospace;font-size:13px;">price-drop</code>、相機精選 → <code style="font-family:monospace;font-size:13px;">camera</code>、你可能會喜歡 → <code style="font-family:monospace;font-size:13px;">recommended</code>。
+              <br><br>
+              標籤代碼建議用英文小寫加連字號，語意清晰即可。中文也可以，但 Staging 欄值和 HTML data-filter 值必須完全一致（包含大小寫）。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">在 Staging 填入 section 值並匯出 JSON（動手前）</p>
+            <p class="step-text">
+              打開 Google Sheets Staging tab，確認 section 欄位已存在（第一次使用需要手動新增欄）。
+              為每個商品填入對應的 section 值，執行 📤 匯出 JSON，更新本機 data/products.json。
+              <br><br>
+              <em>⚠️ 最常踩到的坑：忘了更新 products.json，導致 HTML 篩不到任何資料。先完成這個步驟，才能確認 data-filter 寫對了。</em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">寫 HTML：data-filter + data-max + data-label</p>
+            <p class="step-text">
+              Staging 資料確認後，在每個模組容器加上對應的 <code style="font-family:monospace;font-size:13px;">data-filter="section:xxx"</code>、
+              視需要加 <code style="font-family:monospace;font-size:13px;">data-max</code> 限制數量，
+              以及 <code style="font-family:monospace;font-size:13px;">data-label</code> 標示模組名稱（方便 console debug）。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">④</span>
+          <div class="step-body">
+            <p class="step-title">真實資料驗證（建置後）</p>
+            <p class="step-text">
+              在 browser 開 DevTools，確認每個模組都正確載入了預期數量的商品。
+              如果某個模組顯示 0 筆，<strong>先檢查 Staging 的 section 欄是否已填值並重新匯出 JSON</strong>，再排查 HTML 語法。
+              空白模組在評審時會造成版面塌陷，及早發現及早修正。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-E 設計原則 -->
+      <p class="block-sub">4-E　多模組資料指定的設計原則</p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);">P1</div>
+          <div>
+            <p class="principle-title">section 標籤代碼反映模組的語意，而非技術的方便</p>
+            <p class="principle-desc">
+              標籤代碼是設計師和資料之間的語言。
+              用 <code style="font-family:monospace;font-size:13px;">price-drop</code> 而不是 <code style="font-family:monospace;font-size:13px;">module1</code>；
+              用 <code style="font-family:monospace;font-size:13px;">recommended</code> 而不是 <code style="font-family:monospace;font-size:13px;">test</code>。
+              <strong>好的標籤代碼讓六個月後的你看到 data-filter 就知道這個模組在幹嘛，不需要翻文件。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);">P2</div>
+          <div>
+            <p class="principle-title">section 欄先填，HTML 後寫——資料先行</p>
+            <p class="principle-desc">
+              在 Staging 填完 section 值並更新 products.json 之後，再動手寫 HTML 的 data-filter。
+              <strong>反過來先寫 HTML 後填 Staging，會導致在本機看不到商品、無法即時驗證，
+              然後花時間排查「為什麼空白」。</strong>
+              正確的順序節省 90% 的 debug 時間。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);">P3</div>
+          <div>
+            <p class="principle-title">不同模組的 section 標籤應有明確差異</p>
+            <p class="principle-desc">
+              如果「今日推薦」和「你可能會喜歡」兩個模組用了相同的 section 值，
+              它們就會顯示一模一樣的商品——兩個模組存在的理由就消失了。
+              <strong>每個模組應有獨立的 section 標籤，代表獨立的商業邏輯和使用者價值。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);">P4</div>
+          <div>
+            <p class="principle-title">一份 JSON，多個 section——不要為了分模組而分 JSON 檔</p>
+            <p class="principle-desc">
+              多模組設計概念不需要多份 JSON 檔。
+              section 欄位的設計目的就是讓一份 products.json 服務多個模組。
+              <strong>只有商品真的來自兩個完全不同資料來源時，才需要用兩個 data-api。</strong>
+              分 JSON 只會增加匯出次數和維護負擔。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4-F Do & Don't -->
+      <p class="block-sub">4-F　Do &amp; Don't</p>
+
+      <div class="tool-grid">
+        <div class="tool-card blue">
+          <p class="tool-name">✓ Do</p>
+          <p class="tool-role">先在 Staging 填 section 值，再寫 HTML</p>
+          <p class="tool-desc">資料先行。確認 Staging 有值、products.json 已更新後，再寫 data-filter——每個模組都能立即看到真實商品，省下反覆 debug 的時間。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">✕ Don't</p>
+          <p class="tool-role">data-filter 寫好了才想到 section 欄是空的</p>
+          <p class="tool-desc">HTML 都寫完了，打開瀏覽器全部空白，才去 Staging 補 section 值。這個順序會讓你的開發驗證循環多繞一圈，浪費時間。</p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">✓ Do</p>
+          <p class="tool-role">一個商品可屬於多個 section</p>
+          <p class="tool-desc">一件商品同時屬於「降價」和「相機」兩個模組？在 section 欄填 <code style="font-family:monospace;font-size:12px;">price-drop,camera</code>。它就會同時出現在兩個模組的篩選結果，不需要重複建資料。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">✕ Don't</p>
+          <p class="tool-role">把 limit 寫進 data-filter</p>
+          <p class="tool-desc"><code style="font-family:monospace;font-size:12px;">data-filter="section:camera,limit:4"</code> 是錯的。limit 不是 data-filter 的一部分，要改用獨立的 <code style="font-family:monospace;font-size:12px;">data-max="4"</code> 屬性。</p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">✓ Do</p>
+          <p class="tool-role">多模組頁面一律加 data-label</p>
+          <p class="tool-desc">每個容器加 <code style="font-family:monospace;font-size:12px;">data-label="模組名稱"</code>，console log 載入訊息會帶上模組名稱。多模組 debug 時，一眼就知道哪個容器出問題。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">✕ Don't</p>
+          <p class="tool-role">為了讓評審好看而把不相關商品標入 section</p>
+          <p class="tool-desc">真實商品數量不夠，就把不相關的商品也標成這個 section 讓畫面填滿——這讓設計概念的資料故事失去意義。真實資料不夠時，調整模組設計，不是調整資料。</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Block 08 — 常見錯誤 -->
+    <section class="block" id="mistakes">
+      <div class="block-header">
+        <span class="block-num">08</span>
+        <h2 class="block-title">常見錯誤與禁區：這些坑前人都踩過</h2>
+      </div>
+
+      <p class="block-text">
+        以下是在 code review 和設計概念 QA 中反覆出現的錯誤。
+        每一條都有真實的背景——不是為了限制你，而是因為這些做法在實際運作時會出問題。
+      </p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--red);">✕</div>
+          <div>
+            <p class="principle-title">重寫 buildCard()——「我覺得我的版本更好」</p>
+            <p class="principle-desc">
+              最常見的錯誤。設計師複製 product-loader.js 裡的 buildCard() 邏輯，在自己的 HTML 裡修改。
+              <strong>問題：</strong>product-loader.js 更新時，你的版本不會自動跟著更新。商品卡的 DOM 結構、class 名稱、
+              fallback 邏輯一旦分叉，之後的維護就是兩條平行線。
+              <strong>正確做法：</strong>用 CSS 覆寫樣式，不要碰 JS 邏輯。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--red);">✕</div>
+          <div>
+            <p class="principle-title">用 &lt;script&gt; 手寫商品陣列——「測試用的」</p>
+            <p class="principle-desc">
+              在 HTML 裡宣告一個 JavaScript 陣列存放假商品資料，然後用 for loop 渲染。
+              <strong>問題：</strong>「測試用」的假資料最後往往留在 prototype 裡被拿去評審。
+              評審看到的價格、圖片、標籤全是你寫死的，不反映真實商品狀態。
+              <strong>正確做法：</strong>直接用 data-api + products.json，沒有「測試版」和「正式版」之分。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--red);">✕</div>
+          <div>
+            <p class="principle-title">把 product-loader.js 的路徑寫錯</p>
+            <p class="principle-desc">
+              <code style="font-family:monospace;font-size:13px;">src="scripts/product-loader.js"</code>（少了 <code style="font-family:monospace;font-size:13px;">../</code>）是最常出現的 typo。
+              <strong>問題：</strong>載入失敗但瀏覽器不一定顯示明顯錯誤，容器會空白，設計師以為是資料問題去查 JSON，繞了一大圈。
+              <strong>正確路徑：</strong>確認你的 HTML 在 examples/ 目錄下，路徑應為 <code style="font-family:monospace;font-size:13px;">../scripts/product-loader.js</code>。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--red);">✕</div>
+          <div>
+            <p class="principle-title">用 file:// 直接開 HTML——「雙擊就能看」</p>
+            <p class="principle-desc">
+              瀏覽器的安全限制讓 file:// 協議下的 fetch() 呼叫失敗，商品資料完全讀不到。
+              <strong>問題：</strong>設計概念看起來正常（結構在），但商品卡是空的。
+              <strong>正確做法：</strong>一律用 <code style="font-family:monospace;font-size:13px;">python3 -m http.server 8088</code> 啟動本地 server，
+              再從 <code style="font-family:monospace;font-size:13px;">http://localhost:8088</code> 開啟。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--red);">✕</div>
+          <div>
+            <p class="principle-title">在 product-card 之外自定義商品卡樣式</p>
+            <p class="principle-desc">
+              設計師認為 product-card 元件「不夠好看」，自己設計一套商品卡 HTML + CSS，
+              然後用 JS 填入資料。
+              <strong>問題：</strong>脫離設計系統的商品卡在跨 prototype 的比較評審中造成「這個方向怎麼商品卡長不一樣」的疑惑，評審焦點從設計概念的差異移到元件差異上。
+              <strong>正確做法：</strong>如需調整商品卡樣式，修改 components/product-card.css，讓改動對所有概念生效。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box red">
+        <p class="callout-label">最根本的判斷原則</p>
+        <p>如果你在設計概念的 HTML 裡寫了任何與商品資料相關的 JavaScript，幾乎可以確定你走偏了。<strong>設計概念的 HTML 應該只有結構（HTML）和樣式（CSS），商品資料的一切邏輯都在 product-loader.js 裡。</strong></p>
+      </div>
+    </section>
+
+    <!-- Block 09 — 每日更新流程 -->
+    <section class="block" id="workflow">
+      <div class="block-header">
+        <span class="block-num">09</span>
+        <h2 class="block-title">每日更新流程：五步驟讓資料保持最新</h2>
+      </div>
+
+      <p class="block-text">
+        products.json 不會自己更新——需要有人執行 Google Sheets 的匯出流程。
+        這個流程通常由負責商品管理的人執行，但設計師需要知道整個流程，
+        才能在「資料看起來不對」時知道問題在哪個環節。
+      </p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <p class="step-title">確認 Staging tab 的 source_url</p>
+            <p class="step-text">每列的 source_url 欄位必須是有效的 Yahoo 商品網址。如果某個商品已下架，這一列要移除或更換 URL，否則重新匯入時會失敗並產生空白資料。</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <p class="step-title">選擇正確的匯入指令</p>
+            <p class="step-text">
+              <strong>更新現有商品（價格/標籤）→ 🔄 強制重新匯入全部</strong>（所有有 source_url 的列都重抓）。<br>
+              新增商品（name 欄位空白）→ 📥 匯入商品資料。<br>
+              <strong>⚠️ 最常見錯誤：</strong>用 📥 匯入試圖更新價格——它只處理 name 為空的列，有名稱的商品會被跳過。<strong>每日更新一律用 🔄 強制重新匯入。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <p class="step-title">目視確認 Staging 資料正確</p>
+            <p class="step-text">重新匯入完成後，快速掃一眼 name、price、tag1、tag2 欄位是否正確。特別注意 tag1/tag2——Apps Script 只抓未登入狀態下可見的優惠券，個人化優惠不會出現（這是正常行為，不是 bug）。</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <p class="step-title">匯出 JSON 並更新本機檔案</p>
+            <p class="step-text">商品管理 → 📤 匯出商品 JSON → 開啟 _JSON_Export 工作表 → 點 A1 → 全選複製 → 貼入本機 data/products.json（完整取代整個檔案內容）。</p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <p class="step-title">強制重新整理瀏覽器確認更新生效</p>
+            <p class="step-text">
+              到 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">http://localhost:8088</code> 按 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">Cmd+Shift+R</code>（強制重新整理）——這會清除 10 分鐘的 stale-while-revalidate 快取，確保看到最新資料。
+              普通的 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">Cmd+R</code> 可能因為快取而仍顯示舊資料，如果更新後看起來沒有改變，先試試 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:13px;">Cmd+Shift+R</code>。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">常見問題排查</p>
+        <p>
+          <strong>商品卡是空白的：</strong>先確認 localhost 是否啟動（不是 file://）、product-loader.js 路徑是否正確、products.json 是否存在且格式正確。<br><br>
+          <strong>資料沒有更新：</strong>兩個常見原因——① 用了 📥 匯入而非 🔄 強制重新匯入全部；② 瀏覽器快取未清除。先試 <code style="font-family:monospace;font-size:13px;">Cmd+Shift+R</code>，若還是舊資料再確認匯入指令是否正確。<br><br>
+          <strong>某個模組顯示空白：</strong>Staging 的 section 欄還沒填這個模組的值，或填完後忘了重新匯出 JSON 更新本機。<br><br>
+          <strong>tag1/tag2 是空的：</strong>該商品目前沒有公開優惠券，這是正確行為。
+        </p>
+      </div>
+    </section>
+
+    <!-- Block 10 — 驗收清單 -->
+    <section class="block" id="checklist" style="border-bottom:none;">
+      <div class="block-header">
+        <span class="block-num">10</span>
+        <h2 class="block-title">完成前驗收清單：每次建立概念都跑一遍</h2>
+      </div>
+
+      <p class="block-text">
+        這份清單是今天這個工作流程的濃縮版。
+        建立任何包含商品資料的設計概念前後，各跑一遍——前置確認資料正確，
+        完成後確認實作無誤。
+      </p>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">建立前 — 資料確認</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span><strong>products.json 已是最新版本</strong>——若超過 24 小時未更新，重新執行 🔄 強制重新匯入（不是 📥 匯入）</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>已確認設計概念所需的 section 值在 products.json 中有對應商品（開 JSON 搜尋 section 欄值）</span>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>本地 server 已啟動（<code style="font-family:monospace;font-size:13px;">python3 -m http.server 8088</code>），不是用 file:// 開啟</span>
+          <div class="must-badge">必要</div>
+        </div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header neutral">建立中 — 實作確認</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span><strong>product-loader.js 已引入</strong>，路徑為 <code style="font-family:monospace;font-size:13px;">../scripts/product-loader.js</code></span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>所有商品容器已加 <code style="font-family:monospace;font-size:13px;">data-api="../data/products.json"</code> 屬性</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>HTML 中無任何硬編碼的商品名稱、價格、圖片 URL</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>HTML 中無自定義的 buildCard() 或商品載入 JavaScript</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>若有使用 data-filter，篩選條件語法正確，且對應資料存在</span>
+        </div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">多模組頁面專屬確認（適用時）</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span><strong>Staging 的 section 欄位已填值</strong>，且已重新匯出並更新本機 data/products.json</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>每個容器的 <code style="font-family:monospace;font-size:13px;">data-filter="section:xxx"</code> 值與 Staging section 欄的值一致（拼寫、大小寫相符）</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>數量限制使用 <code style="font-family:monospace;font-size:13px;">data-max</code> 獨立屬性，而非 <code style="font-family:monospace;font-size:13px;">data-filter="limit:xxx"</code></span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>每個容器都加了 <code style="font-family:monospace;font-size:13px;">data-label</code> 屬性，方便 console debug</span>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>不同模組的 section 標籤不同，顯示的商品集合有明顯差異</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>每個模組在真實資料下都能載入預期數量的商品（無版面塌陷或商品數量不足）</span>
+          <div class="must-badge">必要</div>
+        </div>
+      </div>
+
+      <div class="checklist-block">
+        <div class="checklist-header dark">完成後 — 視覺確認</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>商品卡正常渲染，顯示真實商品名稱、價格、圖片</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>商品名稱長度不一時，排版沒有破版（特別注意 30 字以上的長名稱）</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>無圖片的商品顯示 purple-50 背景 + fallback icon，非空白或破圖</span>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>有優惠券的商品標籤顏色正確（pink/red 依 tag1/tag2 前綴）</span>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>Mobile / Tablet / Desktop 三個斷點都正常顯示</span>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">設計概念與 Figma 建置的分工</p>
+        <p>
+          <strong>設計概念（HTML prototype）</strong>用於快速探索和評選方向，側重視覺組合的可能性，資料是真實的但實作是快速的。
+          <strong>Figma 建置</strong>用於精修後的正式設計，側重精確規格、元件品質、以及交付工程師的 Handoff 品質。
+          <br><br>
+          正確的流程是：先用設計概念探索 3–5 個方向 → 三方評選 → 選定方向後按照 Part 1（Brief Basics）的框架撰寫 Brief，進入 Figma 建置 → 建置過程中按照 Part 3（Quality Check）做品質確認。
+          <strong>設計概念的真實資料讓評選決策更可靠；Part 1–3 的流程讓 Figma 建置有系統可依循。兩個流程相輔相成，不互相取代。</strong>
+        </p>
+      </div>
+
+      <div class="block-quote">
+        <p>「看完就能上手、不看就容易出錯——這是這份指南的設計目標。<br>真正的設計能力在於你為這些商品創造的體驗，而不是你如何取得這些商品的資料。」</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="2026-05-20-figma-quality-check.html" class="article-nav-prev">
+      <span class="article-nav-dir">← Previous</span>
+      <span class="article-nav-title">AI 在 Figma 建置時，設計師這樣做品質確認</span>
+      <span class="article-nav-sub">AI 設計協作指南 · Part 3 · 005</span>
+    </a>
+    <a href="index.html#works" class="article-nav-next">
+      <span class="article-nav-dir">All Works →</span>
+      <span class="article-nav-title">回到作品列表</span>
+      <span class="article-nav-sub">Alice Cheng Portfolio</span>
+    </a>
+  </div>
+</nav>
+
+<site-footer></site-footer>
+
+<script>
+  const heroThemes = [
+    'rgb(207,213,218)',
+    'rgb(243,220,221)',
+    'rgb(245,237,207)',
+    'rgb(227,216,228)',
+    'rgb(220,232,221)',
+    'rgb(216,208,206)',
+    'rgb(248,234,235)',
+    'rgb(235,185,181)',
+    'rgb(245,236,185)',
+  ];
+
+  const _stored = localStorage.getItem('heroTheme');
+  localStorage.removeItem('heroTheme');
+  let currentTheme = (_stored !== null && !isNaN(+_stored))
+    ? Math.abs(+_stored) % heroThemes.length
+    : Math.floor(Math.random() * heroThemes.length);
+
+  function applyHeroTheme(bg) {
+    document.documentElement.style.setProperty('--hero-bg', bg);
+  }
+  applyHeroTheme(heroThemes[currentTheme]);
+
+  setInterval(() => {
+    currentTheme = (currentTheme + 1) % heroThemes.length;
+    applyHeroTheme(heroThemes[currentTheme]);
+  }, 5000);
+
+  /* ToC scroll spy */
+  const sections = document.querySelectorAll('.block[id]');
+  const tocItems = document.querySelectorAll('.toc-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocItems.forEach(item => item.classList.remove('active'));
+        const active = document.querySelector(`.toc-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  /* Checklist click interaction */
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    item.addEventListener('click', function () {
+      const box = this.querySelector('.check-box');
+      if (box) {
+        box.classList.toggle('checked');
+        this.classList.toggle('item-checked');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
