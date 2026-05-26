@@ -1,0 +1,13 @@
+source_url,name,price,discount,promo,tag1,tag2,rating,rating_count,sales,image_url,section
+https://tw.buy.yahoo.com/gdsale/（貼入商品 ID）,富士 X100VI 數位相機（填入後由 Apps Script 自動覆蓋）,58900,95折,輕鬆買 分期0利率,pink:$500折,,4.9,328,已售5千+,,相機
+https://tw.buy.yahoo.com/gdsale/（貼入商品 ID）,Sony WF-1000XM5 真無線耳機,6490,80折,降噪之王,pink:$300折,,4.8,2341,已售1萬+,,推薦
+https://tw.buy.yahoo.com/gdsale/（貼入商品 ID）,Dyson V15 Detect 吸塵器,22900,85折,,pink:$1000折,,4.8,1567,已售3千+,,降價
+https://tw.buy.yahoo.com/gdsale/（貼入商品 ID）,Apple Watch Series 10,14900,88折,送保護貼,pink:$500折,red:限時優惠,4.9,4523,已售1萬+,,秒殺10點
+https://tw.buy.yahoo.com/gdsale/（貼入商品 ID）,Samsung Galaxy S25,25900,90折,,pink:$800折,,4.7,2087,已售5千+,,秒殺18點
+https://tw.buy.yahoo.com/gdsale/（貼入商品 ID）,Ray-Ban RB4306F 太陽眼鏡,4290,75折,,pink:$200折,red:限定滿額折,4.7,892,已售2萬+,,太陽眼鏡
+貼入 Yahoo 商品完整網址,,,,,,,,,,,
+貼入 Yahoo 商品完整網址,,,,,,,,,,,
+貼入 Yahoo 商品完整網址,,,,,,,,,,,
+貼入 Yahoo 商品完整網址,,,,,,,,,,,
+貼入 Yahoo 商品完整網址,,,,,,,,,,,
+貼入 Yahoo 商品完整網址,,,,,,,,,,,

@@ -314,6 +314,151 @@
     .phase-badge.once   { background: rgba(20,50,224,0.08); color: var(--blue); }
     .phase-badge.daily  { background: rgba(192,48,48,0.08); color: var(--red); }
 
+    /* ── DOWNLOAD BLOCK ─────────────────────────── */
+    .download-block {
+      border: 1px solid var(--border);
+      margin: 32px 0;
+      background: var(--card-bg);
+      overflow: hidden;
+    }
+    .download-block-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: center;
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .download-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      background: rgba(20,50,224,0.07);
+      border: 1px solid rgba(20,50,224,0.18);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.8px;
+      color: var(--blue);
+      margin-bottom: 10px;
+    }
+    .download-title {
+      font-family: var(--font-d);
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+    .download-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .download-what-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .download-what-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .download-what-list li {
+      font-size: 13px;
+      color: var(--text);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .download-what-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+    }
+    .download-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 32px;
+      background: var(--dark);
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.15s;
+      white-space: nowrap;
+      text-align: center;
+      gap: 5px;
+      min-width: 168px;
+      flex-shrink: 0;
+    }
+    .download-btn:hover { background: #2d2d2d; }
+    .download-btn-main { font-size: 14px; font-weight: 500; color: #fff; }
+    .download-btn-sub { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.3px; }
+    .download-steps {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr 1fr;
+      gap: 0;
+    }
+    .download-steps-label {
+      padding: 14px 20px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.8px;
+      color: var(--muted);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .download-step {
+      padding: 14px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border-right: 1px solid var(--border);
+    }
+    .download-step:last-child { border-right: none; }
+    .download-step-num {
+      font-family: var(--font-d);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--blue);
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+    .download-step p { font-size: 12px; color: var(--text); line-height: 1.6; }
+    .download-step p code { background: rgba(26,26,26,0.07); padding: 1px 5px; font-family: monospace; font-size: 11px; }
+    /* TOC download card */
+    .toc-download-card {
+      padding: 20px;
+      background: var(--dark);
+      border: 1px solid var(--dark);
+      margin-top: 20px;
+    }
+    .toc-download-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 12px; }
+    .toc-download-file { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 4px; }
+    .toc-download-meta { font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 14px; }
+    .toc-download-btn {
+      display: block;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.88px;
+      text-align: center;
+      transition: background 0.15s;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .toc-download-btn:hover { background: rgba(255,255,255,0.18); }
+
     /* ── RWD ─────────────────────────────────────── */
     @media (max-width: 1024px) {
       :root { --toc-w: 200px; }
@@ -346,6 +491,12 @@
       .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
       .contact-social { border-bottom: none; }
       .footer-inner { flex-direction: column; gap: 4px; height: auto; padding: 16px 20px; }
+      .download-block-inner { grid-template-columns: 1fr; padding: 20px; }
+      .download-btn { width: 100%; }
+      .download-steps { grid-template-columns: 1fr; }
+      .download-steps-label { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+      .download-step { border-right: none; border-bottom: 1px solid var(--border); }
+      .download-step:last-child { border-bottom: none; }
       .checklist-item { flex-wrap: wrap; }
       .checklist-item > span { flex: 1 1 0; min-width: 0; word-break: break-word; }
       .code-block { padding: 16px; }
@@ -409,6 +560,10 @@
         <span class="toc-num">02</span>
         <span class="toc-item-title">規劃：Wireframe 到資料規劃</span>
       </a>
+      <a href="#apps-script-setup" class="toc-item">
+        <span class="toc-num">02+</span>
+        <span class="toc-item-title">Apps Script 安裝設定</span>
+      </a>
       <a href="#sheets-guide" class="toc-item">
         <span class="toc-num">03</span>
         <span class="toc-item-title">Google Sheets 情境指南</span>
@@ -456,6 +611,18 @@
         <span class="toc-info-key">前提條件</span>
         <span class="toc-info-val">熟悉 HTML 基礎</span>
       </div>
+    </div>
+    <div class="toc-download-card">
+      <p class="toc-download-label">Resources</p>
+      <p class="toc-download-file">Staging 範本</p>
+      <p class="toc-download-meta">CSV · 12 欄 · 含 section 示範</p>
+      <a href="shp-staging-template.csv" download class="toc-download-btn">下載範本 CSV ↓</a>
+      <p class="toc-download-file" style="margin-top:12px;">Apps Script</p>
+      <p class="toc-download-meta">.js · 選單 + 匯入 + 匯出</p>
+      <a href="shp-apps-script.js" download class="toc-download-btn">下載程式碼 .js ↓</a>
+      <p class="toc-download-file" style="margin-top:12px;">Products 範本</p>
+      <p class="toc-download-meta">CSV · 12 欄 · 含真實商品範例</p>
+      <a href="shp-products-template.csv" download class="toc-download-btn">下載 Products CSV ↓</a>
     </div>
   </aside>
 
@@ -777,6 +944,385 @@
           否則你很容易建了一整套 tab UI，最後才發現資料根本無法支撐這個設計，白費時間。
         </p>
       </div>
+
+      <!-- Download Template Block -->
+      <div class="download-block">
+        <div class="download-block-inner">
+          <div>
+            <div class="download-badge">TEMPLATE &nbsp;·&nbsp; CSV</div>
+            <p class="download-title">Google Sheets Staging 範本</p>
+            <p class="download-desc">新專案直接取用 · 不需要從空白欄位開始建</p>
+            <p class="download-what-label">範本包含</p>
+            <ul class="download-what-list">
+              <li>標準 12 欄 Staging 結構（source_url, name, price, tag1/tag2, section…）</li>
+              <li>6 筆範例商品資料，涵蓋相機、耳機、降價、秒殺時段等 section 分類示範</li>
+              <li>6 列空白商品列，貼入 Yahoo 商品網址後執行 Apps Script 即可匯入</li>
+            </ul>
+          </div>
+          <a href="shp-staging-template.csv" download class="download-btn">
+            <span class="download-btn-main">↓ 下載範本 CSV</span>
+            <span class="download-btn-sub">匯入 Google Sheets 即可使用</span>
+          </a>
+        </div>
+        <div class="download-steps">
+          <p class="download-steps-label">三步驟<br>快速開始</p>
+          <div class="download-step">
+            <span class="download-step-num">1</span>
+            <p>下載 CSV → Google Sheets 新建試算表 → 選單「檔案 → 匯入」→ 上傳 CSV</p>
+          </div>
+          <div class="download-step">
+            <span class="download-step-num">2</span>
+            <p>替換 <code>source_url</code> 欄為你的 Yahoo 商品網址，<code>section</code> 欄填入你的模組代碼</p>
+          </div>
+          <div class="download-step">
+            <span class="download-step-num">3</span>
+            <p>安裝 Apps Script → 執行 🔄 強制重新匯入 → 商品資料自動填入 → 📤 匯出 JSON</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 02+ — Apps Script 安裝設定 -->
+    <section class="block" id="apps-script-setup">
+      <div class="block-header">
+        <span class="block-num">設定</span>
+        <h2 class="block-title">Apps Script 安裝設定：新專案一次完成</h2>
+      </div>
+
+      <p class="block-text">
+        Google Sheets + Apps Script 的組合是這套工作流程的核心。
+        Apps Script 負責從 Yahoo 商品頁面抓取資料、填入 Staging 工作表、以及匯出 products.json——
+        <strong>這些工作完全自動完成，設計師只需要在最初做一次設定，之後每天執行幾個選單指令即可。</strong>
+        這個章節帶你在 15 分鐘內完成設定。
+      </p>
+
+      <div class="block-stats">
+        <div class="block-stat">
+          <span class="stat-big">1</span>
+          <span class="stat-label">次安裝，永久有效</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">5</span>
+          <span class="stat-label">步驟完成設定</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">~15</span>
+          <span class="stat-label">分鐘（含授權）</span>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">開始前確認</p>
+        <p>
+          <strong>已完成：</strong>已下載 Staging 範本 CSV（見上方 Section 02 的下載區塊）。<br>
+          <strong>需要：</strong>一個 Google 帳號，以及 Google Sheets 和 Apps Script 的基本存取權限。<br>
+          <strong>不需要：</strong>寫程式的能力。整個安裝流程只需要複製貼上和點按幾個確認按鈕。
+        </p>
+      </div>
+
+      <!-- Step 1 -->
+      <p class="block-sub">步驟 1 ／ 5　建立 Google Sheets 並匯入範本</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">新建 Google 試算表</p>
+            <p class="step-text">
+              前往 <a href="https://sheets.google.com" target="_blank" style="color:var(--blue);text-decoration:underline;">sheets.google.com</a>
+              → 點「+」建立空白試算表 → 把試算表名稱改成你的專案名稱（例如「SHP 電商首頁概念 2026-06」）。
+              試算表名稱不影響功能，只是方便你之後找到它。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">匯入 CSV 範本</p>
+            <p class="step-text">
+              選單 <strong>檔案 → 匯入 → 上傳</strong> → 選擇你下載的 <code style="font-family:monospace;font-size:13px;">shp-staging-template.csv</code><br><br>
+              匯入設定請選：
+              <br>• 匯入位置：<strong>取代試算表</strong>
+              <br>• 分隔符號類型：<strong>逗號</strong>
+              <br>• 將文字轉換為數字、日期和公式：<strong>否</strong>（避免價格被誤轉）
+              <br><br>
+              點「匯入資料」完成。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">確認工作表名稱是「Staging」</p>
+            <p class="step-text">
+              畫面底部的工作表標籤應該顯示「Staging」。
+              <strong>這個名稱非常重要——Apps Script 靠它識別工作表，名稱不對就找不到資料。</strong>
+              <br><br>
+              如果顯示的是「工作表1」或其他名稱：右鍵點工作表標籤 → 重新命名 → 輸入 <code style="font-family:monospace;font-size:13px;">Staging</code>（注意大寫 S）。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <p class="block-sub">步驟 2 ／ 5　開啟 Apps Script 編輯器</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">開啟 Apps Script</p>
+            <p class="step-text">
+              在 Google Sheets 選單點 <strong>擴充功能 → Apps Script</strong>。
+              瀏覽器會在新分頁開啟 Apps Script 編輯器。
+              <br><br>
+              <em>如果找不到「擴充功能」選單，確認你已登入 Google 帳號，以及試算表是「我的雲端硬碟」裡的檔案（不是他人分享的唯讀連結）。</em>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">清空預設程式碼</p>
+            <p class="step-text">
+              編輯器裡預設會有一段 <code style="font-family:monospace;font-size:13px;">function myFunction() {}</code> 的空函數。
+              <strong>全選（Ctrl/Cmd+A）→ 刪除</strong>，把整個編輯區清空，
+              準備貼入完整的 SHP 商品管理程式碼。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <p class="block-sub">步驟 3 ／ 5　貼入程式碼並儲存</p>
+
+      <!-- Download for the script -->
+      <div class="download-block">
+        <div class="download-block-inner">
+          <div>
+            <div class="download-badge">APPS SCRIPT &nbsp;·&nbsp; .JS</div>
+            <p class="download-title">SHP 商品管理程式碼</p>
+            <p class="download-desc">完整可用的 Apps Script · 複製貼入即可執行</p>
+            <p class="download-what-label">程式碼包含</p>
+            <ul class="download-what-list">
+              <li>自訂選單建立（📥 匯入 / 🔄 強制重新匯入 / 📤 匯出 JSON）</li>
+              <li>從 Yahoo 商品頁面自動抓取資料的解析邏輯</li>
+              <li>強制重新匯入時保留 section 欄不覆蓋的保護機制</li>
+              <li>匯出至 _JSON_Export 工作表並顯示下一步提示</li>
+            </ul>
+          </div>
+          <a href="shp-apps-script.js" download class="download-btn">
+            <span class="download-btn-main">↓ 下載程式碼 .js</span>
+            <span class="download-btn-sub">複製全部 → 貼入編輯器</span>
+          </a>
+        </div>
+        <div class="download-steps">
+          <p class="download-steps-label">貼入<br>步驟</p>
+          <div class="download-step">
+            <span class="download-step-num">1</span>
+            <p>開啟下載的 .js 檔案 → Ctrl/Cmd+A 全選 → Ctrl/Cmd+C 複製全部內容</p>
+          </div>
+          <div class="download-step">
+            <span class="download-step-num">2</span>
+            <p>回到 Apps Script 編輯器 → 點編輯區 → Ctrl/Cmd+V 貼上</p>
+          </div>
+          <div class="download-step">
+            <span class="download-step-num">3</span>
+            <p>Ctrl/Cmd+S 儲存 → 確認左上角出現「已儲存變更」（可改名稱為「SHP 商品管理」）</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-text">
+        貼入後，你應該會看到編輯器左側的函數清單出現 <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">onOpen</code>、
+        <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">importNewProducts</code>、
+        <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">forceReimportAll</code>、
+        <code style="background:rgba(26,26,26,0.07);padding:2px 6px;font-family:monospace;font-size:14px;">exportProductsJson</code> 等函數。
+        如果編輯器顯示紅色錯誤標示，通常是貼入時有多餘空白或 BOM 字元——重新全選刪除再貼一次即可。
+      </p>
+
+      <!-- Step 4 -->
+      <p class="block-sub">步驟 4 ／ 5　執行授權</p>
+
+      <p class="block-text">
+        Apps Script 需要你的授權才能存取 Google Sheets 和外部網路（用來抓取 Yahoo 商品資料）。
+        <strong>這個授權只需要做一次，之後每次使用不需要重複。</strong>
+        以下是詳細的授權步驟——Google 的授權介面設計比較繞，請按照步驟操作：
+      </p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">選擇 onOpen 並執行</p>
+            <p class="step-text">
+              在編輯器頂部的函數下拉選單（預設顯示「選取函式」），
+              選擇 <code style="font-family:monospace;font-size:13px;">onOpen</code>。
+              點選左側的 <strong>▶ 執行</strong> 按鈕。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">點「查看權限」開始授權</p>
+            <p class="step-text">
+              系統會彈出「需要授權」對話框 → 點 <strong>「查看權限」</strong>。
+              接著選擇你的 Google 帳號（即擁有這份試算表的帳號）。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">通過「Google 尚未驗證」警告</p>
+            <p class="step-text">
+              Google 會顯示「Google 尚未驗證這個應用程式」的警告頁面。
+              <strong>這是正常的</strong>——你自己寫的 Script 都會出現這個畫面，不代表程式有問題。
+              <br><br>
+              點左下角的 <strong>「進階」</strong> 展開隱藏選項 →
+              點 <strong>「前往 SHP 商品管理（不安全）」</strong>（名稱取決於你的專案名稱）。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">④</span>
+          <div class="step-body">
+            <p class="step-title">點「允許」完成授權</p>
+            <p class="step-text">
+              確認權限要求頁面（會列出 Apps Script 需要的權限：
+              存取試算表、以你的身份連接外部服務）→
+              點 <strong>「允許」</strong>。
+              <br><br>
+              授權完成後，畫面會回到 Apps Script 編輯器，
+              底部執行紀錄應顯示「執行完成」。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <p class="block-sub">步驟 5 ／ 5　確認選單出現</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">回到 Google Sheets 並重新整理</p>
+            <p class="step-text">
+              切回 Google Sheets 的分頁 → 按 <code style="font-family:monospace;font-size:13px;">Cmd+R</code>（或 F5）重新整理頁面。
+              授權完成後，onOpen() 函數才會在頁面載入時執行，建立選單。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">確認「商品管理」選單</p>
+            <p class="step-text">
+              重新整理後，頂部選單列應該出現 <strong>「商品管理」</strong> 選項。
+              點開確認有三個指令：
+              <br>• 📥 匯入商品資料（只補空白名稱）
+              <br>• 🔄 強制重新匯入全部
+              <br>• ─────────────
+              <br>• 📤 匯出商品 JSON
+              <br><br>
+              出現這三個選項代表安裝完成。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Three commands explained -->
+      <p class="block-sub">三個選單指令：什麼時候用哪個</p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);font-size:18px;">📥</div>
+          <div>
+            <p class="principle-title">匯入商品資料（只補空白名稱）</p>
+            <p class="principle-desc">
+              掃描 Staging 工作表，只抓取 <code style="background:rgba(26,26,26,0.07);padding:1px 5px;font-family:monospace;font-size:13px;">name</code> 欄為空白的列。
+              <strong>用途：</strong>新專案剛貼入 source_url 後，第一次把商品資料填進來。
+              <br>
+              <strong>不適合：</strong>更新已有名稱的商品價格——那些列會被跳過，不會更新。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);font-size:18px;">🔄</div>
+          <div>
+            <p class="principle-title">強制重新匯入全部</p>
+            <p class="principle-desc">
+              重新抓取所有有 source_url 的列，不管 name 欄有沒有值。
+              <strong>section 欄的值不會被覆蓋。</strong>
+              <br><br>
+              <strong>用途：</strong>每次想更新最新商品資料前（評審前、每日更新）一律用這個。
+              一次抓取多筆商品需要 1–5 分鐘，抓取中請勿關閉瀏覽器。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num" style="color:var(--blue);font-size:18px;">📤</div>
+          <div>
+            <p class="principle-title">匯出商品 JSON</p>
+            <p class="principle-desc">
+              把 Staging 工作表的所有有效商品資料轉成 JSON 格式，
+              寫入 <code style="background:rgba(26,26,26,0.07);padding:1px 5px;font-family:monospace;font-size:13px;">_JSON_Export</code> 工作表的 A1 儲存格。
+              <br><br>
+              <strong>用途：</strong>每次強制重新匯入後都要執行一次，然後把 A1 的內容複製貼入本機 <code style="background:rgba(26,26,26,0.07);padding:1px 5px;font-family:monospace;font-size:13px;">data/products.json</code>。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification checklist -->
+      <p class="block-sub">安裝完成驗收</p>
+
+      <div class="checklist-block">
+        <div class="checklist-header blue">安裝驗收清單</div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>工作表標籤名稱是「<strong>Staging</strong>」（S 大寫，非 Sheet1 / 工作表1）</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>標題列欄位包含 <code style="font-family:monospace;font-size:13px;">source_url</code>、<code style="font-family:monospace;font-size:13px;">name</code>、<code style="font-family:monospace;font-size:13px;">section</code>（全小寫）</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>Google Sheets 頂部出現「<strong>商品管理</strong>」選單</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>商品管理選單裡有三個指令（📥 匯入 / 🔄 強制重新匯入 / 📤 匯出 JSON）</span>
+          <div class="must-badge">必要</div>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>將一個 Yahoo 商品網址填入 source_url 欄 → 執行 📥 匯入 → 確認 name 欄被自動填入商品名稱</span>
+        </div>
+        <div class="checklist-item">
+          <div class="check-box"></div>
+          <span>執行 📤 匯出 JSON → 確認 <code style="font-family:monospace;font-size:13px;">_JSON_Export</code> 工作表 A1 出現 JSON 格式資料</span>
+        </div>
+      </div>
+
+      <!-- Troubleshooting -->
+      <div class="callout-box red">
+        <p class="callout-label">常見問題</p>
+        <p>
+          <strong>「商品管理」選單沒出現：</strong>確認授權有完成（回 Apps Script 執行 onOpen 看有無報錯） → 重新整理 Google Sheets 頁面。<br><br>
+          <strong>授權時找不到「進階」按鈕：</strong>往下捲動警告頁面，「進階」通常在頁面底部。不同瀏覽器介面略有不同。<br><br>
+          <strong>執行時出現「找不到 Staging 工作表」：</strong>確認工作表標籤名稱完全正確（<code style="font-family:monospace;font-size:13px;">Staging</code>，S 大寫，不是 <code style="font-family:monospace;font-size:13px;">staging</code> 或 <code style="font-family:monospace;font-size:13px;">STAGING</code>）。<br><br>
+          <strong>匯入後 name 欄仍是空白：</strong>確認 source_url 是完整的 Yahoo 商品網址（以 <code style="font-family:monospace;font-size:13px;">https://tw.buy.yahoo.com</code> 開頭），商品尚在架。可打開 Apps Script → 查看「執行記錄」取得詳細錯誤訊息。<br><br>
+          <strong>抓取速度很慢或中途失敗：</strong>Apps Script 每次抓取有 6 分鐘的執行時間上限。一次匯入不要超過 15–20 筆，可以分批執行。
+        </p>
+      </div>
+
     </section>
 
     <!-- Block 03 — Google Sheets 情境指南 -->
@@ -791,6 +1337,18 @@
         products.json 忠實記錄這些分類，HTML 按照分類篩選顯示。
         無論面對多複雜的設計概念，都能用這個機制找到對應的資料建構方式。
       </p>
+
+      <div class="callout-box blue">
+        <p class="callout-label">新專案？從範本開始，不要從空白開始</p>
+        <p>
+          每次新專案都要從空白 Google Sheets 手動建欄位很浪費時間。
+          <strong><a href="shp-staging-template.csv" download style="color:var(--blue);text-decoration:underline;">下載 Staging 範本 CSV ↓</a></strong>——
+          匯入後欄位結構即完整，6 筆範例資料涵蓋 section 分類示範（相機、降價、秒殺時段等）。
+          替換 source_url、調整 section 欄值，執行 Apps Script 即可開始。
+          <br><br>
+          第一次建立 section 欄位的設定步驟請看下方 3-A。
+        </p>
+      </div>
 
       <p class="block-sub">3-A　第一次使用：在 Staging 建立 section 欄位</p>
 
@@ -1183,6 +1741,42 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Download Products Template Block -->
+      <div class="download-block">
+        <div class="download-block-inner">
+          <div>
+            <div class="download-badge">TEMPLATE &nbsp;·&nbsp; CSV</div>
+            <p class="download-title">Products 商品資料範本</p>
+            <p class="download-desc">對應 products.json 欄位 · 可直接匯入 Google Sheets</p>
+            <p class="download-what-label">範本包含</p>
+            <ul class="download-what-list">
+              <li>標準 12 欄結構（source_url, name, price, discount, promo, tag1/tag2, rating, sales, image_url, section）</li>
+              <li>3 筆真實格式範例商品，涵蓋相機、太陽眼鏡、耳機等 section 示範</li>
+              <li>空白商品列，貼入 Yahoo 商品網址後由 Apps Script 自動填入其餘欄位</li>
+            </ul>
+          </div>
+          <a href="shp-products-template.csv" download class="download-btn">
+            <span class="download-btn-main">↓ 下載 Products CSV</span>
+            <span class="download-btn-sub">對應 products.json 欄位結構</span>
+          </a>
+        </div>
+        <div class="download-steps">
+          <p class="download-steps-label">使用<br>方式</p>
+          <div class="download-step">
+            <span class="download-step-num">1</span>
+            <p>下載 CSV → Google Sheets 新建試算表 → 「檔案 → 匯入 → 上傳」</p>
+          </div>
+          <div class="download-step">
+            <span class="download-step-num">2</span>
+            <p>將 <code>source_url</code> 欄替換為你的 Yahoo 商品網址，<code>section</code> 欄填入模組代碼</p>
+          </div>
+          <div class="download-step">
+            <span class="download-step-num">3</span>
+            <p>執行 Apps Script 🔄 強制重新匯入 → 📤 匯出 JSON → 貼入本機 <code>data/products.json</code></p>
+          </div>
+        </div>
       </div>
     </section>
 
