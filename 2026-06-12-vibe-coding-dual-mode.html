@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 設計協作的雙模式工作流程 — Alice Cheng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Inter:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="shared-components.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #f5f0e8;
+      --dark:   #1a1a1a;
+      --text:   #3d3d3d;
+      --muted:  #7a7069;
+      --border: rgba(26,26,26,0.16);
+      --blue:   #1432e0;
+      --red:    #c03030;
+      --green:  #1a7a40;
+      --card-bg:#ffffff;
+      --font-d: 'Playfair Display', serif;
+      --font-b: 'Inter', 'Noto Sans JP', sans-serif;
+      --toc-w:  240px;
+      --hero-bg:           rgb(220,232,221);
+      --hero-ghost:        rgba(255,255,255,0.05);
+      --hero-badge-border: rgba(26,26,26,0.16);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--dark); font-family: var(--font-b); overflow-x: hidden; }
+
+    .nav { position: sticky; top: 0; z-index: 200; height: 56px; width: 100%; background: rgba(245,240,232,0.96); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 1360px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 48px; }
+    .nav-logo { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); text-decoration: none; }
+    .nav-logo em { font-style: italic; }
+    .nav-links { display: flex; height: 56px; }
+    .nav-links a { display: flex; align-items: center; padding: 0 22px; height: 56px; border-left: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--text); text-decoration: none; transition: background 0.15s; }
+    .nav-links a:hover { background: rgba(26,26,26,0.04); }
+    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-back:hover { color: var(--dark); }
+
+    .article-hero { background: var(--hero-bg); border-bottom: 1px solid var(--border); }
+    .article-hero-inner { max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: var(--toc-w) 1fr; min-height: 400px; }
+    .hero-left { border-right: 1px solid var(--border); padding: 48px 32px; display: flex; flex-direction: column; justify-content: space-between; }
+    .hero-badge { display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--hero-badge-border); font-size: 11px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); width: fit-content; margin-bottom: 40px; }
+    .hero-date-badge { background: var(--dark); border: 1px solid var(--dark); padding: 12px 16px; font-family: var(--font-d); font-size: 20px; font-weight: 700; color: #fff; line-height: 24px; width: fit-content; }
+    .hero-meta-list { display: flex; flex-direction: column; gap: 16px; margin-top: auto; }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 3px; }
+    .hero-meta-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .hero-meta-value { font-size: 13px; font-weight: 400; color: var(--text); }
+    .hero-right { padding: 64px 48px 64px 64px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .hero-index { font-family: var(--font-d); font-size: clamp(88px, 12vw, 177px); font-weight: 700; color: rgba(26,26,26,0.06); line-height: 1; user-select: none; margin-bottom: -16px; }
+    .hero-title-en { font-family: var(--font-d); font-size: clamp(53px, 6vw, 97px); font-weight: 700; font-style: italic; color: var(--dark); line-height: 1; }
+    .hero-title-zh { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--muted); line-height: 1.3; margin-top: 12px; margin-bottom: 32px; }
+    .hero-tagline { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); max-width: 560px; }
+
+    .page-layout { max-width: 1360px; margin: 0 auto; display: grid; grid-template-columns: var(--toc-w) 1fr; align-items: start; }
+
+    .toc { position: sticky; top: 56px; border-right: 1px solid var(--border); min-height: calc(100vh - 56px); padding: 48px 32px; display: flex; flex-direction: column; gap: 32px; }
+    .toc-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .toc-list { display: flex; flex-direction: column; gap: 0; }
+    .toc-item { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); text-decoration: none; transition: background 0.15s; }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-item:hover .toc-item-title { color: var(--dark); }
+    .toc-num { font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--muted); flex-shrink: 0; }
+    .toc-item-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+    .toc-item.active .toc-item-title { color: var(--dark); font-weight: 700; }
+    .toc-item.active .toc-num { color: var(--dark); }
+    .toc-info-card { margin-top: auto; padding: 20px; background: var(--card-bg); border: 1px solid var(--border); }
+    .toc-info-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+    .toc-info-row { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .toc-info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .toc-info-key { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .toc-info-val { font-size: 13px; font-weight: 500; color: var(--dark); }
+
+    .content-blocks { padding: 0 48px; }
+    .block { border-bottom: 1px solid var(--border); padding: 64px 0; }
+    .block:last-child { border-bottom: none; }
+    .block-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 32px; }
+    .block-num { font-size: 11px; font-weight: 500; letter-spacing: 2px; color: var(--muted); }
+    .block-title { font-family: var(--font-d); font-size: clamp(20px, 2.2vw, 31px); font-weight: 700; color: var(--dark); }
+    .block-sub { font-family: var(--font-d); font-size: 19px; font-weight: 700; color: var(--dark); margin: 28px 0 10px; }
+    .block-text { font-size: 17px; font-weight: 300; line-height: 1.9; color: var(--text); margin-bottom: 20px; }
+    .block-text:last-child { margin-bottom: 0; }
+    .block-text strong { color: var(--dark); font-weight: 500; }
+
+    .block-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--border); margin: 32px 0; }
+    .block-stat { padding: 28px 24px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .block-stat:last-child { border-right: none; }
+    .stat-big { font-family: var(--font-d); font-size: 49px; font-weight: 700; color: var(--dark); line-height: 1; }
+    .stat-label { font-size: 11px; font-weight: 500; letter-spacing: 1.4px; color: var(--muted); text-transform: uppercase; }
+
+    .block-quote { padding: 32px; background: var(--dark); margin: 32px 0; }
+    .block-quote p { font-family: var(--font-d); font-size: clamp(18px, 1.8vw, 22px); font-style: italic; line-height: 1.55; color: #fff; }
+
+    .callout-box { padding: 20px 24px; border-left: 3px solid; margin: 24px 0; }
+    .callout-box.blue  { background: rgba(20,50,224,0.05); border-color: var(--blue); }
+    .callout-box.red   { background: rgba(192,48,48,0.05); border-color: var(--red); }
+    .callout-box.dark  { background: rgba(26,26,26,0.05); border-color: var(--dark); }
+    .callout-box.green { background: rgba(26,122,64,0.05); border-color: var(--green); }
+    .callout-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout-box.blue  .callout-label { color: var(--blue); }
+    .callout-box.red   .callout-label { color: var(--red); }
+    .callout-box.dark  .callout-label { color: var(--dark); }
+    .callout-box.green .callout-label { color: var(--green); }
+    .callout-box p { font-size: 14px; font-weight: 400; line-height: 1.7; color: var(--text); }
+    .callout-box p strong { color: var(--dark); font-weight: 500; }
+    .callout-box code { font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 12px; background: rgba(26,26,26,0.07); padding: 2px 5px; }
+
+    .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin: 24px 0; }
+    .tool-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .tool-card { padding: 24px; background: var(--card-bg); border-top: 3px solid; }
+    .tool-card.blue   { border-top-color: var(--blue); }
+    .tool-card.dark   { border-top-color: var(--dark); }
+    .tool-card.red    { border-top-color: var(--red); }
+    .tool-card.muted  { border-top-color: var(--muted); }
+    .tool-card.green  { border-top-color: var(--green); }
+    .tool-card.purple { border-top-color: #7c3aed; }
+    .tool-card.full   { grid-column: 1 / -1; }
+    .tool-name { font-family: var(--font-d); font-size: 17px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .tool-role { font-size: 11px; font-weight: 500; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+    .tool-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .tool-desc strong { color: var(--dark); font-weight: 500; }
+    .tool-tag { display: inline-flex; margin-top: 10px; padding: 4px 10px; border: 1px solid var(--border); font-size: 10px; font-weight: 500; letter-spacing: 1px; color: var(--muted); background: var(--bg); }
+
+    .compare-wrap { overflow-x: auto; margin: 24px 0; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+    .compare-table th { padding: 10px 14px; background: var(--dark); color: #fff; text-align: left; font-size: 10px; font-weight: 500; letter-spacing: 1.5px; font-family: var(--font-b); text-transform: uppercase; }
+    .compare-table th:not(:first-child) { border-left: 1px solid rgba(255,255,255,0.1); }
+    .compare-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+    .compare-table td:not(:first-child) { border-left: 1px solid var(--border); }
+    .compare-table .row-label { font-weight: 500; color: var(--dark); }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .tag-done  { display: inline-flex; padding: 2px 8px; background: rgba(20,50,224,0.08); color: var(--blue); font-size: 11px; font-weight: 500; }
+    .tag-need  { display: inline-flex; padding: 2px 8px; background: rgba(192,48,48,0.08); color: var(--red); font-size: 11px; font-weight: 500; }
+    .tag-green { display: inline-flex; padding: 2px 8px; background: rgba(26,122,64,0.08); color: var(--green); font-size: 11px; font-weight: 500; }
+
+    .principle-set { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin: 24px 0; }
+    .principle-card { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--card-bg); }
+    .principle-card:last-child { border-bottom: none; }
+    .principle-num { font-family: var(--font-d); font-size: 24px; font-weight: 700; color: var(--border); line-height: 1.2; padding-top: 2px; }
+    .principle-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+    .principle-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .principle-desc strong { color: var(--dark); font-weight: 500; }
+    .principle-desc code { font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 12px; background: rgba(26,26,26,0.07); padding: 2px 5px; }
+
+    .process-steps { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+    .process-step { display: grid; grid-template-columns: 56px 1fr; border: 1px solid var(--border); border-bottom: none; }
+    .process-step:last-child { border-bottom: 1px solid var(--border); }
+    .step-num { display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--border); font-family: var(--font-d); font-size: 14px; font-weight: 700; color: var(--muted); }
+    .step-body { padding: 20px 24px; }
+    .step-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .step-text { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .step-text strong { color: var(--dark); font-weight: 500; }
+    .step-text code { font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 12px; background: rgba(26,26,26,0.07); padding: 2px 5px; }
+
+    .code-block { background: var(--dark); padding: 24px; margin: 24px 0; overflow-x: auto; }
+    .code-block pre { font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.85); white-space: pre; }
+    .code-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.35); text-transform: uppercase; margin-bottom: 12px; }
+    .code-comment { color: rgba(255,255,255,0.35); }
+    .code-attr { color: #7dd3fc; }
+    .code-val { color: #86efac; }
+    .code-tag { color: #fca5a5; }
+    .code-hl { color: #fde68a; }
+
+    .layer-diagram { border: 1px solid var(--border); margin: 24px 0; overflow: hidden; }
+    .layer-row { display: grid; grid-template-columns: 24px 1fr auto; align-items: stretch; border-bottom: 1px solid var(--border); }
+    .layer-row:last-child { border-bottom: none; }
+    .layer-stripe { width: 24px; }
+    .layer-stripe.done  { background: var(--blue); opacity: 0.7; }
+    .layer-stripe.need  { background: var(--red); opacity: 0.6; }
+    .layer-stripe.green { background: var(--green); opacity: 0.7; }
+    .layer-body { padding: 20px 24px; }
+    .layer-num { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); margin-bottom: 4px; }
+    .layer-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 4px; }
+    .layer-desc { font-size: 13px; font-weight: 300; line-height: 1.6; color: var(--text); }
+    .layer-source { padding: 20px 24px 20px 0; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 4px; text-align: right; min-width: 160px; }
+    .layer-src-label { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
+    .layer-src-val { font-size: 13px; font-weight: 500; color: var(--dark); }
+    .layer-badge { display: inline-flex; padding: 3px 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.5px; }
+    .layer-badge.done  { background: rgba(20,50,224,0.1); color: var(--blue); }
+    .layer-badge.need  { background: rgba(192,48,48,0.1); color: var(--red); }
+    .layer-badge.green { background: rgba(26,122,64,0.1); color: var(--green); }
+
+    .flow-diagram { padding: 24px; background: var(--card-bg); border: 1px solid var(--border); margin: 24px 0; }
+    .flow-caption { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+    .flow-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0; row-gap: 8px; }
+    .flow-node { padding: 8px 14px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .flow-node.blue    { background: rgba(20,50,224,0.08); color: var(--blue); }
+    .flow-node.dark    { background: var(--dark); color: #fff; }
+    .flow-node.neutral { background: rgba(26,26,26,0.06); color: var(--text); }
+    .flow-node.green   { background: rgba(26,122,64,0.08); color: var(--green); }
+    .flow-arrow { padding: 0 6px; color: var(--muted); font-size: 12px; }
+    .flow-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+    /* Zone blocks for boundary framework */
+    .zone-grid { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); margin: 24px 0; }
+    .zone-card { display: grid; grid-template-columns: 8px 80px 1fr; align-items: stretch; border-bottom: 1px solid var(--border); }
+    .zone-card:last-child { border-bottom: none; }
+    .zone-stripe-1 { background: var(--red); }
+    .zone-stripe-2 { background: var(--blue); }
+    .zone-stripe-3 { background: var(--green); }
+    .zone-label-col { padding: 20px 16px; background: rgba(26,26,26,0.03); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; text-align: center; }
+    .zone-num { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: var(--dark); }
+    .zone-name { font-size: 10px; font-weight: 500; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; }
+    .zone-body { padding: 20px 24px; }
+    .zone-title { font-size: 15px; font-weight: 500; color: var(--dark); margin-bottom: 6px; }
+    .zone-desc { font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--text); }
+    .zone-desc code { font-family: 'SF Mono','Fira Code','Courier New',monospace; font-size: 12px; background: rgba(26,26,26,0.07); padding: 2px 5px; }
+    .zone-desc strong { color: var(--dark); font-weight: 500; }
+
+    /* Fidelity meter */
+    .fidelity-bar { margin: 24px 0; border: 1px solid var(--border); overflow: hidden; }
+    .fidelity-bar-inner { height: 48px; background: linear-gradient(to right, var(--blue) 0%, var(--blue) 85%, var(--muted) 85%, var(--muted) 100%); display: flex; align-items: center; padding: 0 16px; gap: 12px; }
+    .fidelity-pct { font-family: var(--font-d); font-size: 22px; font-weight: 700; color: #fff; }
+    .fidelity-label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.8); }
+    .fidelity-legend { display: grid; grid-template-columns: 1fr 1fr; }
+    .fidelity-legend-item { padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--border); }
+    .fidelity-legend-item:first-child { border-right: 1px solid var(--border); }
+    .fidelity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .fidelity-dot.blue { background: var(--blue); }
+    .fidelity-dot.muted { background: var(--muted); }
+    .fidelity-legend-text { font-size: 13px; font-weight: 300; color: var(--text); }
+    .fidelity-legend-text strong { color: var(--dark); font-weight: 500; }
+
+    .block-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .block-tag { display: inline-flex; align-items: center; padding: 6px 14px; border: 1px solid var(--border); font-size: 11px; font-weight: 500; letter-spacing: 0.88px; color: var(--dark); background: var(--card-bg); }
+    .block-tag.blue  { background: rgba(20,50,224,0.07); border-color: rgba(20,50,224,0.2); color: var(--blue); }
+    .block-tag.red   { background: rgba(192,48,48,0.07); border-color: rgba(192,48,48,0.2); color: var(--red); }
+    .block-tag.green { background: rgba(26,122,64,0.07); border-color: rgba(26,122,64,0.2); color: var(--green); }
+
+    .article-nav { border-top: 1px solid var(--border); }
+    .article-nav-inner { max-width: 1360px; margin: 0 auto; display: flex; }
+    .article-nav-prev, .article-nav-next { flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: background 0.15s; }
+    .article-nav-prev { border-right: 1px solid var(--border); }
+    .article-nav-prev:hover, .article-nav-next:hover { background: rgba(26,26,26,0.03); }
+    .article-nav-dir { font-size: 10px; font-weight: 500; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+    .article-nav-title { font-family: var(--font-d); font-size: 20px; font-weight: 700; color: var(--dark); }
+    .article-nav-sub { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+    .contact { background: var(--dark); }
+    .contact-inner { max-width: 1360px; margin: 0 auto; display: flex; align-items: stretch; }
+    .contact-quote { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; align-items: center; }
+    .contact-quote p { font-family: var(--font-d); font-size: clamp(18px,2vw,24px); font-style: italic; line-height: 1.4; color: var(--bg); }
+    .contact-email { flex: 1; padding: 48px 40px; border-right: 1px solid rgba(255,255,255,0.09); display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .contact-email-label { font-size: 10px; font-weight: 500; letter-spacing: 1.8px; color: rgba(255,255,255,0.4); }
+    .contact-email a { font-family: var(--font-d); font-size: clamp(16px,1.6vw,22px); font-style: italic; text-decoration: underline; color: var(--bg); transition: opacity 0.15s; }
+    .contact-email a:hover { opacity: 0.75; }
+    .contact-social { width: 240px; padding: 48px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center; }
+    .contact-social a { font-size: 11px; font-weight: 500; letter-spacing: 1.32px; color: var(--bg); text-decoration: none; transition: opacity 0.15s; }
+    .contact-social a:hover { opacity: 0.7; }
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.07); }
+    .footer-inner { max-width: 1360px; margin: 0 auto; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; font-size: 11px; color: var(--bg); }
+
+    @media (max-width: 1024px) {
+      :root { --toc-w: 200px; }
+      .content-blocks { padding: 0 32px; }
+      .hero-right { padding: 48px 32px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .article-hero-inner { grid-template-columns: 1fr; }
+      .hero-left { border-right: none; border-bottom: 1px solid var(--border); padding: 32px 20px; }
+      .hero-index { display: none; }
+      .hero-right { padding: 40px 20px; }
+      .page-layout { grid-template-columns: minmax(0, 1fr); }
+      .toc { display: none; }
+      .content-blocks { padding: 0 20px; }
+      .block { padding: 40px 0; }
+      .block-stats { grid-template-columns: 1fr; }
+      .block-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .block-stat:last-child { border-bottom: none; }
+      .tool-grid, .tool-grid-3 { grid-template-columns: 1fr; }
+      .zone-card { grid-template-columns: 8px 64px 1fr; }
+      .article-nav-inner { flex-direction: column; }
+      .article-nav-prev { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+      .article-nav-next { padding: 24px 20px; }
+      .contact-inner { flex-direction: column; }
+      .contact-quote, .contact-email, .contact-social { width: 100%; flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.09); padding: 32px 20px; }
+      .contact-social { border-bottom: none; }
+      .layer-source { display: none; }
+      .layer-row { grid-template-columns: 24px 1fr; }
+      .fidelity-legend { grid-template-columns: 1fr; }
+      .fidelity-legend-item:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-back">← ALICE CHENG</a>
+    <div class="nav-links">
+      <a href="index.html#works">WORKS</a>
+      <a href="index.html#about">ABOUT</a>
+      <a href="index.html#contact">CONTACT</a>
+    </div>
+  </div>
+</nav>
+
+<header class="article-hero">
+  <div class="article-hero-inner">
+    <div class="hero-left">
+      <div>
+        <div class="hero-badge">AI DESIGN LAB · PART 7</div>
+        <div class="hero-date-badge">2026<br>06/12</div>
+      </div>
+      <div class="hero-meta-list">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">類別</span>
+          <span class="hero-meta-value">AI 設計協作工作流程</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">適用對象</span>
+          <span class="hero-meta-value">SHP 設計師</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">前置閱讀</span>
+          <span class="hero-meta-value">008 · Vibe Coding × Design Token</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">閱讀時間</span>
+          <span class="hero-meta-value">約 30 分鐘</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-index">009</div>
+      <h1 class="hero-title-en">Explore &amp; Precision</h1>
+      <p class="hero-title-zh">AI 設計協作的雙模式工作流程</p>
+      <p class="hero-tagline">建立 tokens.css、components.css 和設計規格 MD 之後，你擁有了一套精準執行的基礎——但這只是工作流程的一半。這篇文章說明如何加入探索模式，讓 AI 從執行者變成設計思考夥伴，以及如何在兩種模式之間切換，打造可掌控品質、同時保留創意空間的完整設計工作流程。</p>
+    </div>
+  </div>
+</header>
+
+<div class="page-layout">
+  <nav class="toc">
+    <p class="toc-label">目錄</p>
+    <div class="toc-list">
+      <a href="#opening"    class="toc-item"><span class="toc-num">00</span><span class="toc-item-title">你現在站在哪裡</span></a>
+      <a href="#challenge"  class="toc-item"><span class="toc-num">01</span><span class="toc-item-title">單模式工作流的代價</span></a>
+      <a href="#twomode"    class="toc-item"><span class="toc-num">02</span><span class="toc-item-title">兩種模式的定義</span></a>
+      <a href="#principles" class="toc-item"><span class="toc-num">03</span><span class="toc-item-title">設計原則：三區邊界框架</span></a>
+      <a href="#explore"    class="toc-item"><span class="toc-num">04</span><span class="toc-item-title">模式 A · 探索模式</span></a>
+      <a href="#precision"  class="toc-item"><span class="toc-num">05</span><span class="toc-item-title">模式 B · 精製模式</span></a>
+      <a href="#switching"  class="toc-item"><span class="toc-num">06</span><span class="toc-item-title">雙模式完整工作流程</span></a>
+      <a href="#outcomes"   class="toc-item"><span class="toc-num">07</span><span class="toc-item-title">可以期待的設計成果</span></a>
+      <a href="#closing"    class="toc-item"><span class="toc-num">08</span><span class="toc-item-title">結語</span></a>
+    </div>
+    <div class="toc-info-card">
+      <p class="toc-info-label">本文建立在</p>
+      <div class="toc-info-row">
+        <span class="toc-info-key">Layer 1a · tokens.css</span>
+        <span class="toc-info-val">顏色語意 token</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">Layer 1b · components.css</span>
+        <span class="toc-info-val">元件骨架定義</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">Layer 2 · CLAUDE.md</span>
+        <span class="toc-info-val">AI 協作規則</span>
+      </div>
+      <div class="toc-info-row">
+        <span class="toc-info-key">Layer 3 · spec MDs</span>
+        <span class="toc-info-val">設計意圖文件</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content-blocks">
+
+    <!-- Block 00 — 前言 -->
+    <section class="block" id="opening">
+      <div class="block-header">
+        <span class="block-num">00</span>
+        <h2 class="block-title">你現在站在哪裡：已建立的基礎與待補的那一半</h2>
+      </div>
+
+      <p class="block-text">
+        如果你已閱讀完上一篇文章，你現在應該有：
+        <strong>tokens.css（顏色語意）、components.css（元件骨架）、CLAUDE.md（AI 協作規則）、設計規格 MD（設計意圖）</strong>。
+        這四層讓 AI 能夠精準輸出符合你設計系統的 prototype——顏色正確、元件骨架正確、設計意圖正確。
+      </p>
+
+      <p class="block-text">
+        但這套工作流程解決的，是設計過程的後半段：<strong>你已決定怎麼設計，AI 幫你精準輸出</strong>。
+        設計過程的前半段——探索可能性、發現更好的方向、讓 AI 帶入它的設計知識——還沒有被設計進工作流程裡。
+      </p>
+
+      <div class="block-quote">
+        <p>「你建立的精準基礎，是為了讓 AI 執行你的決定。但你還沒有建立讓 AI 幫你做出更好決定的流程。」</p>
+      </div>
+
+      <p class="block-text">
+        這篇文章補完這一半。你將學到：
+      </p>
+
+      <div class="tool-grid tool-grid-3">
+        <div class="tool-card blue">
+          <p class="tool-name">目標一</p>
+          <p class="tool-role">理解兩種工作模式</p>
+          <p class="tool-desc">探索模式與精製模式的定義、差異、以及各自要給 AI 哪些資訊。</p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">目標二</p>
+          <p class="tool-role">建立三區邊界框架</p>
+          <p class="tool-desc">清楚定義哪些是 AI 必須遵守的、哪些是軟性建議、哪些是刻意留給 AI 的創意空間。</p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">目標三</p>
+          <p class="tool-role">掌握模式切換流程</p>
+          <p class="tool-desc">在一個設計專案中，何時使用哪個模式、如何從探索切換到精製、每個階段可以期待什麼成果。</p>
+        </div>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag blue">雙模式 AI 協作</span>
+        <span class="block-tag">探索模式</span>
+        <span class="block-tag">精製模式</span>
+        <span class="block-tag">三區邊界框架</span>
+      </div>
+    </section>
+
+    <!-- Block 01 — 挑戰 -->
+    <section class="block" id="challenge">
+      <div class="block-header">
+        <span class="block-num">01</span>
+        <h2 class="block-title">單模式工作流程的隱藏代價：當精準成為唯一目標</h2>
+      </div>
+
+      <p class="block-text">
+        「只用精製模式」的工作流程，有一個不易察覺的代價：
+        <strong>設計師漸漸從設計者變成規格撰寫者</strong>。
+        你花在寫設計規格 MD 的時間，多於花在思考設計本身的時間。
+        AI 輸出精準了，但設計的品質取決於你在寫規格之前就想清楚了多少。
+      </p>
+
+      <div class="tool-grid">
+        <div class="tool-card red">
+          <p class="tool-name">代價一：AI 的設計知識被鎖在規格之外</p>
+          <p class="tool-role">被過度規格化的工作流程浪費了</p>
+          <p class="tool-desc">AI 訓練了數百萬個設計案例，知道哪些設計模式對使用者有效、哪些已過時。但當你給 AI 完整的規格，AI 只能執行——它帶入設計知識的機會已被規格鎖死。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">代價二：探索設計方向沒有工具支援</p>
+          <p class="tool-role">發散階段仍靠設計師獨力完成</p>
+          <p class="tool-desc">要用 AI 生成第一個 prototype，你需要先寫完規格。但規格需要你先做設計決策。設計決策需要你先探索可能性……AI 沒有幫上設計前段的忙。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">代價三：精準度達到 85% 後回報遞減</p>
+          <p class="tool-role">繼續精進規格的成本不成比例</p>
+          <p class="tool-desc">components.css 可以讓 prototype 達到 85–90% 的視覺還原度。剩下的 10–15% 需要越來越細緻的規格，但設計決策本身的品質沒有因此提升。</p>
+        </div>
+        <div class="tool-card red">
+          <p class="tool-name">代價四：vibe coding 的「vibe」消失了</p>
+          <p class="tool-role">工作流程失去了它本來的設計感</p>
+          <p class="tool-desc">Vibe coding 的核心是「描述設計感覺，AI 輸出正確結果」。當工作流程變成「先把所有決定寫成規格，再讓 AI 執行」，你失去了 vibe coding 最有價值的部分：設計的直覺空間。</p>
+        </div>
+      </div>
+
+      <div class="callout-box dark">
+        <p class="callout-label">核心問題不是精準度不夠，而是工作流程缺少探索階段</p>
+        <p>
+          精製模式是必要的，不是問題。問題是<strong>它是工作流程中唯一的模式</strong>。
+          一個完整的設計工作流程需要兩種模式在不同的設計階段交替使用——
+          探索模式讓你更快找到好方向，精製模式讓你精準執行選定的方向。
+        </p>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag red">單模式代價</span>
+        <span class="block-tag">設計流程</span>
+        <span class="block-tag">AI 設計知識</span>
+      </div>
+    </section>
+
+    <!-- Block 02 — 兩種模式 -->
+    <section class="block" id="twomode">
+      <div class="block-header">
+        <span class="block-num">02</span>
+        <h2 class="block-title">兩種模式的定義：探索模式 × 精製模式</h2>
+      </div>
+
+      <p class="block-text">
+        完整的 AI 設計協作工作流程由兩種模式組成。
+        它們服務設計過程的不同階段，給 AI 不同程度的自由度，產出不同形式的設計結果。
+      </p>
+
+      <div class="tool-grid">
+        <div class="tool-card green">
+          <p class="tool-name">模式 A · 探索模式</p>
+          <p class="tool-role">AI 主導 · 設計師策展</p>
+          <p class="tool-desc">
+            給 AI 最小的約束（設計問題 + 設計系統硬規則），
+            讓 AI 在 SHP token 框架內自由探索，生成多個設計方向，並主動解釋每個方向的設計邏輯。
+            <br><br>
+            <strong>設計師的角色</strong>：提問、觀察 AI 的設計思維、識別洞見、選擇或組合方向。
+          </p>
+          <span class="tool-tag">發散 · 多方向 · 快速</span>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">模式 B · 精製模式</p>
+          <p class="tool-role">設計師主導 · AI 精準執行</p>
+          <p class="tool-desc">
+            給 AI 完整的約束（四層知識架構全部就緒），
+            讓 AI 按照設計規格精確輸出高保真 prototype，不做任何超出規格的自主決定。
+            <br><br>
+            <strong>設計師的角色</strong>：確認規格完整、QA 輸出品質、調整規格後重新生成。
+          </p>
+          <span class="tool-tag">收斂 · 高保真 · 可控</span>
+        </div>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>比較面向</th>
+              <th>模式 A · 探索模式</th>
+              <th>模式 B · 精製模式</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">給 AI 的資訊</td>
+              <td>設計問題 + 設計系統硬規則（token + CLAUDE.md）</td>
+              <td>完整四層（token + components.css + CLAUDE.md + spec MD）</td>
+            </tr>
+            <tr>
+              <td class="row-label">AI 自由度</td>
+              <td>高——AI 自行選擇視覺策略和構圖方向</td>
+              <td>低——AI 嚴格執行規格，不做自主判斷</td>
+            </tr>
+            <tr>
+              <td class="row-label">產出形式</td>
+              <td>3–5 個設計方向 + 每個方向的設計邏輯說明</td>
+              <td>1 個高保真 HTML prototype（85–90% Figma 還原度）</td>
+            </tr>
+            <tr>
+              <td class="row-label">設計師工作</td>
+              <td>提問、觀察、識別洞見、選擇方向</td>
+              <td>確認規格、QA 輸出、更新規格、重新生成</td>
+            </tr>
+            <tr>
+              <td class="row-label">適合的設計階段</td>
+              <td>設計早期：探索方向、驗證假設、發現洞見</td>
+              <td>設計後期：精製方案、互動原型、工程 handoff</td>
+            </tr>
+            <tr>
+              <td class="row-label">速度</td>
+              <td>快（5–10 分鐘生成多方向）</td>
+              <td>中（規格準備 15–30 分鐘；生成後 QA）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">兩種模式不互相取代，而是接力</p>
+        <p>
+          標準的工作節奏：<strong>模式 A 找到正確方向 → 模式 B 精確執行選定方向</strong>。
+          你也可以在設計迭代過程中再次切換回模式 A——當你遇到設計卡關、
+          需要重新評估方向時，模式 A 讓你快速重新發散，而不需要重寫所有規格。
+        </p>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag green">模式 A · 探索</span>
+        <span class="block-tag blue">模式 B · 精製</span>
+        <span class="block-tag">AI 自由度</span>
+        <span class="block-tag">設計階段</span>
+      </div>
+    </section>
+
+    <!-- Block 03 — 設計原則 -->
+    <section class="block" id="principles">
+      <div class="block-header">
+        <span class="block-num">03</span>
+        <h2 class="block-title">設計原則：三區邊界框架，讓 AI 有空間，也讓設計師可控</h2>
+      </div>
+
+      <p class="block-text">
+        兩種模式的設計，需要一個核心框架來支撐：<strong>設計師和 AI 的工作邊界不是一條線，而是三個區域</strong>。
+        每個區域定義了 AI 在其中有多少自由度。
+        清楚定義三個區域，才能在模式切換時不讓工作流程崩潰。
+      </p>
+
+      <div class="zone-grid">
+        <div class="zone-card">
+          <div class="zone-stripe-1"></div>
+          <div class="zone-label-col">
+            <span class="zone-num">01</span>
+            <span class="zone-name">硬約束</span>
+          </div>
+          <div class="zone-body">
+            <p class="zone-title">AI 必須遵守，不容商量</p>
+            <p class="zone-desc">
+              設計系統的 token 語意規則（<code>basic</code> vs. <code>element</code> 系列、功能色限制、dark mode 規則）、
+              無障礙標準、品牌禁止事項。這些放在 <code>CLAUDE.md</code> 中，
+              <strong>在探索模式和精製模式中都必須遵守</strong>。
+              AI 可以自由發揮視覺方向，但不能違反這些規則。
+            </p>
+          </div>
+        </div>
+        <div class="zone-card">
+          <div class="zone-stripe-2"></div>
+          <div class="zone-label-col">
+            <span class="zone-num">02</span>
+            <span class="zone-name">軟約束</span>
+          </div>
+          <div class="zone-body">
+            <p class="zone-title">AI 應該遵守，但可以提出替代方案</p>
+            <p class="zone-desc">
+              <code>components.css</code> 的元件骨架定義、設計規格 MD 的視覺意圖。
+              這些在精製模式中 AI 嚴格執行；在探索模式中，
+              <strong>AI 可以使用預定義的元件，也可以提議不同的元件結構，但必須說明理由</strong>。
+              設計師決定要接受 AI 的替代方案，還是堅持原有定義。
+            </p>
+          </div>
+        </div>
+        <div class="zone-card">
+          <div class="zone-stripe-3"></div>
+          <div class="zone-label-col">
+            <span class="zone-num">03</span>
+            <span class="zone-name">創意空間</span>
+          </div>
+          <div class="zone-body">
+            <p class="zone-title">AI 被授權自由發揮，設計師策展</p>
+            <p class="zone-desc">
+              設計師<strong>刻意留白</strong>的區域：版面構圖的可能性、視覺層次的不同詮釋、
+              互動流程的替代方案、設計問題的不同切入角度。
+              <strong>這個區域是模式 A 的核心</strong>——設計師用設計問題開啟這個空間，
+              AI 用它的設計知識填滿，設計師再從中策展最有洞見的方向。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-sub">五個設計工作原則</p>
+
+      <div class="principle-set">
+        <div class="principle-card">
+          <span class="principle-num">1</span>
+          <div>
+            <p class="principle-title">不同設計階段，給 AI 不同程度的自由</p>
+            <p class="principle-desc">
+              設計早期（探索假設）：給 AI 最大自由度，讓它帶來你沒想到的可能性。
+              設計後期（精確執行）：鎖定所有決策，讓 AI 嚴格輸出。
+              <strong>自由度不是固定的，它跟著設計進度調整。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <span class="principle-num">2</span>
+          <div>
+            <p class="principle-title">讓 AI 說明它的設計邏輯，不只是生成結果</p>
+            <p class="principle-desc">
+              在模式 A 中，要求 AI 解釋每個設計方向的設計假設和邏輯。
+              <strong>AI 說明設計決策的過程，本身就是對設計師的啟發</strong>——
+              你可能不選 AI 的方向，但 AI 的分析邏輯可能改變你的設計思考。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <span class="principle-num">3</span>
+          <div>
+            <p class="principle-title">探索的目的是找到可以鎖定的決策，不是生成更多選項</p>
+            <p class="principle-desc">
+              模式 A 的終點是「選定一個方向」，不是「生成越來越多方向」。
+              <strong>探索的價值在於讓你的設計決策有更好的依據，而不是讓 AI 替你做決定。</strong>
+              設計師做決策，AI 擴大決策的視野。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <span class="principle-num">4</span>
+          <div>
+            <p class="principle-title">components.css 定義的元件是軟約束，不是牢籠</p>
+            <p class="principle-desc">
+              預定義的元件骨架給 AI 提供了「最常見的正確答案」。
+              但如果一個設計問題需要突破現有元件定義，
+              <strong>你應該更新 components.css，而不是在 prompt 裡繞過它</strong>——
+              規格文件永遠是設計決策的唯一來源。
+            </p>
+          </div>
+        </div>
+        <div class="principle-card">
+          <span class="principle-num">5</span>
+          <div>
+            <p class="principle-title">設計師的工作是「策展」，不是「控制」</p>
+            <p class="principle-desc">
+              最有效的 AI 設計協作，不是設計師把所有決定提前寫死，而是設計師<strong>設定問題、給定框架、觀察 AI 的回應、識別洞見、做出判斷</strong>。
+              你是策展人，AI 是有豐富設計知識的創作夥伴。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag">三區邊界框架</span>
+        <span class="block-tag blue">硬約束</span>
+        <span class="block-tag">軟約束</span>
+        <span class="block-tag green">創意空間</span>
+        <span class="block-tag">設計工作原則</span>
+      </div>
+    </section>
+
+    <!-- Block 04 — 模式 A -->
+    <section class="block" id="explore">
+      <div class="block-header">
+        <span class="block-num">04</span>
+        <h2 class="block-title">模式 A · 探索模式：建置與運用</h2>
+      </div>
+
+      <p class="block-text">
+        探索模式的核心是一個認知轉換：<strong>你問 AI 一個設計問題，而不是給 AI 一份設計規格</strong>。
+        AI 的任務不是執行，而是帶著它的設計知識，在你的設計系統約束內，提出多個值得考慮的方向。
+      </p>
+
+      <p class="block-sub">探索模式的輸入結構</p>
+
+      <div class="layer-diagram">
+        <div class="layer-row">
+          <div class="layer-stripe done"></div>
+          <div class="layer-body">
+            <div class="layer-num">必要 · 硬約束</div>
+            <div class="layer-title">設計系統規則（tokens.css + CLAUDE.md 硬規則）</div>
+            <div class="layer-desc">AI 在探索時必須遵守的設計系統邊界。顏色語意、token 選用規則、dark mode 規則、品牌禁止事項。</div>
+          </div>
+          <div class="layer-source"><span class="layer-badge done">必須給</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-stripe done"></div>
+          <div class="layer-body">
+            <div class="layer-num">必要 · 設計問題</div>
+            <div class="layer-title">清楚的設計問題陳述（以使用者為中心）</div>
+            <div class="layer-desc">
+              「這個頁面要幫助使用者完成什麼任務？」不是「這個頁面應該長什麼樣子？」
+              <strong>問題越聚焦，AI 的設計洞見越有價值。</strong>
+            </div>
+          </div>
+          <div class="layer-source"><span class="layer-badge done">必須給</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-stripe green"></div>
+          <div class="layer-body">
+            <div class="layer-num">可選 · 探索參數</div>
+            <div class="layer-title">方向數量、要變化的維度、要排除的方向</div>
+            <div class="layer-desc">生成幾個方向（建議 3）、要對比哪些設計維度（資訊密度 / 視覺重心 / 互動模式）、哪些方向你已知道不適合（節省 AI 探索空間）。</div>
+          </div>
+          <div class="layer-source"><span class="layer-badge green">可選</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-stripe green"></div>
+          <div class="layer-body">
+            <div class="layer-num">可選 · 設計洞見請求</div>
+            <div class="layer-title">請 AI 先分析，再設計</div>
+            <div class="layer-desc">
+              在生成設計方向之前，先問 AI：類似場景的有效設計模式是什麼？使用者常遇到的問題是什麼？
+              這讓 AI 帶入設計知識，而不是直接跳到輸出。
+            </div>
+          </div>
+          <div class="layer-source"><span class="layer-badge green">推薦加入</span></div>
+        </div>
+      </div>
+
+      <p class="block-sub">探索模式 Prompt 框架</p>
+
+      <div class="code-block">
+        <p class="code-label">模式 A · 探索模式 Prompt 範本</p>
+        <pre><span class="code-comment">── 設計問題（以使用者任務為中心）────────────────────</span>
+這個設計問題是：
+[用一句話說明使用者要完成的任務，例：]
+「讓使用者在商品列表頁 3 秒內找到感興趣的商品並觸發點擊」
+
+<span class="code-comment">── 設計洞見請求（在設計前先請 AI 分析）──────────────</span>
+在開始設計之前，請先告訴我：
+1. 類似場景（電商列表頁）最有效的設計模式是哪些？哪些已過時？
+2. 使用者在這類頁面最常遇到的認知負擔是什麼？
+3. 針對這個設計目標，你認為最值得探索的設計假設是什麼？
+
+<span class="code-comment">── 探索指示 ─────────────────────────────────────────</span>
+然後，在以下約束內生成 3 個不同方向的設計概念：
+· 必須使用 @tofuydesign/shp-react 的 token（--shp-*）
+· 必須遵守 CLAUDE.md 的 token 選用規則
+· 三個方向使用不同的視覺策略（請自行選擇有意義的對比維度）
+
+<span class="code-comment">── 要求每個方向說明 ─────────────────────────────────</span>
+每個方向需要說明：
+· 視覺策略和設計假設是什麼
+· 這個方向最適合哪種使用者情境
+· 你選擇這個方向的設計邏輯
+
+<span class="code-comment">── 輸出格式 ──────────────────────────────────────────</span>
+每個方向輸出：
+· 設計說明（150 字以內）
+· HTML prototype（單頁，支援 dark mode）
+· 你認為這個方向的最大優點和最大風險各一點</pre>
+      </div>
+
+      <p class="block-sub">如何評估和使用 AI 的探索結果</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <p class="step-title">先讀 AI 的設計洞見分析，再看設計方向</p>
+            <p class="step-text">
+              AI 在生成設計方向之前對設計問題的分析，通常比設計方向本身更有價值。
+              <strong>關注 AI 識別出的使用者問題和設計假設——這些可能改變你對設計問題的理解。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <p class="step-title">評估每個方向的設計邏輯，不只是視覺效果</p>
+            <p class="step-text">
+              AI 生成的視覺效果只是設計方向的載體，真正的價值是它背後的設計邏輯。
+              問自己：<strong>「這個方向的設計假設是否值得驗證？」</strong>而不是「這個視覺效果我喜不喜歡？」
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <p class="step-title">可以組合不同方向的最佳元素</p>
+            <p class="step-text">
+              你不一定要選擇 AI 給出的某一個方向。
+              你可以告訴 AI：「我喜歡方向 1 的資訊架構，加上方向 3 的視覺調性，請生成組合版。」
+              <strong>設計師的判斷在於識別並組合最有價值的設計決策。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <p class="step-title">確認選定方向後，將設計決策轉化為規格</p>
+            <p class="step-text">
+              選定方向之後，把這次探索確定的設計決策整理進設計規格 MD——這是進入模式 B 的準備。
+              <strong>探索的結論（設計決策）是模式 B 的輸入，不需要重新從零開始寫規格。</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box green">
+        <p class="callout-label">模式 A 的最大價值：AI 帶來你沒想到的視角</p>
+        <p>
+          最值得注意的不是 AI 給你了幾個設計方向，而是：
+          <strong>AI 的分析有沒有讓你對這個設計問題有不同的理解？</strong>
+          如果 AI 的回應讓你覺得「這個角度我沒想到，但它說的有道理」——
+          那就是模式 A 發揮了最大的價值。
+        </p>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag green">模式 A · 探索</span>
+        <span class="block-tag">設計洞見請求</span>
+        <span class="block-tag">多方向生成</span>
+        <span class="block-tag">設計師策展</span>
+      </div>
+    </section>
+
+    <!-- Block 05 — 模式 B -->
+    <section class="block" id="precision">
+      <div class="block-header">
+        <span class="block-num">05</span>
+        <h2 class="block-title">模式 B · 精製模式：視覺還原上限與 QA 流程</h2>
+      </div>
+
+      <p class="block-text">
+        精製模式在前一篇文章已有完整說明（四層架構 + components.css 建置流程）。
+        這一節聚焦在兩個設計師需要清楚理解的現實：
+        <strong>components.css 能把 prototype 精準到什麼程度，以及剩下的缺口如何處理。</strong>
+      </p>
+
+      <p class="block-sub">視覺還原的真實上限：85–90%</p>
+
+      <div class="fidelity-bar">
+        <div class="fidelity-bar-inner">
+          <span class="fidelity-pct">85–90%</span>
+          <span class="fidelity-label">components.css 可達到的視覺還原度</span>
+        </div>
+        <div class="fidelity-legend">
+          <div class="fidelity-legend-item">
+            <div class="fidelity-dot blue"></div>
+            <span class="fidelity-legend-text"><strong>涵蓋</strong>：顏色、border-radius、padding、font-size、gap、hover 狀態、loading skeleton、dark mode</span>
+          </div>
+          <div class="fidelity-legend-item">
+            <div class="fidelity-dot muted"></div>
+            <span class="fidelity-legend-text"><strong>缺口</strong>：動畫時間曲線、responsive 行為、複雜多步互動、品牌圖示 SVG、字型渲染細節</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-text">
+        <strong>85–90% 對大多數設計用途已經足夠：</strong>設計概念驗證、設計評審展示、互動原型測試。
+        剩下的 10–15% 主要是需要額外資產或特殊說明的部分——
+        在設計師 QA 確認後，可以視需求補充或在工程 handoff 時說明。
+      </p>
+
+      <p class="block-sub">視覺還原 QA 檢查流程</p>
+
+      <p class="block-text">
+        每次生成 prototype 後，按照以下四層檢查清單進行 QA。
+        發現問題時，修正的來源是設計規格，不是直接改 HTML。
+      </p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>QA 層級</th>
+              <th>檢查項目</th>
+              <th>目標還原度</th>
+              <th>修正方式</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">Layer 1 · 顏色語意</td>
+              <td>所有 CSS 使用 <code>var(--shp-*)</code>，無 hardcode hex · <code>data-theme="dark"</code> 切換正確</td>
+              <td><span class="tag-done">100% 可達</span></td>
+              <td>更新 CLAUDE.md token 規則</td>
+            </tr>
+            <tr>
+              <td class="row-label">Layer 2 · 元件骨架</td>
+              <td>border-radius 與 Figma 一致 · padding 正確 · font-size / line-height 一致 · gap 正確</td>
+              <td><span class="tag-done">95% 可達</span></td>
+              <td>更新 <code>components.css</code> 對應 class</td>
+            </tr>
+            <tr>
+              <td class="row-label">Layer 3 · 互動狀態</td>
+              <td>hover / pressed · loading skeleton · empty state · error · disabled 全部已定義且正確</td>
+              <td><span class="tag-done">90% 可達</span></td>
+              <td>在 spec MD 補充狀態說明後重新生成</td>
+            </tr>
+            <tr>
+              <td class="row-label">Layer 4 · 進階細節</td>
+              <td>動畫時間曲線 · responsive breakpoint · 品牌圖示 SVG · 字型渲染</td>
+              <td><span class="tag-need">需額外處理</span></td>
+              <td>在 spec MD 補充說明 / 提供 SVG 資產 / 接受瀏覽器渲染差異</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="block-sub">當 QA 發現問題時，修正的正確順序</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">①</span>
+          <div class="step-body">
+            <p class="step-title">判斷問題屬於哪一層</p>
+            <p class="step-text">
+              顏色選錯 → Layer 1（CLAUDE.md 問題）。
+              骨架尺寸不對 → Layer 2（components.css 問題）。
+              狀態缺少 → Layer 3（spec MD 問題）。
+              <strong>先診斷來源層，再決定修正在哪裡。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">②</span>
+          <div class="step-body">
+            <p class="step-title">修正設計規格，不是直接改 HTML</p>
+            <p class="step-text">
+              直接改 HTML 是一次性的修補，之後重新生成問題又回來。
+              <strong>修正設計規格（更新 components.css 或 spec MD），再重新生成</strong>——
+              規格是持久的，HTML 是可以重新生成的。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">③</span>
+          <div class="step-body">
+            <p class="step-title">重新生成後確認修正是否有效</p>
+            <p class="step-text">
+              重新生成後，對照 Figma 設計稿確認問題已解決。
+              如果同樣問題出現在多個元件，通常是 CLAUDE.md 或 components.css 層面的系統性問題——
+              在規格層修正一次，所有元件都受益。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box blue">
+        <p class="callout-label">模式 B 精製模式 · Prompt 範本</p>
+        <p>
+          <strong>精製模式的 prompt 應該明確：引用哪份規格、使用哪些 class、要求不自行發明 CSS。</strong>
+        </p>
+      </div>
+
+      <div class="code-block">
+        <p class="code-label">模式 B · 精製模式 Prompt 範本</p>
+        <pre><span class="code-comment">根據 specs/[路徑]/[檔案名稱].md 的設計規格，</span>
+<span class="code-comment">使用 CLAUDE.md 元件 class 對照表（.shp-card、.shp-btn 等），</span>
+<span class="code-comment">生成 [元件 / 頁面名稱] 的 HTML prototype。</span>
+
+<span class="code-hl">要求：</span>
+· 引入 @tofuydesign/shp-react 的 tokens.css 和 components.css
+· <span class="code-val">使用 components.css 中的預定義 class，不要重新定義元件 CSS</span>
+· 處理所有狀態：[列出 spec MD 中定義的狀態]
+· 支援 data-theme="dark" 的 dark mode 自動切換
+· 所有顏色使用 var(--shp-*) 變數，不使用 hardcode 值
+
+<span class="code-hl">輸出到：</span>prototypes/[YYYYMMDD]-[名稱]/index.html</pre>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag blue">模式 B · 精製</span>
+        <span class="block-tag">視覺還原 85–90%</span>
+        <span class="block-tag">QA 四層檢查</span>
+        <span class="block-tag">components.css</span>
+      </div>
+    </section>
+
+    <!-- Block 06 — 雙模式切換流程 -->
+    <section class="block" id="switching">
+      <div class="block-header">
+        <span class="block-num">06</span>
+        <h2 class="block-title">雙模式完整工作流程：節奏、觸發點與切換時機</h2>
+      </div>
+
+      <p class="block-text">
+        一個完整的設計工作週期，是兩種模式按照設計進度交替使用的過程。
+        以下是一個典型設計專案從開始到交付的完整節奏，包含每個階段的觸發點和切換時機。
+      </p>
+
+      <div class="flow-diagram">
+        <p class="flow-caption">FIG.03 · 雙模式設計工作流程 · 完整週期</p>
+        <div class="flow-row" style="margin-bottom:12px;">
+          <div class="flow-node" style="background:rgba(26,122,64,0.1);color:var(--green);padding:8px 14px;font-size:12px;font-weight:500;">模式 A 啟動</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">問設計問題</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">AI 給設計洞見</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">生成 3 個方向</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">設計師策展選定</div>
+        </div>
+        <div class="flow-row" style="margin-bottom:12px;">
+          <div class="flow-arrow" style="padding:0 0 0 80px;">↓ 選定方向後切換</div>
+        </div>
+        <div class="flow-row" style="margin-bottom:12px;">
+          <div class="flow-node dark">模式 B 啟動</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">選定方向轉化為規格 MD</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">生成精製 prototype</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node neutral">QA 四層檢查</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node blue">交付</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-arrow" style="padding:0 0 0 80px;">↺ 設計卡關時，可再次切回模式 A</div>
+        </div>
+        <p class="flow-note">模式切換不是單向的——設計迭代過程中遇到卡關或需要重新評估方向時，可以再次啟動模式 A</p>
+      </div>
+
+      <p class="block-sub">完整流程：七個步驟手把手引導</p>
+
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="step-num">1</span>
+          <div class="step-body">
+            <p class="step-title">定義設計問題（模式 A 的起點）</p>
+            <p class="step-text">
+              用一句以使用者為中心的句子，說明這個設計任務要幫助使用者完成什麼。
+              <strong>「這個頁面要讓使用者快速找到感興趣的商品」</strong>比「這個頁面是商品列表頁」更有效——
+              前者是設計問題，後者只是頁面類型。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">2</span>
+          <div class="step-body">
+            <p class="step-title">啟動模式 A：讓 AI 先分析，再生成</p>
+            <p class="step-text">
+              使用模式 A 的 Prompt 框架，要求 AI 在生成設計方向之前先分享設計洞見。
+              <strong>重點：把 CLAUDE.md 的硬規則提供給 AI，但不提供 components.css 或 spec MD——
+              讓 AI 有足夠的自由度真正探索。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">3</span>
+          <div class="step-body">
+            <p class="step-title">策展 AI 的探索結果</p>
+            <p class="step-text">
+              先閱讀 AI 的設計分析（比設計方向本身更重要）。
+              評估每個方向的設計邏輯和假設——不只是視覺效果。
+              <strong>選定一個方向，或組合多個方向的最佳元素。</strong>
+              如果 AI 的所有方向都不對，重新問一次，換一個對比維度。
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">4</span>
+          <div class="step-body">
+            <p class="step-title">將選定方向轉化為設計規格 MD（模式 B 的前置工作）</p>
+            <p class="step-text">
+              從模式 A 的探索結果中，提取已確認的設計決策：
+              視覺層次、CTA 位置、元件選擇、狀態清單。
+              <strong>把這些決策填入設計規格 MD（範本 A 或 B）——
+              不需要從零開始，直接整理探索階段確認的決策就夠了。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">5</span>
+          <div class="step-body">
+            <p class="step-title">啟動模式 B：使用完整四層生成精製 prototype</p>
+            <p class="step-text">
+              確認四層都就緒（tokens.css + components.css + CLAUDE.md + spec MD）。
+              使用模式 B 的 Prompt 範本生成 prototype。
+              <strong>明確告訴 AI 使用 components.css 的預定義 class，不要重新定義元件 CSS。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">6</span>
+          <div class="step-body">
+            <p class="step-title">QA 四層檢查，更新規格後重新生成</p>
+            <p class="step-text">
+              按照 Block 05 的 QA 清單逐層確認。
+              發現問題 → 判斷屬於哪一層 → 修正設計規格 → 重新生成。
+              <strong>反覆迭代，直到 prototype 達到 85% 以上的視覺還原度。</strong>
+            </p>
+          </div>
+        </div>
+        <div class="process-step">
+          <span class="step-num">7</span>
+          <div class="step-body">
+            <p class="step-title">交付或繼續迭代</p>
+            <p class="step-text">
+              設計評審通過 → 設計規格 MD 直接作為工程師的 design spec（token 名稱和 Figma 一致）。
+              設計方向需要調整 → 切回模式 A，重新探索，不需要從頭寫規格。
+              <strong>設計規格 MD 在整個過程中持續更新，是設計決策的唯一記錄。</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="block-sub">模式切換的觸發條件</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>情境</th>
+              <th>切換至</th>
+              <th>理由</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>設計專案剛開始，還沒有方向</td>
+              <td><span class="tag-green">模式 A</span></td>
+              <td>需要探索設計空間，不應該過早鎖定方向</td>
+            </tr>
+            <tr>
+              <td>有初步方向但設計卡關，迭代沒有進展</td>
+              <td><span class="tag-green">模式 A</span></td>
+              <td>可能需要重新評估設計假設，AI 的洞見可以打開新視角</td>
+            </tr>
+            <tr>
+              <td>設計方向已確認，需要精製細節</td>
+              <td><span class="tag-done">模式 B</span></td>
+              <td>方向已定，AI 的任務是精確執行，不是再度發散</td>
+            </tr>
+            <tr>
+              <td>準備設計評審或工程 handoff</td>
+              <td><span class="tag-done">模式 B</span></td>
+              <td>需要高保真輸出，設計決策必須完全確定且有文件記錄</td>
+            </tr>
+            <tr>
+              <td>設計評審後需要重大調整</td>
+              <td><span class="tag-green">模式 A</span></td>
+              <td>重大調整可能意味著設計假設需要重新驗證</td>
+            </tr>
+            <tr>
+              <td>設計評審後只需要微調細節</td>
+              <td><span class="tag-done">模式 B</span></td>
+              <td>方向不變，只更新設計規格 MD 後重新生成</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag">完整工作流程</span>
+        <span class="block-tag green">模式切換</span>
+        <span class="block-tag">七步驟引導</span>
+        <span class="block-tag">設計迭代節奏</span>
+      </div>
+    </section>
+
+    <!-- Block 07 — 設計成果 -->
+    <section class="block" id="outcomes">
+      <div class="block-header">
+        <span class="block-num">07</span>
+        <h2 class="block-title">可以期待的設計成果：每個階段的具體產出</h2>
+      </div>
+
+      <p class="block-text">
+        雙模式工作流程在不同階段產出不同形式的設計成果。
+        以下是每個階段你可以合理期待的具體結果——
+        以及一些需要管理期望的現實。
+      </p>
+
+      <p class="block-sub">模式 A 探索階段的成果</p>
+
+      <div class="tool-grid tool-grid-3">
+        <div class="tool-card green">
+          <p class="tool-name">設計洞見報告</p>
+          <p class="tool-role">AI 對設計問題的知識貢獻</p>
+          <p class="tool-desc">AI 對類似場景的有效設計模式分析、使用者常見問題識別、值得驗證的設計假設。<strong>這通常是模式 A 最有價值的輸出，即使設計方向最後沒有採用。</strong></p>
+        </div>
+        <div class="tool-card green">
+          <p class="tool-name">3 個設計方向 prototype</p>
+          <p class="tool-role">有設計邏輯說明的探索稿</p>
+          <p class="tool-desc">使用 SHP token 的 HTML prototype，附帶每個方向的設計假設說明。<strong>視覺還原度約 60–70%</strong>（無 components.css 約束），但足以傳達設計方向。</p>
+        </div>
+        <div class="tool-card green">
+          <p class="tool-name">設計決策基礎</p>
+          <p class="tool-role">進入模式 B 的輸入</p>
+          <p class="tool-desc">從探索中確認的設計決策——視覺策略、元件選擇、CTA 定位——直接轉化為模式 B 的設計規格 MD。<strong>不需要重頭寫規格。</strong></p>
+        </div>
+      </div>
+
+      <p class="block-sub">模式 B 精製階段的成果</p>
+
+      <div class="tool-grid">
+        <div class="tool-card blue">
+          <p class="tool-name">高保真 HTML Prototype</p>
+          <p class="tool-role">視覺還原度 85–90%</p>
+          <p class="tool-desc">
+            使用 <code>--shp-*</code> token + <code>components.css</code> 預定義元件生成的 prototype。
+            顏色精準、元件骨架正確、dark mode 自動處理、所有定義的狀態都有呈現。
+            <br><br>
+            <strong>適合用於：</strong>設計評審展示、使用者測試、設計提案、工程師起點參考。
+          </p>
+        </div>
+        <div class="tool-card blue">
+          <p class="tool-name">設計規格 MD（工程 handoff）</p>
+          <p class="tool-role">設計師和工程師的共同語言</p>
+          <p class="tool-desc">
+            記錄所有設計決策的 MD 文件——token 名稱（而不是 hex 值）、元件選用、狀態清單、禁止事項。
+            工程師的 <code>npm install @tofuydesign/shp-react</code> token 和 Figma 完全一致，不需要對色。
+            <br><br>
+            <strong>設計規格 MD 是整個專案週期最穩定的設計語言。</strong>
+          </p>
+        </div>
+      </div>
+
+      <p class="block-sub">需要管理的期望</p>
+
+      <div class="callout-box dark">
+        <p class="callout-label">這套工作流程仍有的限制</p>
+        <p>
+          <strong>模式 A 不能替代設計師的設計判斷。</strong>
+          AI 的探索結果提供視角和可能性，但設計決策仍然需要設計師做。
+          AI 不知道你的產品策略、使用者研究、商業目標——這些是設計師帶入的，AI 沒有。<br><br>
+          <strong>模式 B 的 85–90% 還原度不等於 100% Figma 精確度。</strong>
+          動畫、響應式行為、品牌圖示仍需要額外工作。
+          工程師 handoff 仍需要 QA 確認，不能直接從 prototype 上線。<br><br>
+          <strong>設計規格 MD 需要設計師維護。</strong>
+          Figma 有更新時，設計規格 MD 需要同步更新；components.css 也需要對應調整。
+          這是工作流程的維護成本，但遠低於每次手動對色的成本。
+        </p>
+      </div>
+
+      <div class="block-stats">
+        <div class="block-stat">
+          <span class="stat-big">3</span>
+          <span class="stat-label">分鐘內完成一次探索模式的初始 prompt</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">85%</span>
+          <span class="stat-label">components.css 達到的視覺還原度下限</span>
+        </div>
+        <div class="block-stat">
+          <span class="stat-big">1x</span>
+          <span class="stat-label">設計規格 MD 在整個專案中只需要寫一次</span>
+        </div>
+      </div>
+
+      <div class="block-tags">
+        <span class="block-tag green">探索成果</span>
+        <span class="block-tag blue">精製成果</span>
+        <span class="block-tag">期望管理</span>
+        <span class="block-tag">工程 handoff</span>
+      </div>
+    </section>
+
+    <!-- Block 08 — 結語 -->
+    <section class="block" id="closing">
+      <div class="block-header">
+        <span class="block-num">08</span>
+        <h2 class="block-title">結語：AI 是設計夥伴，不只是設計工具</h2>
+      </div>
+
+      <p class="block-text">
+        這兩篇文章（008 + 009）描述的工作流程，核心是一個設計哲學上的轉變：
+        <strong>AI 在設計工作中的最大價值，不是更快地執行你的設計，而是幫你做出更好的設計決策。</strong>
+      </p>
+
+      <p class="block-text">
+        精製模式（模式 B）讓你的設計決策被精準執行。
+        探索模式（模式 A）讓你的設計決策有更好的依據。
+        兩種模式缺一不可——只有執行，沒有洞見；或者只有探索，沒有精準輸出，都是不完整的工作流程。
+      </p>
+
+      <div class="block-quote">
+        <p>「給 AI 清楚的問題，它帶來設計洞見。給 AI 完整的規格，它輸出精準結果。設計師的工作，是知道什麼時候問問題、什麼時候給規格。」</p>
+      </div>
+
+      <p class="block-text">
+        三區邊界框架（硬約束 / 軟約束 / 創意空間）是這套工作流程的骨幹。
+        清楚定義邊界，才能在給 AI 足夠空間的同時，保持對設計品質的掌控。
+        邊界不是為了限制 AI，而是為了讓 AI 在對的地方發揮它的能力。
+      </p>
+
+      <p class="block-text">
+        這套工作流程需要一次性的前置投資（建立 components.css、更新 CLAUDE.md、熟悉兩種模式的切換節奏），
+        但之後的每個設計專案，都能從這個基礎上受益——
+        <strong>更快的探索、更精準的輸出、更清楚的設計決策記錄、更順暢的工程 handoff</strong>。
+      </p>
+
+      <div class="block-tags">
+        <span class="block-tag blue">Vibe Coding</span>
+        <span class="block-tag green">AI 設計協作</span>
+        <span class="block-tag">雙模式工作流程</span>
+        <span class="block-tag">SHP Design System</span>
+        <span class="block-tag">@tofuydesign/shp-react</span>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<nav class="article-nav">
+  <div class="article-nav-inner">
+    <a href="2026-06-10-vibe-coding-design-doc-guide.html" class="article-nav-prev">
+      <span class="article-nav-dir">← Previous</span>
+      <span class="article-nav-title">Vibe Coding × Design Token — AI 精準輸出的設計工作流</span>
+      <span class="article-nav-sub">AI 設計協作指南 · Part 6 · 008</span>
+    </a>
+    <a href="index.html#works" class="article-nav-next">
+      <span class="article-nav-dir">All Works →</span>
+      <span class="article-nav-title">回到作品列表</span>
+      <span class="article-nav-sub">Alice Cheng Portfolio</span>
+    </a>
+  </div>
+</nav>
+
+<site-footer></site-footer>
+
+<script>
+  const tocItems = document.querySelectorAll('.toc-item');
+  const sections = document.querySelectorAll('.block[id]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocItems.forEach(i => i.classList.remove('active'));
+        const active = document.querySelector(`.toc-item[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
