@@ -351,8 +351,8 @@
 <script id="calendar-data" type="application/json">
 {
   "version": 3,
-  "updated": "2026-07-17",
-  "source": "05_Project_Tracker.md v2.0（2026-07-15 全量同步；v1 行事曆資料已合併）＋v3 資訊分層＋本日收工同步（2026-07-16）＋本日收工同步（2026-07-17：tracker §8 十四條＋demo 部署上線）",
+  "updated": "2026-07-18",
+  "source": "05_Project_Tracker.md v2.0（2026-07-15 全量同步；v1 行事曆資料已合併）＋v3 資訊分層＋本日收工同步（2026-07-16）＋本日收工同步（2026-07-17：tracker §8 十四條＋demo 部署上線）＋2026-07-18 同步整理（07-17 尾三條補入、N-2/B-DOCK 結案、新佇列 N-6~N-9、過時註記更新）＋07-18 裁決：C×4 便當盒移除、archive 清除",
   "stages": [
     {
       "id": "S1",
@@ -516,15 +516,15 @@
     {
       "id": "P1-2",
       "epic": "EP-1",
-      "name": "首發變體重繪：D×1 Le Creuset、C×4 便當盒（雙尺寸）",
+      "name": "首發變體重繪：D×1 Le Creuset（desktop 1200＋mobile 375）",
       "start": "2026-07-13",
       "end": "2026-09-08",
       "status": "active",
       "owner": "Tofu + Claude",
       "rev": "Yu-ting",
       "dep": "P1-1",
-      "out": "兩頁×兩尺寸 template，僅用元件庫拼組。阻塞：出現 case 客製元件即失敗",
-      "note": "D×1 Le Creuset desktop 完成（2026-07-13，100% 正式 Atoms 拼組）；待補：商品圖上稿輪、mobile 375、C×4 便當盒版"
+      "out": "D×1 雙尺寸 template，僅用元件庫拼組。阻塞：出現 case 客製元件即失敗",
+      "note": "D×1 desktop 完成（2026-07-13，100% 正式 Atoms 拼組）；07-17 #3 裁決＝FrameTest demo 即 MVP 版型 v1 基準、mobile/tablet 已在 demo 驗證；Figma 模組元件建置移 N-5；C×4 便當盒版 07-18 使用者裁決自範圍移除（archived 舊版實驗不再保留，以新專案實驗設計版型為定案；03 §5 C×4 格位已驗證狀態不受影響）"
     },
     {
       "id": "P1-3",
@@ -1199,14 +1199,14 @@
       "id": "B-DOCK",
       "epic": "EP-1",
       "name": "浮動 dock HTML prototype 供使用者確認互動",
-      "start": "",
-      "end": "",
-      "status": "review",
+      "start": "2026-07-16",
+      "end": "2026-07-16",
+      "status": "done",
       "owner": "Tofu + Claude",
       "rev": "使用者",
       "dep": "手動版範本（Figma 96:1483）",
       "out": "使用者確認互動後，回寫 04 互動規則＋同步正式範本（階段確認閘門）",
-      "note": "FrameTest prototype 已產出，開關②可切換 dock 兩種出現時機＋scroll-spy＋TOP；確認後回寫 04"
+      "note": "09-H1 裁決（07-16）結案：dock 唯一形態確立；剩餘動作＝02/04 回寫＋正式範本同步，已併入裁決收斂會（N-3）"
     },
     {
       "id": "L-0716y",
@@ -1247,20 +1247,20 @@
       "rev": "使用者",
       "dep": "L-0716y",
       "out": "mobile/tablet 預覽逐模組確認 → 凍結 09 mobile 規格",
-      "note": "FrameTest ?device=mobile；面板第 5 組"
+      "note": "07-17 自查輪完成：4 資料集 ×375 程式化檢查＋16 張截圖目檢全過（截圖歸檔 qa/.../79-mobile-walkthrough/）；待使用者最終驗收；新開放項＝標籤 mobile 雙欄實際上限 8 全形字（併入 N-3）"
     },
     {
       "id": "N-2",
       "epic": "EP-1",
-      "name": "【下次繼續】74 件商品標籤 ≤9 字重跑（H4 v4 規則）",
-      "start": "",
-      "end": "",
-      "status": "todo",
+      "name": "74 件商品標籤 ≤9 字重跑（H4 v4 規則）",
+      "start": "2026-07-17",
+      "end": "2026-07-17",
+      "status": "done",
       "owner": "Tofu + Claude",
       "rev": "使用者",
       "dep": "—",
       "out": "AI 潤飾 ≤9 字＋真值保真比對；備忘 §2.3.1 v4",
-      "note": ""
+      "note": "07-17 完成：超標 8 件（6 文案）AI 潤飾保留原意、自測斷言 ≤11→≤9、desktop ×4 hash＋mobile 375 零溢出；QA finding 64、截圖 78"
     },
     {
       "id": "N-3",
@@ -1273,7 +1273,7 @@
       "rev": "Yu-ting",
       "dep": "—",
       "out": "待裁決總表批次裁決 → 升版凍結；含 git init 等 08 §3 立即項",
-      "note": ""
+      "note": "議題累計：02/04 回寫（含 09-H1 dock 互動、card/tag 灰化與 price/sale dark 色 02 回寫）＋08/09/10 正式登錄＋M1 改期＋標籤 mobile 雙欄寬度邊界（8 全形字，選項 a/b/c）"
     },
     {
       "id": "N-4",
@@ -1300,6 +1300,58 @@
       "dep": "N-3",
       "out": "15 模組 component＋figmaComponentId 回填 → 再拉 mobile/tablet 變體",
       "note": "P1-1 殘項；09 §3.2 順序"
+    },
+    {
+      "id": "N-6",
+      "epic": "EP-2",
+      "name": "【下次繼續】xlsx 匯入 Google Sheets → 首次「人工調修→待建置核可→建置」全流程",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "A1 管線 v2；runs/2026-07-17-lecreuset/*_schema_v1.xlsx",
+      "out": "URL→Sheets→活動頁全流程首跑紀錄；R2 狀態欄核可機制實測",
+      "note": "Sheets MCP 授權卡關，改 A1 xlsx「檔案＞匯入」路線（不阻塞）"
+    },
+    {
+      "id": "N-7",
+      "epic": "EP-1",
+      "name": "【下次繼續】FrameTest 整頁（含本期活動入口 ×4）換用同一快照真值",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "N-6 首次全流程",
+      "out": "整頁單一快照真值一致性",
+      "note": "入口 ×4 現仍為 07-13 舊快照（QA finding 75 註記）"
+    },
+    {
+      "id": "N-8",
+      "epic": "EP-1",
+      "name": "【待確認後動工】Figma token 回寫（11 號文件 §5：06 Responsive·Device collection 對照）",
+      "start": "",
+      "end": "",
+      "status": "decision",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "使用者確認（階段確認閘門）",
+      "out": "desktop/mobile primitive＋tablet alias token 化",
+      "note": "可與裁決收斂會（N-3）02/04 回寫併輪"
+    },
+    {
+      "id": "N-9",
+      "epic": "EP-2",
+      "name": "【量產期】Sheets 直寫升級位：service account 直寫／GAS 承接",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "Blocking #2 裁決＝MVP 期 Claude 代行；量產期演進",
+      "out": "取代 xlsx 匯入的自動化通道",
+      "note": ""
     },
     {
       "id": "L-0717a",
@@ -1481,7 +1533,7 @@
       "rev": "使用者",
       "dep": "—",
       "out": "",
-      "note": "下一步＝Sheets MCP 授權→建實體範本→LC URL 首次全流程；LC 初稿套用仍待核可"
+      "note": "後續同日完成：LC 初稿套用已核可（L-0717p）；Sheets MCP 授權卡關改走 A1 xlsx 匯入路線（L-0717q/r、N-6）"
     },
     {
       "id": "L-0717n",
@@ -1510,6 +1562,104 @@
       "dep": "—",
       "out": "",
       "note": "https://2026-ai-driven-design-sharing.netlify.app/lecreuset-frametest/"
+    },
+    {
+      "id": "L-0717p",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "LC 示範套用真值初稿（使用者核可）：KV「鍋具七折」→「鍋具68折」＋檔期→「2026.07.03 ~ 08.01」（773133 真值互證）；跑馬燈/舊版鎖陣自動連動；驗證 8 項 PASS——finding 3 上線阻塞＋11 §8 開放項 #1 結案",
+      "start": "2026-07-17",
+      "end": "2026-07-17",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "QA finding 75；快照 qa/84；入口 ×4 留 07-13 快照，首次全流程時整頁同快照（N-7）"
+    },
+    {
+      "id": "L-0717q",
+      "kind": "log",
+      "epic": "EP-2",
+      "name": "A1 管線建置（使用者選 A1 混合式）：workflow/pipeline/ 落地——fetch_parse.js（URL→snapshot、raw 稽核留檔、僅 tw.buy.yahoo.com）＋write_xlsx.js（四分頁＋🔒/✍️/🎚 權限表頭色＋下拉＋異常標紅）＋gate.js（CP-02~04 機器閘）＋run.js 兩段式；策展初稿＝Claude 對話產出（curate.js）；LC 端到端 PASS（2 檔活動 44 件、31 入稿）＋負向測試 9/9",
+      "start": "2026-07-17",
+      "end": "2026-07-17",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "產物 pipeline/runs/2026-07-17-lecreuset/；Google Sheets 直寫（service account/MCP）列量產期升級位（N-9）"
+    },
+    {
+      "id": "L-0717r",
+      "kind": "log",
+      "epic": "EP-2",
+      "name": "A1 管線 v2（對抗性審查 28 項缺陷全數修補）：32 代理紅隊審查——真值閘繞過 ×9／解析漏件 ×2／工作簿 ×2／03 契約偏差 ×15；gate 封閉世界原則（全 AI 可寫欄驗真值＋全形正規化＋sha256 指紋）＋write_xlsx 契約對齊（P1 一列 60 欄）＋CP-01 字型碼點快照＋CP-04 圖片 HTTP 200；LC 端到端 PASS（45 件、64 圖 200）＋負向測試 30/30＋過期報告拒收",
+      "start": "2026-07-17",
+      "end": "2026-07-17",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "憑證：pipeline/README.md 驗證紀錄"
+    },
+    {
+      "id": "L-0718a",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "C×4 便當盒版裁決移除＋archive 資料夾最終清除（使用者裁決：archived 舊版實驗不再保留，以新專案實驗設計版型＝FrameTest demo MVP v1 為拍板定案）——P1-2 範圍縮為 D×1 雙尺寸、M2 凍結物同步、archive/ 整夾移至垃圾桶（7 prototype＋README）、規劃 README 同步",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "03 §5 C×4 格位「已驗證（策展邏輯層面）」不受影響；歷史 QA/生成紀錄檔名引用維持原文"
+    },
+    {
+      "id": "L-0718b",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "KV 標題排版修正（使用者截圖回報：起徽壓字＋跨裝置間距失衡）——desktop 改 flex 群組置中＋起徽行內化＋統一字級＋字型競態重算；CP-05 活動文字排版檢查登錄檢查點登記表 v1.1＝每次建頁必跑 design QA；自測 ×4 PASS",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "QA finding 76、截圖 85-cp05-*；開放項＝desktop 字級 68→52 待裁量"
+    },
+    {
+      "id": "L-0718c",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "mono 黑灰白家族入庫（第五家族）：02 §2.4 五步＋R10 QA gate 18 項全過；Figma 04/05 collections 新增 modes＋頁 07 登記卡；demo 主題切換 5 家族 × 明暗＋檢查器 10 主題；枚舉 R5 同步",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "QA finding 77、截圖 86-mono-*"
+    },
+    {
+      "id": "L-0718d",
+      "kind": "log",
+      "epic": "EP-2",
+      "name": "workflow 04 策展輸入與模組選用規則 v1（提案待審：輸入三級制／本期活動優惠二型（coupons[]＋onsale actid 實抓驗證）／模組標題 titleSource 規則／模組 metadata＋AI 選模組）＋12 號文件設計維護與擴充工作流程全貌（維護 SOP／Sheets 銜接待辦／色彩擴充二題／跨部門推廣）",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "皆為提案待使用者審閱；demo 部署待使用者 git push（權限限制）"
     }
   ]
 }
