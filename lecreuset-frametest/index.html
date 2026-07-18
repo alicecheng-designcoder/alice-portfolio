@@ -433,7 +433,7 @@ body.kv-legacy .kv-variant-new{display:none}
 .kv-offer-box .latin{font-family:"Zen Kaku Gothic Antique","PingFang TC",sans-serif;font-weight:700;font-size:28px;line-height:36px;color:#232a31}
 .kv-offer-box .cn{font-size:28px;line-height:36px;font-weight:700;color:var(--color-price-sale)}
 .kv-title-row{
-  position:relative;width:368px;padding:16px 0;text-align:center;
+  position:relative;width:448px;padding:16px 0;text-align:center; /* 2026-07-18 使用者裁決 B 案：板寬 368→448，維持 68px 字級衝擊力（02/Figma 基準回寫掛裁決收斂會） */
   display:flex;align-items:center;justify-content:center; /* CP-05 v3（2026-07-18 使用者指示修正）：desktop 改與 tablet/mobile 同機制——標題＋行內起徽為一個群組置中，起徽不再絕對定位撞字 */
   background:var(--campaign-kv-title-bg);
   border-top:1px solid var(--campaign-kv-title-line);border-bottom:1px solid var(--campaign-kv-title-line);
@@ -472,7 +472,7 @@ body.kv-font-zen .kv-title{font-family:"Zen Kaku Gothic Antique","PingFang TC","
   background:var(--campaign-kv-title-line);color:var(--campaign-kv-title-text);
   font-size:25px;font-weight:400;letter-spacing:0;
 }
-.kv-date{width:368px;text-align:center;font-size:28px;line-height:36px;font-weight:700;color:var(--campaign-text-primary)}
+.kv-date{width:448px;text-align:center;font-size:28px;line-height:36px;font-weight:700;color:var(--campaign-text-primary)} /* 368→448 隨標題板（2026-07-18 B 案） */
 .kv-date .num{font-family:"Zen Kaku Gothic Antique",sans-serif}
 .kv-media{position:absolute;right:0;top:0;width:719px;height:480px}
 .circle-media{border-radius:50%;overflow:hidden;aspect-ratio:1/1;flex:none;background:var(--color-surface-card)}
