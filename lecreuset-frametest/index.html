@@ -2149,7 +2149,7 @@ function parseHash(){
     if (k === "dataset") { flags.dataset = v; return; } // 可分享的資料集示範狀態（bento）
     if (k === "panel" && v === "0") { document.getElementById("exp-panel").style.display = "none"; return; }
     if (k === "theme" && LEGACY_THEME[v]) v = LEGACY_THEME[v];
-    if (EXP_DEFS[k] && EXP_DEFS[k].opts[v]) expState[k] = v;
+    if (EXP_DEFS[k] && EXP_DEFS[k].opts[v]) { expState[k] = v; if (k === "theme") flags.hasTheme = true; } // hasTheme＝hash 帶明確主題（開機還原時優先於資料集預設主題）
   });
   return flags;
 }
@@ -2618,7 +2618,13 @@ document.getElementById("btn-share").addEventListener("click", async () => {
   if (navigator.share) { try { await navigator.share(data); } catch (e) {} }
   else if (navigator.clipboard) { navigator.clipboard.writeText(location.href); }
 });
-if (flags.dataset && DEMO_DATASETS[flags.dataset]) { const u = DEMO_DATASETS[flags.dataset].url; applyProductUrl(u); const inp = document.getElementById("ep-url"); if (inp) inp.value = u; }
+if (flags.dataset && DEMO_DATASETS[flags.dataset]) {
+  const u = DEMO_DATASETS[flags.dataset].url;
+  const hashTheme = flags.hasTheme ? expState.theme : null; // 2026-07-18 使用者回報修復：hash 明確主題（分享/裝置預覽）優先於資料集預設——否則 iframe 開機時資料集把 mono 蓋回 blue/green/gold
+  applyProductUrl(u);
+  if (hashTheme && expState.theme !== hashTheme) setExp("theme", hashTheme);
+  const inp = document.getElementById("ep-url"); if (inp) inp.value = u;
+}
 if (flags.test) runSelfTest();
 </script>
 </body>
