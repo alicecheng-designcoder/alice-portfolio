@@ -352,7 +352,7 @@
 {
   "version": 3,
   "updated": "2026-07-18",
-  "source": "05_Project_Tracker.md v2.0（2026-07-15 全量同步；v1 行事曆資料已合併）＋v3 資訊分層＋本日收工同步（2026-07-16）＋本日收工同步（2026-07-17：tracker §8 十四條＋demo 部署上線）＋2026-07-18 同步整理（07-17 尾三條補入、N-2/B-DOCK 結案、新佇列 N-6~N-9、過時註記更新）＋07-18 裁決：C×4 便當盒移除、archive 清除",
+  "source": "05_Project_Tracker.md v2.0（2026-07-15 全量同步；v1 行事曆資料已合併）＋v3 資訊分層＋本日收工同步（2026-07-16）＋本日收工同步（2026-07-17：tracker §8 十四條＋demo 部署上線）＋2026-07-18 同步整理（07-17 尾三條補入、N-2/B-DOCK 結案、新佇列 N-6~N-9、過時註記更新）＋07-18 裁決：C×4 便當盒移除、archive 清除＋07-18 收斂會落地",
   "stages": [
     {
       "id": "S1",
@@ -415,8 +415,8 @@
   "milestones": [
     {
       "id": "M1",
-      "label": "M1 凍結 v1.0",
-      "date": "2026-07-31"
+      "label": "M1 凍結 v1.0（07-18 收斂會改期）",
+      "date": "2026-08-15"
     },
     {
       "id": "M2",
@@ -478,8 +478,8 @@
       "id": "P0-4",
       "epic": "EP-0",
       "name": "Le Creuset reference implementation 定義（七項交付物）",
-      "start": "2026-07-15",
-      "end": "2026-07-29",
+      "start": "2026-07-21",
+      "end": "2026-08-13",
       "status": "todo",
       "owner": "Tofu",
       "rev": "Yu-ting + 內容運營",
@@ -491,8 +491,8 @@
       "id": "P0-3",
       "epic": "EP-0",
       "name": "M1 凍結 v1.0（凍結物見里程碑表）",
-      "start": "2026-07-23",
-      "end": "2026-07-31",
+      "start": "2026-08-08",
+      "end": "2026-08-15",
       "status": "todo",
       "owner": "Tofu",
       "rev": "Yu-ting",
@@ -738,14 +738,14 @@
       "id": "EX-3",
       "epic": "EP-X",
       "name": "對照組評估：台式慣例 vs editorial（與 Yu-ting）",
-      "start": "",
-      "end": "",
-      "status": "todo",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
       "owner": "Tofu",
       "rev": "Yu-ting",
       "dep": "EX-1、EX-2、P1-2",
       "out": "評估紀錄與裁決：editorial 語彙是否升格為正式變體（屆時才回寫 02/04）",
-      "note": ""
+      "note": "07-18 收斂會：不單獨執行，editorial 語彙由 colorTheme 組合包承接；EXP 兩版型留 06-EXP 頁參考"
     },
     {
       "id": "L-0713",
@@ -1266,14 +1266,14 @@
       "id": "N-3",
       "epic": "EP-0",
       "name": "【下次繼續】裁決收斂會：02/04 回寫＋08/09/10 正式登錄＋M1 改期裁決",
-      "start": "",
-      "end": "",
-      "status": "decision",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
       "owner": "Tofu",
       "rev": "Yu-ting",
       "dep": "—",
       "out": "待裁決總表批次裁決 → 升版凍結；含 git init 等 08 §3 立即項",
-      "note": "議題累計：02/04 回寫（含 09-H1 dock 互動、card/tag 灰化與 price/sale dark 色 02 回寫）＋08/09/10 正式登錄＋M1 改期＋標籤 mobile 雙欄寬度邊界（8 全形字，選項 a/b/c）"
+      "note": "2026-07-18 執行：8 議題全數定案＋當日落地（02 v1.2／04 v1.0／tokens v1.1／08-12 登錄／M1→08-15／Schema v1.1／標籤結案／自動導向部署／EX-3 結案）——詳 05 §8"
     },
     {
       "id": "N-4",
@@ -1352,6 +1352,32 @@
       "dep": "Blocking #2 裁決＝MVP 期 Claude 代行；量產期演進",
       "out": "取代 xlsx 匯入的自動化通道",
       "note": ""
+    },
+    {
+      "id": "N-10",
+      "epic": "EP-1",
+      "name": "日本組配色入庫（07-18 裁決首發）：J1 櫻×抹茶 colorTheme 組合包＋J2 藍白清潔感新家族＋J3 紅白祭典（ΔE 分級檢查）",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "02 §2.4 入庫五步；J3 需 ΔE 對鐵律紅檢查",
+      "out": "colorTheme 枚舉首批組合包＋新家族 modes＋demo 主題同步",
+      "note": "12 號文件 §4.1 建議做法；J1 近 pink 家族幾乎零成本示範"
+    },
+    {
+      "id": "N-11",
+      "epic": "EP-2",
+      "name": "pipeline 擴充：gdsale 商品頁入口型＋coupons[] 解析＋過期券過濾＋全模組標題數字詞掃描（Schema v1.1 落地）",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "workflow 04 v1.0（07-18 核可）；03 Schema v1.1",
+      "out": "fetch_parse/gate/write_xlsx 擴充＋P4 枚舉 R5 同步",
+      "note": "欄位契約見 workflow 04 §2/§3/§5"
     },
     {
       "id": "L-0717a",
@@ -1645,7 +1671,7 @@
       "rev": "使用者",
       "dep": "—",
       "out": "",
-      "note": "QA finding 77、截圖 86-mono-*"
+      "note": "QA finding 77、截圖 86-mono-*；07-18 使用者核准入庫定案"
     },
     {
       "id": "L-0718d",
@@ -1660,6 +1686,62 @@
       "dep": "—",
       "out": "",
       "note": "皆為提案待使用者審閱；demo 部署待使用者 git push（權限限制）"
+    },
+    {
+      "id": "L-0718e",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "視覺裁決輪（畫廊四題）：04/12 皆先再議（掛收斂會）｜KV 字級 B 案定版＝板寬 448、68px 維持（已實作＋部署，四資料集零重疊）｜mono 家族核准定案｜各國配色首發＝日本組（J1 組合層＋J2 藍白新家族＋J3 紅白祭典 ΔE 分級）",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu",
+      "rev": "—",
+      "dep": "—",
+      "out": "",
+      "note": "裁決畫廊＝KV 四方案 ×2 資料集／mono 全頁 ×2／色盤原稿；02/Figma 板寬基準回寫掛 N-3"
+    },
+    {
+      "id": "L-0718f",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "裝置預覽切換丟失主題修復（使用者回報）：iframe 內切開關回寫主頁＋換裝置帶 inner hash（含 dataset flag）；三情境驗證＋自測 ×4 迴歸 PASS；已部署",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "QA finding 78；mono 首例曝光的既有 bug（任何預覽內切的開關皆受影響）"
+    },
+    {
+      "id": "L-0718g",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "主題 × 資料集開機衝突修復（使用者回報二修）：資料集預設主題開機蓋掉 hash mono——hasTheme 旗標＋開機回寫；20 組合全矩陣＋線上抽驗＋workflow 三代理複核全過；矩陣歸檔 qa/87 成固定回歸資產；已部署",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "QA finding 79；教訓＝主題類修復驗證必含全資料集；新開放項（收斂會）＝真機直開桌面版可用性"
+    },
+    {
+      "id": "L-0718h",
+      "kind": "log",
+      "epic": "EP-0",
+      "name": "裁決收斂會（8 議題定案＋當日落地）：02 v1.2／04 v1.0／tokens.json v1.1 重匯出／08-12＋workflow04 全登錄定稿／M1→08-15／Schema v1.1／標籤寬度實測結案／真機自動導向部署／EX-3 結案併組合包",
+      "start": "2026-07-18",
+      "end": "2026-07-18",
+      "status": "done",
+      "owner": "Tofu",
+      "rev": "—",
+      "dep": "—",
+      "out": "",
+      "note": "兩輪選擇題裁決（畫廊輔助）；pipeline 擴充列 N-11"
     }
   ]
 }
