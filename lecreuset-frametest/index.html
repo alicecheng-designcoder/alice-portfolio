@@ -2184,10 +2184,24 @@ function renderPanel(){
 const dpState = { device:"desktop" };
 const dpOverlay = document.getElementById("device-preview-overlay");
 const dpFrame = document.getElementById("dp-frame");
+function dpInnerHash(){ // 預覽 iframe 內的即時 #exp= 狀態（主題/資料集可能在 iframe 內被切換）；跨源或未載入時回 null
+  try { const h = dpFrame.contentWindow.location.hash; if (h && h.startsWith("#exp=")) return h; } catch (e) {}
+  return null;
+}
+function dpAdoptInnerExp(){ // 2026-07-18 使用者回報修復：iframe 內切的開關（含 mono 主題）只改 iframe 自己的 hash——切裝置/關閉前先回寫主頁 expState，否則重建 iframe 會用主頁舊 hash 蓋掉主題
+  const h = dpInnerHash(); if (!h) return;
+  h.slice(5).split(",").forEach(kv => {
+    let [k, v] = kv.split(":");
+    if (k === "theme" && LEGACY_THEME[v]) v = LEGACY_THEME[v];
+    if (EXP_DEFS[k] && EXP_DEFS[k].opts[v]) expState[k] = v;
+  });
+  applyState(); writeHash(); // dataset 維持主頁現狀（內容資料不在此同步）；跨裝置延續由 dpSrc 帶完整 inner hash 保證
+}
 function dpSrc(){
   const u = new URL(location.href);
   u.searchParams.set("device", dpState.device);
   u.searchParams.delete("typo"); // 字級 A/B 已移除（2026-07-17）：A 案 v2＝MVP v1 唯一基準
+  const inner = dpInnerHash(); if (inner) u.hash = inner; // 換裝置＝以預覽內即時狀態（含 dataset flag）重建，主題不丟失
   return u.href;
 }
 function dpRenderButtons(){ // 面板＋覆層工具列按鈕狀態同步；typo 子開關僅 mobile 預覽時可用
@@ -2198,6 +2212,7 @@ function dpRenderButtons(){ // 面板＋覆層工具列按鈕狀態同步；typo
 }
 function openDevicePreview(device){
   if (device === "desktop") { closeDevicePreview(); return; } // desktop＝關閉預覽
+  dpAdoptInnerExp(); // 換裝置前先回寫 iframe 內狀態（2026-07-18 修復：預覽內切主題後換裝置不再退回舊主題）
   dpState.device = device;
   dpOverlay.classList.toggle("dp-tablet", device === "tablet");
   dpFrame.src = dpSrc();
@@ -2205,6 +2220,7 @@ function openDevicePreview(device){
   dpRenderButtons();
 }
 function closeDevicePreview(){
+  dpAdoptInnerExp(); // 關閉時同步：預覽內切的主題/開關帶回 desktop 主頁（dataset 除外）
   dpState.device = "desktop";
   dpOverlay.hidden = true;
   dpFrame.src = "about:blank"; // 卸載 iframe：停掉預覽頁內輪播/計時器
