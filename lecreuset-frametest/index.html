@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le Creuset 活動頁框架測試｜FrameTest Prototype</title>
+<script>
+/* 2026-07-18 收斂會裁決（QA finding 79 開放項）：真機直開自動導向 ?device=——
+   觸控裝置＋螢幕寬 <1200 才導向（<768→mobile、其餘→tablet），桌機零影響；hash（主題/資料集分享狀態）原樣保留 */
+(function(){
+  if (/[?&]device=/.test(location.search)) return;
+  var touch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+  var w = Math.min(window.screen ? screen.width : 1e9, window.innerWidth || 1e9);
+  if (!touch || w >= 1200) return;
+  var dev = w < 768 ? "mobile" : "tablet";
+  var q = location.search ? location.search + "&device=" + dev : "?device=" + dev;
+  location.replace(location.pathname + q + location.hash);
+})();
+</script>
 <!--
   框架測試 prototype（desktop 1440）——依 Figma 手動修改版 148:1218 建置
   實驗開關狀態存 URL hash：#exp=kv:new|legacy,dock:after|always,font:noto|zen,theme:light|dark
