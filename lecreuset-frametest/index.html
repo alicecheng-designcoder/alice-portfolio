@@ -415,6 +415,7 @@ body.campaign-dark .group-card{box-shadow:0 1px 4px rgba(0,0,0,.35)}
 #sec-uh{height:45px;background:var(--color-surface-header);display:flex;align-items:center;position:sticky;top:0;z-index:50}
 #sec-uh .uh-inner{width:var(--content-w);margin:0 auto;display:flex;align-items:center;justify-content:space-between}
 #sec-uh img{height:24px}
+#sec-uh .uh-logo{display:flex;align-items:center}
 #sec-uh .uh-right{display:flex;gap:24px;color:#fff;font-size:14px}
 #sec-uh .uh-right a,#sec-uh .uh-right button{color:#fff;background:none;border:none;font:inherit;cursor:pointer}
 
@@ -706,8 +707,9 @@ body[class*="-light"] .kv-cutout img.no-alpha{mix-blend-mode:multiply} /* 資料
 .explore-item .circle-media{width:64px}
 .explore-item .lbl{font-size:16px;font-weight:700;color:var(--card-label-text)}
 .explore-item .sub{font-size:12px;color:#6e7780}
-#sec-notice{padding:40px 0}
-#sec-notice .notice-box{width:800px;margin:0 auto;color:var(--campaign-text-muted);font-size:12px;line-height:1.9}
+#sec-notice{padding:40px 0} /* 上緣 40＝與上方樓層 section-padding 一致 */
+#sec-notice .notice-box{color:var(--campaign-text-muted);font-size:12px;line-height:1.9} /* 2026-07-19 使用者指示：desktop/tablet 靠版心左緣——改掛 .content（1200/720/邊距 16 三裝置自動對齊），原 800 置中盒退場 */
+#sec-notice #notice-text{white-space:pre-line} /* 欄位化：資料層 noticeText 純文字＋換行（＝Sheets 儲存格語意） */
 #sec-notice .notice-box strong{display:block;font-size:14px;color:var(--campaign-text-secondary);margin-bottom:6px}
 #sec-footer{background:var(--color-surface-footer);color:#fff;text-align:center;padding:40px 0 96px}
 #sec-footer .f-title{font-size:16px;font-weight:700}
@@ -1034,9 +1036,10 @@ html[data-device="tablet"] .kv-cutout img{max-height:240px}
 
 <header id="sec-uh">
   <div class="uh-inner">
-    <img src="figma-assets/yahoo-shopping-logo-hrz-white.svg" alt="Yahoo購物中心">
+    <!-- 2026-07-19 使用者指示：logo 連往購物中心首頁（沿用站內外連慣例 _blank）；活動說明改頁內錨點鈕（button 不寫 hash——#exp 狀態通道不可污染） -->
+    <a class="uh-logo" href="https://tw.buy.yahoo.com/" target="_blank" rel="noopener"><img src="figma-assets/yahoo-shopping-logo-hrz-white.svg" alt="Yahoo購物中心"></a>
     <div class="uh-right">
-      <a href="https://tw.buy.yahoo.com/brands/41166677?cid=29588048" target="_blank" rel="noopener">活動說明</a>
+      <button id="btn-notice" type="button">活動說明</button>
       <button id="btn-share" type="button">分享</button>
     </div>
   </div>
@@ -1124,11 +1127,9 @@ html[data-device="tablet"] .kv-cutout img{max-height:240px}
   </section>
 
   <section id="sec-notice">
-    <div class="notice-box">
+    <div class="notice-box content">
       <strong>注意事項</strong>
-      商品價格、優惠條件、活動期間與可售狀態，請以商品頁與結帳頁顯示為準。<br>
-      不同商品可能適用不同優惠、配送方式與庫存狀態。<br>
-      點擊商品卡後可前往商品頁查看完整規格、付款方式、配送資訊與最新優惠。
+      <div id="notice-text"></div><!-- 2026-07-19 欄位化（使用者指示）：內容由資料層 noticeText 驅動＝Sheets P1 欄位（AI 產初稿→營運調修→核可建置） -->
     </div>
   </section>
 </main>
@@ -1397,7 +1398,9 @@ let kvCutouts = { // 舊版 KV 左右舞台（2026-07-16 v5）：單張去背圖
 };
 
 let dockHeroLabel = "品牌精選";              // 資料集可覆寫（清除時還原）
-let footerTitle = "法式餐桌與經典鍋具精選";     // 頁尾標題＝資料層內容
+let footerTitle = "法式餐桌與經典鍋具精選";     // 頁尾標題＝資料層內容（Sheets P1 欄位 footerTitle：AI 初稿→營運調修）
+const NOTICE_BOILERPLATE = "商品價格、優惠條件、活動期間與可售狀態，請以商品頁與結帳頁顯示為準。\n不同商品可能適用不同優惠、配送方式與庫存狀態。\n點擊商品卡後可前往商品頁查看完整規格、付款方式、配送資訊與最新優惠。"; // AI 初稿共用法務樣板：正式版由 pipeline 逐活動產出
+let noticeText = NOTICE_BOILERPLATE;          // 注意事項內文＝資料層內容（2026-07-19 使用者指示欄位化：Sheets P1 欄位 noticeText，營運可逐活動調修）
 function dockAnchors(){ // 2026-07-16 修正：導航文字隨資料層生成（分類樓層標題直接取自 categorySections，資料集切換即同步）
   return [
     { label: dockHeroLabel, target:"sec-hero" },
@@ -1861,7 +1864,7 @@ function snapshotDefaults(){
     editorWall: structuredClone(editorWall), editorTitleLines: structuredClone(editorTitleLines),
     categorySections: structuredClone(categorySections), exploreItems: structuredClone(exploreItems),
     moreUrl, productBrandPrefix, kvCornerImgs: structuredClone(kvCornerImgs),
-    dockHeroLabel, footerTitle, kvFigUrls: structuredClone(kvFigUrls), kvCutouts: structuredClone(kvCutouts), kvKeyProducts: structuredClone(kvKeyProducts),
+    dockHeroLabel, footerTitle, noticeText, kvFigUrls: structuredClone(kvFigUrls), kvCutouts: structuredClone(kvCutouts), kvKeyProducts: structuredClone(kvKeyProducts),
     kvImgs: ["kv-img-main", "kv-img-sub1", "kv-img-sub2"].map(id => document.getElementById(id).src),
     theme: "pink-light"
   };
@@ -1871,6 +1874,7 @@ function rerenderData(){
   renderCategories(); renderExplore(); renderLegacyCutouts();
   renderDock(); // 導航文字隨資料集更新（2026-07-16 修正）
   document.getElementById("footer-title").textContent = footerTitle;
+  document.getElementById("notice-text").textContent = noticeText; // 欄位化（2026-07-19）：純文字寫入＋pre-line 換行（＝Sheets 儲存格語意）
   document.getElementById("promo-more").href = moreUrl;
   playKvFlip();
 }
@@ -1902,7 +1906,7 @@ const DEMO_DATASETS = {
         { lbl:"戶外露營／登山用品", sub:"Yahoo購物中心 分館", img:CAMP_PRODUCTS[10][5], url:CAMP_URL }
       ];
       moreUrl = CAMP_URL; productBrandPrefix = "";
-      dockHeroLabel = "露營精選"; footerTitle = "KAZMI 野外露營裝備選品";
+      dockHeroLabel = "露營精選"; footerTitle = "KAZMI 野外露營裝備選品"; noticeText = NOTICE_BOILERPLATE; // 每活動一筆 noticeText（鏡射 Sheets P1 逐列語意）
       // KV 主視覺商品挑選（2026-07-16 使用者指定四圖；名稱/連結真值）
       const CAMP_KV = [
         { img:"https://img.yec.tw/zp/MerchandiseImages/11BFD1C7F5-SP-22819976.jpg", name:"【KAZMI】KZM 工業風304不鏽鋼套杯8件組(350ml*4+50ml*4).茶杯組.水杯/K23T3K03 黑色+沙色", url:"https://tw.buy.yahoo.com/gdsale/KAZMI-KZM-工業風304不鏽鋼套杯8件組-350ml-4-50ml-4-茶杯組-水杯-K23-12126031.html" },
@@ -1957,7 +1961,7 @@ const DEMO_DATASETS = {
         { lbl:"鍵盤／滑鼠／繪圖板", sub:"Yahoo購物中心 分類", img:KB_PRODUCTS[8][5], url:KB_URL }
       ];
       moreUrl = KB_URL; productBrandPrefix = "";
-      dockHeroLabel = "鍵盤精選"; footerTitle = "鍵盤桌面升級選品";
+      dockHeroLabel = "鍵盤精選"; footerTitle = "鍵盤桌面升級選品"; noticeText = NOTICE_BOILERPLATE;
       // KV 主視覺商品挑選（2026-07-16 使用者指定四圖，皆為來源快照真值商品：粉白柔和系）
       const KB_KV = [
         { img:"https://img.yec.tw/zp/MerchandiseImages/52F0C16F92-Product-34435532.jpg", name:"羅技 Wave Keys 人體工學鍵盤-玫瑰粉", url:"https://tw.buy.yahoo.com/gdsale/gdsale.asp?gdid=10987175" },
@@ -2012,7 +2016,7 @@ const DEMO_DATASETS = {
         { lbl:"盛夏折扣季", sub:"2件9折・3件85折（~07.26）", img:FA_PRODUCTS[8][5], url:FA_URL }
       ];
       moreUrl = FA_URL; productBrandPrefix = "";
-      dockHeroLabel = "銀穗精選"; footerTitle = "en-suey 銀穗盛夏女裝選品";
+      dockHeroLabel = "銀穗精選"; footerTitle = "en-suey 銀穗盛夏女裝選品"; noticeText = NOTICE_BOILERPLATE;
       kvCutouts = { // 舊版鎖陣舞台：使用者提供資料夾去背素材（theme-item-img/流行女裝，裁實框 fa-1~4）；新版 KV 圖不動；連結＝品牌頁（素材未指定對應單品）
         left: [
           { img:"assets/generated/theme-item-trimmed/fa-1.png", name:"en-suey 銀穗女裝選品", url:FA_URL, cut:true },
@@ -2092,7 +2096,7 @@ function clearProductUrl(silent){
   categorySections = structuredClone(DEFAULT_STATE.categorySections);
   exploreItems = structuredClone(DEFAULT_STATE.exploreItems);
   moreUrl = DEFAULT_STATE.moreUrl; productBrandPrefix = DEFAULT_STATE.productBrandPrefix;
-  dockHeroLabel = DEFAULT_STATE.dockHeroLabel; footerTitle = DEFAULT_STATE.footerTitle;
+  dockHeroLabel = DEFAULT_STATE.dockHeroLabel; footerTitle = DEFAULT_STATE.footerTitle; noticeText = DEFAULT_STATE.noticeText;
   kvFigUrls = structuredClone(DEFAULT_STATE.kvFigUrls);
   kvCutouts = structuredClone(DEFAULT_STATE.kvCutouts);
   kvKeyProducts = structuredClone(DEFAULT_STATE.kvKeyProducts);
@@ -2214,6 +2218,7 @@ function dpSrc(){
   const u = new URL(location.href);
   u.searchParams.set("device", dpState.device);
   u.searchParams.delete("typo"); // 字級 A/B 已移除（2026-07-17）：A 案 v2＝MVP v1 唯一基準
+  u.searchParams.delete("dataset"); u.searchParams.delete("theme"); // 2026-07-19：入口捷徑 query 不帶進預覽 iframe——inner hash 已是完整即時狀態（防 stale query 蓋掉頁內切換）
   const inner = dpInnerHash(); if (inner) u.hash = inner; // 換裝置＝以預覽內即時狀態（含 dataset flag）重建，主題不丟失
   return u.href;
 }
@@ -2535,6 +2540,14 @@ async function runSelfTest(){
       document.body.innerHTML.includes("2026.07.09~07.26") && location.hash.includes("dataset:fashion"));
     clearProductUrl();
     ok("URL 清除：hash 移除 dataset 旗標", !location.hash.includes("dataset:"));
+    // 2026-07-19 header 行為＋注意事項欄位化（使用者指示三則＋QA finding 80）
+    ok("Header：logo 連往購物中心首頁", (document.querySelector("#sec-uh .uh-logo") || {}).href === "https://tw.buy.yahoo.com/" && !!document.querySelector("#sec-uh .uh-logo img"));
+    ok("Header：活動說明＝頁內錨點鈕（不寫 hash、#exp 通道不受污染）", !!document.getElementById("btn-notice") && !document.querySelector("#sec-uh a[href^='#']"));
+    ok("Header：分享鈕存在（行動＝navigator.share 原生面板）", !!document.getElementById("btn-share"));
+    ok("注意事項欄位化：notice-text 由資料層渲染", document.getElementById("notice-text").textContent.includes("商品頁與結帳頁"));
+    ok("注意事項版心對齊：notice-box 掛 .content、左緣＝版心左緣",
+      document.querySelector("#sec-notice .notice-box").classList.contains("content") &&
+      Math.abs(document.querySelector("#sec-notice .notice-box").getBoundingClientRect().left - document.querySelector("main .content").getBoundingClientRect().left) < 1);
     ok("URL 清除：導航與頁尾還原預設", document.getElementById("sec-anchornav-floating").textContent.includes("品牌精選") &&
       document.getElementById("sec-anchornav-floating").textContent.includes("餐桌器皿") &&
       document.getElementById("footer-title").textContent === "法式餐桌與經典鍋具精選");
@@ -2601,10 +2614,18 @@ if (themeImages.background.editorTile) {
   ed.style.backgroundImage = getComputedStyle(ed).backgroundImage.replace(/url\([^)]+\)/, `url("${themeImages.background.editorTile}")`);
 }
 renderKvContent(); renderPromoEntries(); renderFeatured(); renderEditorTopic(); renderCategories(); renderExplore(); renderLegacyCutouts(); renderDock();
+document.getElementById("notice-text").textContent = noticeText; // 首次渲染（boot 不走 rerenderData）
 snapshotDefaults(); // URL 清除的還原基準（含主圖 override 後的最終預設）
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitKvTitles(); fitLegacyLock(); playKvFlip(); }); // 字型就緒後重算縮字（新版＋舊版鎖陣）＋首播掀牌；此時 hash 的 kv:new|legacy 已套用
 if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", () => { fitKvTitles(); fitLegacyLock(); }); // CP-05 v3：Mochiy 等字型晚於 fonts.ready 載完時再重算（修「有時候正常有時候重疊」的字型競態；冪等、不重播掀牌）
 const flags = parseHash();
+{ // 2026-07-19 QA finding 80：手機同分頁點分享連結只換 hash＝same-document navigation 不重載→dataset/theme 增設 ?query 入口通道（不同 query 必整頁重載）。hash 與 query 並存時 hash 優先（hash＝頁內即時持久化狀態、query＝入口捷徑；dpSrc 已剝 query 防 stale 打架）
+  const qs = new URLSearchParams(location.search);
+  const qd = qs.get("dataset");
+  let qt = qs.get("theme"); if (qt && LEGACY_THEME[qt]) qt = LEGACY_THEME[qt];
+  if (!flags.dataset && qd && DEMO_DATASETS[qd]) flags.dataset = qd;
+  if (!flags.hasTheme && qt && EXP_DEFS.theme.opts[qt]) { expState.theme = qt; flags.hasTheme = true; }
+}
 applyState(); updateSpy();
 
 document.getElementById("ep-body").addEventListener("click", ev => {
@@ -2628,8 +2649,15 @@ document.getElementById("ep-toggle").addEventListener("click", () => {
 });
 document.getElementById("btn-share").addEventListener("click", async () => {
   const data = { title: document.title, url: location.href };
-  if (navigator.share) { try { await navigator.share(data); } catch (e) {} }
-  else if (navigator.clipboard) { navigator.clipboard.writeText(location.href); }
+  if (navigator.share) { try { await navigator.share(data); } catch (e) {} } // 行動裝置＝OS 原生分享面板（iOS/Android；需 HTTPS＋使用者手勢，Netlify 站符合）
+  else if (navigator.clipboard) {
+    try { await navigator.clipboard.writeText(location.href); } catch (e) { return; }
+    const b = document.getElementById("btn-share"), t = b.textContent;
+    b.textContent = "已複製連結"; setTimeout(() => { b.textContent = t; }, 1600); // 桌機 fallback 顯性回饋（2026-07-19：原靜默複製使用者無感）
+  }
+});
+document.getElementById("btn-notice").addEventListener("click", () => { // 2026-07-19 使用者指示：活動說明＝頁內錨點至注意事項；比照 dock 用 scrollIntoView（section scroll-margin 64 落點一致），不寫 location.hash——#exp 狀態通道不可污染
+  document.getElementById("sec-notice").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 if (flags.dataset && DEMO_DATASETS[flags.dataset]) {
   const u = DEMO_DATASETS[flags.dataset].url;
@@ -2639,6 +2667,18 @@ if (flags.dataset && DEMO_DATASETS[flags.dataset]) {
   const inp = document.getElementById("ep-url"); if (inp) inp.value = u;
 }
 if (flags.test) runSelfTest();
+window.addEventListener("hashchange", () => { // 2026-07-19 QA finding 80：同分頁 hash-only 導航（手機瀏覽器重用分頁點第二條分享連結）——過去無監聽＝停在前一個資料集/主題
+  if (!/#exp=/.test(location.hash)) return; // 非 #exp 狀態 hash 不處理（防未來頁內錨點誤觸發）
+  const f = parseHash(); // 同步 expState（theme/kv/font…）；dataset/test 走 flags
+  const hashTheme = f.hasTheme ? expState.theme : null;
+  if (f.dataset && DEMO_DATASETS[f.dataset]) {
+    if (f.dataset !== activeDatasetKey) applyProductUrl(DEMO_DATASETS[f.dataset].url);
+  } else if (!f.dataset && activeDatasetKey !== "lecreuset") {
+    clearProductUrl(true); // 無 dataset 旗標＝回預設資料集（鏡射開機語意）
+  }
+  if (hashTheme && expState.theme !== hashTheme) setExp("theme", hashTheme); // hash 明確主題優先於資料集預設（同 2026-07-18 開機修復）
+  applyState(); writeHash(); // 其餘旗標（kv/font/dock）一併套用＋hash 正規化（replaceState 不re-觸發 hashchange）
+});
 </script>
 </body>
 </html>
