@@ -929,11 +929,15 @@ html[data-device="mobile"] #sec-anchornav-floating{
 html[data-device="mobile"] #sec-anchornav-floating::-webkit-scrollbar{display:none}
 html[data-device="mobile"] #sec-anchornav-floating.is-visible{transform:translateY(0)}
 html[data-device="mobile"] .anchor-item{height:44px;padding:0 16px;font-size:16px;flex:none} /* 字級 15→16 綁 type/cta（09 §1.4） */
-html[data-device="mobile"] .anchor-item.top{ /* TOP 44×44 固定右端＋tonal 分線（導覽 rail 免頁點、不 snap） */
-  position:sticky;right:0;z-index:1;width:44px;padding:0;justify-content:center;
-  font-size:0;box-shadow:-9px 0 0 -8px var(--campaign-line-tonal);
+html[data-device="mobile"] .anchor-item.top{ /* TOP 44×44 固定右端＋tonal 分線（導覽 rail 免頁點、不 snap）；白圓改掛 ::after——負 z 底板會蓋掉母元素自身背景（繪製序：bg→負z子層→內容） */
+  position:sticky;right:0;z-index:2;width:44px;padding:0;justify-content:center;
+  font-size:0;background:transparent;
 }
-html[data-device="mobile"] .anchor-item.top::after{content:"↑";font-size:20px}
+html[data-device="mobile"] .anchor-item.top::before{ /* 2026-07-19 使用者回報：TOP 懸浮壓住 rail 選項半透穿插——加不透明 dock 底色板，滑過的錨點完整遮蔽（同桌機 TOP 坐在 dock 底上）；分線由底板 border-left 承載；rail-fade.r 提示右側仍有項目、捲到底最後一顆在 TOP 左側可點 */
+  content:"";position:absolute;top:-8px;bottom:-8px;left:-1px;right:-8px;background:#000;z-index:-1;
+  border-left:1px solid var(--campaign-line-tonal);
+}
+html[data-device="mobile"] .anchor-item.top::after{content:"↑";font-size:20px;width:44px;height:44px;border-radius:50%;background:var(--color-nav-idle-bg);display:flex;align-items:center;justify-content:center}
 /* rail-fade 溢出提示（2026-07-19 使用者需求：mobile 導覽連動）：零流寬 sticky＋負 margin 抵 flex gap；spy 連動置中由 updateSpy 處理 */
 .rail-fade{display:none}
 html[data-device="mobile"] .rail-fade{display:block;flex:none;width:0;margin:0 -8px;align-self:stretch;position:sticky;pointer-events:none;z-index:1}
