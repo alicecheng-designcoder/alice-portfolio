@@ -1,0 +1,23 @@
+# N-15 過渡防護（2026-07-19）：敏感子路徑 basic auth＋noindex；LC demo 與作品站本體維持公開（PF-9：demo 資料可公開）
+[[edge_functions]]
+  function = "preview-auth"
+  path = "/lecreuset-frametest/titanium-preview/*"
+[[edge_functions]]
+  function = "preview-auth"
+  path = "/lecreuset-frametest/platform-decisions/*"
+[[edge_functions]]
+  function = "preview-auth"
+  path = "/lecreuset-frametest/platform-plan-doc13/*"
+
+[[headers]]
+  for = "/lecreuset-frametest/titanium-preview/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+[[headers]]
+  for = "/lecreuset-frametest/platform-decisions/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+[[headers]]
+  for = "/lecreuset-frametest/platform-plan-doc13/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
