@@ -351,7 +351,7 @@
 <script id="calendar-data" type="application/json">
 {
   "version": 3,
-  "updated": "2026-07-18",
+  "updated": "2026-07-19",
   "source": "05_Project_Tracker.md v2.0（2026-07-15 全量同步；v1 行事曆資料已合併）＋v3 資訊分層＋本日收工同步（2026-07-16）＋本日收工同步（2026-07-17：tracker §8 十四條＋demo 部署上線）＋2026-07-18 同步整理（07-17 尾三條補入、N-2/B-DOCK 結案、新佇列 N-6~N-9、過時註記更新）＋07-18 裁決：C×4 便當盒移除、archive 清除＋07-18 收斂會落地＋07-18 收工部署同步（行事曆上線＋儀表板重產部署）",
   "stages": [
     {
@@ -1240,14 +1240,14 @@
       "id": "N-1",
       "epic": "EP-1",
       "name": "【下次繼續】mobile 裝置預覽整體驗收走查（fx5 定版後全頁確認）",
-      "start": "",
-      "end": "",
-      "status": "review",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
       "owner": "Tofu",
       "rev": "使用者",
       "dep": "L-0716y",
       "out": "mobile/tablet 預覽逐模組確認 → 凍結 09 mobile 規格",
-      "note": "07-17 自查輪完成：4 資料集 ×375 程式化檢查＋16 張截圖目檢全過（截圖歸檔 qa/.../79-mobile-walkthrough/）；待使用者最終驗收；新開放項＝標籤 mobile 雙欄實際上限 8 全形字（併入 N-3）"
+      "note": "07-17 自查輪完成：4 資料集 ×375 程式化檢查＋16 張截圖目檢全過（截圖歸檔 qa/.../79-mobile-walkthrough/）；待使用者最終驗收；新開放項＝標籤 mobile 雙欄實際上限 8 全形字（併入 N-3）；2026-07-19 使用者逐項裁決＋即時實作部署完成，KV 近滿版高度與 H2⑦ 縮小明示接受，09 凍結障礙解除；貼紙 14/探索 16 兩豁免、KV 左欄 −10%、特色標 16 深灰、dock 連動、分享修復 finding 80"
     },
     {
       "id": "N-2",
@@ -1756,6 +1756,124 @@
       "dep": "—",
       "out": "",
       "note": "新常規（使用者指示）＝每次 session 結束前：今日進度更新行事曆＋完成上線部署；佇列「儀表板重產部署」結案"
+    },
+    {
+      "id": "N-12",
+      "epic": "EP-1",
+      "name": "FrameTest a11y 無障礙盤點（axe-core＋VoiceOver/TalkBack 抽測，CP-07）",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "13 號文件 §10 依據",
+      "out": "a11y 檢查點納入 CP-07；axe-core 自動掃＋螢幕報讀器抽測清單",
+      "note": "13 號文件 §10 依據；FrameTest 增設無障礙盤點關卡（axe-core 自動＋VoiceOver/TalkBack 抽測）"
+    },
+    {
+      "id": "N-13",
+      "epic": "EP-2",
+      "name": "資料層 JSON 契約 v0（頂層 5 欄＋9 tuple 具名化＋鈦案驗證）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "active",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "14 號文件；橫跨 EP-2／EP-3",
+      "out": "契約 v0 定版；loader 改造點 4 個列債",
+      "note": "14 號文件；頂層 5 欄＋9 tuple 具名化＋鈦案資料集驗證通過。本輪契約完成、loader 未建——loader 改造 4 個點列入技術債"
+    },
+    {
+      "id": "N-14",
+      "epic": "EP-3",
+      "name": "活動索引頁＋發起入口 SOP＋變更單格式 v0（含基準指紋三方比對）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "活動索引頁＋發起入口 SOP＋變更單 v0；基準指紋三方比對機制",
+      "note": "2026-07-19 完成：活動索引頁與發起入口 SOP 落地，變更單格式 v0 含基準指紋三方比對"
+    },
+    {
+      "id": "N-15",
+      "epic": "EP-3",
+      "name": "過渡防護立即段（CF Pages middleware basic auth 三子路徑＋noindex）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "—",
+      "out": "CF Pages middleware basic auth＋noindex；覆蓋三子路徑",
+      "note": "2026-07-19 完成：Cloudflare Pages middleware basic auth 覆蓋三子路徑＋noindex（過渡防護立即段）"
+    },
+    {
+      "id": "N-16",
+      "epic": "EP-2",
+      "name": "rules.json 規則單一來源（gate.js 抽頂 17/17 parity）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "—",
+      "out": "rules.json 單一來源；gate.js 規則抽頂",
+      "note": "2026-07-19 完成：規則抽出至 rules.json 單一來源，gate.js 抽頂 17/17 parity 通過"
+    },
+    {
+      "id": "N-17",
+      "epic": "EP-1",
+      "name": "鈦案建成 FrameTest 第 5 真實資料集（真活動頁上線 ?dataset=titanium）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "?dataset=titanium 真活動頁上線；36 件＋三樓層＋3 真活動＋mono-light",
+      "note": "2026-07-19 完成：鈦案為 FrameTest 第 5 真實資料集，36 件商品＋三樓層＋3 真活動＋mono-light；自測 78 PASS"
+    },
+    {
+      "id": "N-18",
+      "epic": "EP-2",
+      "name": "E2E 真實走測（xlsx→Sheets→下載往返；schema 零破壞）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "—",
+      "out": "E2E 往返驗證；三斷點記錄",
+      "note": "2026-07-19 完成：xlsx→Sheets→下載往返、schema 零破壞；三斷點記錄（int→float／share-link 401／Netlify 額度）"
+    },
+    {
+      "id": "N-19",
+      "epic": "EP-3",
+      "name": "Sheets 欄位化落地——kvVariant（BI）＋KV 商品頁 URL（BJ/BK/BL）＋P0 資訊架構分頁",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "已入 xlsx，待匯入 Sheets",
+      "out": "kvVariant（BI）＋KV 商品頁 URL（BJ/BK/BL）＋P0 資訊架構分頁入庫；回寫 Schema v1.2/1.3 定版",
+      "note": "欄位已入 xlsx，待匯入 Sheets 並回寫 Schema v1.2/1.3 定版"
+    },
+    {
+      "id": "L-0719a",
+      "kind": "log",
+      "epic": "EP-D",
+      "name": "主站遷移 Cloudflare Pages（Netlify 額度凍結）：ai-design-sharing.pages.dev（wrangler direct upload）＋N-15 過渡防護＋PF-1~13 平台裁決全落盤（13 號文件 v0.5）",
+      "start": "2026-07-19",
+      "end": "2026-07-19",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "—",
+      "out": "",
+      "note": "Netlify 額度凍結 → 主站遷 Cloudflare Pages；ai-design-sharing.pages.dev（wrangler direct upload）；過渡防護見 N-15；PF-1~13 平台裁決全落盤 13 號文件 v0.5"
     }
   ]
 }
