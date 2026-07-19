@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="only light"><title>平台規劃裁決頁｜PF-1～PF-13</title>
+<style>
+body{font-family:"PingFang TC",sans-serif;margin:0;background:#f5f8fa;color:#232a31;line-height:1.65}
+header{background:#232a31;color:#fff;padding:16px}h1{font-size:18px;margin:0}header p{margin:6px 0 0;font-size:13px;color:#c8cdd2}
+.pf{background:#fff;border-radius:12px;margin:14px 16px;padding:14px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.pf h2{font-size:15px;margin:0 0 2px}.pf .why{font-size:12.5px;color:#5b636a;margin:0 0 10px}
+.opt{display:flex;gap:8px;border:1.5px solid #e0e4e9;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:14px}
+.opt.rec{border-color:#2c5c88;background:#f3f8fc}
+.opt b{flex:none}.opt .risk{display:block;font-size:12px;color:#8a6d1a;margin-top:2px}
+.opt .cost{display:block;font-size:12px;color:#5b636a}
+.tag{display:inline-block;background:#2c5c88;color:#fff;font-size:11px;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.reply{margin:20px 16px 28px;background:#fff8e6;border:1px solid #e6cf8f;border-radius:10px;padding:12px 14px;font-size:14px}
+a{color:#2c5c88}
+</style></head><body>
+<header><h1>平台規劃裁決頁（PF-1～PF-13）</h1>
+<p>13 號文件 v0.4 的待裁決項，已選項化＋風險註記。全文：<a href="../platform-plan-doc13/" style="color:#9fc3e2">13 號文件網頁版</a>。藍框＝我的建議。</p></header>
+
+<div class="pf"><h2>PF-9｜資料機密等級（建議最先裁——牽動 PF-1/PF-2）</h2><p class="why">活動頁資料（價格策略、檔期、AI 理由行）算不算內部機密？決定整個防護形態。</p>
+<div class="opt rec"><b>A</b><span>真活動資料＝內部機密；demo 資料可公開<span class="tag">建議</span><span class="risk">風險：平台所有階段都要帶防護，前置多一步</span></span></div>
+<div class="opt"><b>B</b><span>全部可公開<span class="risk">風險：價格策略/檔期/選品邏輯對外可見，競品可讀</span></span></div></div>
+
+<div class="pf"><h2>PF-11｜「內網」邊界定義（你已表達內網傾向——這題定義它）</h2><p class="why">「連動 Google Sheets」與「嚴格內網」互斥：Sheets 本體在 Google 雲。</p>
+<div class="opt"><b>A</b><span>B-i1 企業雲即邊界：公司 Google Workspace 網域限定共用＝視同公司邊界，保留 Sheets<span class="cost">成本：低一個量級（沿用 Sheets 生態）</span><span class="risk">風險：需公司資安政策認可「Workspace＝邊界」；資料實體在 Google 雲</span></span></div>
+<div class="opt rec"><b>B</b><span>B-i2 嚴格內網：Sheets 由內網自架試算表層（Grist/NocoDB）取代，全組件內網＋公司 SSO<span class="tag">若資安要求嚴格</span><span class="cost">成本：自架運維 owner＋內網主機/SSO 申請＋選型 PoC</span><span class="risk">風險：運維歸屬懸空則不可持續；申請流程時間不可控</span></span></div></div>
+
+<div class="pf"><h2>PF-2｜站點＋資料端點防護形態（受 PF-9/PF-11 制約）</h2><p class="why">現行 Netlify 站公開無認證；審查發現「發佈到網路」讀路徑會繞過站點密碼。</p>
+<div class="opt"><b>A</b><span>Cloudflare Access／edge basic auth<span class="cost">成本：免費層可用</span><span class="risk">風險：帳號名單要另外維護</span></span></div>
+<div class="opt"><b>B</b><span>Netlify Pro 站點密碼<span class="cost">成本：約 $19/成員/月</span><span class="risk">風險：單一共享密碼、審計弱</span></span></div>
+<div class="opt rec"><b>C</b><span>內網部署（PF-11 選任一內網姿態即自動此項）<span class="tag">與內網傾向一致</span><span class="risk">風險：主機申請前置時間</span></span></div>
+<div class="opt"><b>D</b><span>維持公開<span class="risk">風險：僅限 demo 資料，真活動不可上</span></span></div></div>
+
+<div class="pf"><h2>PF-1｜Stage A 先行範圍</h2><p class="why">跨部門最快什麼時候「看得到、提得動」。</p>
+<div class="opt rec"><b>A</b><span>預覽通用化＋活動索引頁＋變更單（不含 Sheets 直讀）<span class="tag">建議</span><span class="cost">成本：預覽通用化實估 3–5 天＋KV 素材 SOP</span><span class="risk">風險：資料更新靠重新建置，非讀直連</span></span></div>
+<div class="opt"><b>B</b><span>加做 A+ 唯讀直連<span class="risk">風險：讀端點機密性（PF-9=A 時不可用公開發佈）＋約 5 分鐘快取非即時；若 PF-11=B 則 A+ 無意義（直接等內網 REST）</span></span></div>
+<div class="opt"><b>C</b><span>跳過 A、直攻 Stage B<span class="risk">風險：跨部門空窗期整段拉長</span></span></div></div>
+
+<div class="pf"><h2>PF-3｜與 M1 凍結（08-15）的先後</h2><p class="why">M1 前版型仍可能變，早做編修面板恐返工（R-1）。</p>
+<div class="opt rec"><b>A</b><span>預覽通用化先行、編修面板等 M1 後<span class="tag">建議</span><span class="risk">風險：低（版型變動由 M1 收斂管理）</span></span></div>
+<div class="opt"><b>B</b><span>全部等 M1<span class="risk">風險：平台停擺近一個月</span></span></div>
+<div class="opt"><b>C</b><span>全部先行<span class="risk">風險：M1 變動→面板欄位對映返工</span></span></div></div>
+
+<div class="pf"><h2>PF-4＋PF-10｜gate/pipeline 執行位</h2><p class="why">現在 gate 跑在單一使用者本機＝跨部門核可流程的單點故障。</p>
+<div class="opt rec"><b>A</b><span>雲端/內網 CI 跑 pipeline（GitHub Actions 或內網 CI；node 腳本近原樣可跑）<span class="tag">建議</span><span class="cost">成本：一次性接入＋秘鑰管理</span><span class="risk">風險：內網 CI 需出網白名單（→PF-13）</span></span></div>
+<div class="opt"><b>B</b><span>過渡期 Claude 代行排程＋SLA/代理人 SOP<span class="risk">風險：SPOF 殘留，依賴單人</span></span></div></div>
+
+<div class="pf"><h2>PF-5｜資料文件結構</h2><p class="why">單一總表 vs 每活動一份。</p>
+<div class="opt rec"><b>A</b><span>每活動一份＋總表索引<span class="tag">建議</span><span class="risk">風險：檔案數多（索引頁緩解）</span></span></div>
+<div class="opt"><b>B</b><span>單一總表<span class="risk">風險：權限/版本歷史混雜、量產後笨重</span></span></div></div>
+
+<div class="pf"><h2>PF-6｜HTML 匯出形態</h2><p class="why">核可後「複製完整 HTML」的打包範圍。</p>
+<div class="opt rec"><b>A</b><span>單檔自包含＋商品圖外鏈（img.yec.tw）<span class="tag">建議</span><span class="risk">風險：CDN 圖被移除即破圖（與現行資料鏈同風險）</span></span></div>
+<div class="opt"><b>B</b><span>含圖資產包<span class="risk">風險：體積大、圖片搬運的權責問題</span></span></div></div>
+
+<div class="pf"><h2>PF-7｜無障礙驗收基準</h2>
+<div class="opt rec"><b>A</b><span>WCAG 2.1 AA＋CP-07（axe-core 必跑＋報讀抽測 SOP）<span class="tag">建議</span><span class="cost">成本：FrameTest 現況先補一輪盤點（N-12）</span></span></div>
+<div class="opt"><b>B</b><span>僅基本 alt/語意<span class="risk">風險：報讀順序/互動元件體驗不完整，與你的需求落差</span></span></div></div>
+
+<div class="pf"><h2>PF-8｜SEO 欄位規格</h2>
+<div class="opt rec"><b>A</b><span>照 §9 表定案（seoTitle ≈28 全形、description 70–90、OG 群、jsonLd 真值直出）<span class="tag">建議</span></span></div>
+<div class="opt"><b>B</b><span>修改（請註明哪一欄）</span></div></div>
+
+<div class="pf"><h2>PF-12｜B-i2 資料層選型（僅 PF-11=B 時需裁）</h2>
+<div class="opt rec"><b>A</b><span>Grist 自架 PoC（開源、欄級 ACL、REST、快照）<span class="tag">建議</span></span></div>
+<div class="opt"><b>B</b><span>NocoDB</span></div>
+<div class="opt"><b>C</b><span>公司既有內部工具（請提供名稱，選型讓位）</span></div></div>
+
+<div class="pf"><h2>PF-13｜內網 CI 出網白名單 spike（僅內網姿態時需裁）</h2>
+<div class="opt rec"><b>A</b><span>先驗證（白名單 tw.buy.yahoo.com／img.yec.tw）<span class="tag">建議</span><span class="risk">被拒風險：抓取退回人工節點</span></span></div>
+<div class="opt"><b>B</b><span>暫緩<span class="risk">風險：Stage B 排程後才發現阻斷</span></span></div></div>
+
+<p class="reply"><b>回覆格式</b>：例「PF-9=A、PF-11=B、PF-2=C、PF-1=A、PF-3=A、PF-4=A、PF-5=A、PF-6=A、PF-7=A、PF-8=A、PF-12=A、PF-13=A」。可只回有意見的題，未回的照藍框建議記為暫定。</p>
+</body></html>

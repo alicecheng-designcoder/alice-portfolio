@@ -1,0 +1,499 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="only light"><title>13｜活動創建平台規劃（v0.4 全文）</title>
+<style>body{font-family:"PingFang TC",sans-serif;max-width:860px;margin:0 auto;padding:16px;line-height:1.75;color:#232a31;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}th,td{border:1px solid #d5dbe1;padding:6px 10px;text-align:left;vertical-align:top}th{background:#f0f3f5}
+pre{background:#f5f8fa;padding:12px;overflow-x:auto;border-radius:8px;font-size:12px}h1{font-size:22px}h2{font-size:18px;border-left:4px solid #232a31;padding-left:8px}h3{font-size:16px}
+a{color:#2c5c88}</style></head><body>
+<p><a href="../platform-decisions/">← 回裁決頁</a></p>
+<h1>13｜活動創建平台規劃——跨部門工作台（提案待審）</h1>
+<p>版本：v0.1（2026-07-19 使用者需求）｜狀態：提案，待裁決收斂會
+需求原文摘要：鈦案流程目前只能在使用者本機執行；期待成為跨部門可取用的平台——①直觀的 AI 策展活動頁預覽（貼近上線視覺）②所見即所得的欄位編修③最終一律連動 Google Sheets 雲端文件做資料維護。</p>
+<h2>§0 定位：不是新蓋，是把既有資產接上跨部門介面</h2>
+<p>本平台＝追蹤板 <strong>EP-3（後台規劃 P3-1/P3-2）的具體化提案</strong>，前置依賴 P2-4（field-to-UI matrix）。既有資產盤點：</p>
+<table>
+<thead>
+<tr>
+<th>資產</th>
+<th>在平台中的角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FrameTest（demo 站已上線 Netlify）</td>
+<td><strong>渲染引擎</strong>：預覽＝同一套版型代碼吃資料層渲染——「貼近上線視覺」天然成立（titanium-preview 已示範 draft→頁面）</td>
+</tr>
+<tr>
+<td>03 Schema（P1/P2/P3/P4）</td>
+<td>欄位契約＝編修面板的表單定義來源（✍️ 可編／🔒 唯讀／🎚 開關）</td>
+</tr>
+<tr>
+<td>pipeline（fetch_parse/gate/write_xlsx）</td>
+<td>AI 策展初稿產生器＋<strong>機器閘（真值鐵律的守門員，平台不可繞過）</strong></td>
+</tr>
+<tr>
+<td>R2 狀態欄／R5 版本註記／sha256 指紋</td>
+<td>核可流轉、變更追溯、防繞過 gate 手改</td>
+</tr>
+<tr>
+<td>12 號文件 §跨部門推廣</td>
+<td>MVP＝範本＋demo 連結＋SOP；量產＝P3 工作台——本文件即 P3 工作台的規格前身</td>
+</tr>
+</tbody>
+</table>
+<h2>§1 角色與使用情境</h2>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>用平台做什麼</th>
+<th>寫入權限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>內容運營（主使用者）</td>
+<td>貼 URL 發起策展（T1/T2）→ 看預覽 → 編修文案欄 → 送核可</td>
+<td>✍️ 欄位</td>
+</tr>
+<tr>
+<td>選品／數據團隊</td>
+<td>看選品清單與理由行、換商品、調樓層件數</td>
+<td>✍️＋🎚 部分</td>
+</tr>
+<tr>
+<td>設計（Yu-ting）</td>
+<td>檢視版型套用結果、colorTheme 裁決</td>
+<td>🎚 主題欄</td>
+</tr>
+<tr>
+<td>審核者</td>
+<td>R2 狀態欄「待建置」核可、看 gate 報告</td>
+<td>狀態欄</td>
+</tr>
+<tr>
+<td>工程/AI（Claude 代行位）</td>
+<td>重抓真值、跑 gate、產出建置</td>
+<td>🔒 欄位唯一寫入者</td>
+</tr>
+</tbody>
+</table>
+<h2>§2 介面概念：三欄工作台（預覽為主體）</h2>
+<pre><code>┌─────────────────────────────┬──────────────────┐
+│  ① 活動頁預覽（FrameTest 引擎）      │ ② 欄位編修面板       │
+│  - 裝置切換 desktop/tablet/mobile │ - 點預覽模組→面板     │
+│  - 即時渲染資料層變更                │   捲至該模組欄位群     │
+│  - 模組 hover 高亮＋點選            │ - ✍️ 直接編輯        │
+│                                 │ - 🔒 灰底＋真值來源連結 │
+│                                 │ - 每欄帶 P3 理由行     │
+├─────────────────────────────┴──────────────────┤
+│ ③ 狀態列：R2 狀態流轉｜gate 結果徽章（PASS/WARN/Blocking 逐條）｜ │
+│    Sheets 同步狀態（最後同步時間/待推送變更數）｜版本（R5）        │
+└────────────────────────────────────────────────┘
+</code></pre>
+<p>關鍵互動（「所見即所得」的具體定義）：
+1. <strong>模組↔欄位雙向定位</strong>：點預覽的任一模組→面板捲至對應欄位群並高亮（依 P2-4 field-to-UI matrix）；改欄位→預覽即時重渲染（FrameTest 資料層驅動、既有能力）。
+2. <strong>編修即預檢</strong>：欄位失焦即跑輕量檢查（字元上限表 03 §8.1、優惠詞掃描、必填）——紅字即時回饋；完整 gate 於「送核可」時執行。
+3. <strong>真值欄唯讀＋溯源</strong>：🔒 欄顯示值＋來源（actid/gdid 連結）；要改→按「重抓」由 Claude 代行更新，人不能手打數字（真值鐵律在 UI 層的落實）。
+4. <strong>理由行常駐</strong>：AI 每個選擇的白話理由（P3）顯示在欄位旁——跨部門同事不需要懂規則文件就能理解「為何這樣選」。</p>
+<h2>§3 資料流：Google Sheets＝單一真相源（Single Source of Truth）</h2>
+<pre><code>發起：URL(+主題/目的) ──AI 策展──▶ 初稿 → gate → 寫入 Sheets（P1~P4）
+                                                    │
+預覽（讀路徑）：Sheets ──「發佈到網路」JSON/CSV（唯讀、零憑證）──▶ 平台預覽渲染
+編修（寫路徑）：平台編修面板 ──寫回 API──▶ Sheets 對應儲存格（附 R5 註記）
+                                   └─▶ 寫回前過欄位級預檢；送核可時過完整 gate
+維護：營運也可直接在 Sheets 編輯（試算表原生協作）→ 平台預覽自動反映（讀路徑輪詢/重新整理）
+</code></pre>
+<p><strong>雙入口原則</strong>：平台編修與 Sheets 直接編輯<strong>都允許</strong>（Sheets 是母體、平台是視覺化外掛）——平台不鎖死資料、Sheets 手改由指紋＋gate 於建置時攔截異常。這使跨部門同事可各取所需：習慣試算表的人留在 Sheets，需要視覺對照的人用平台。</p>
+<h2>§4 三階段路線（每階段皆可獨立交付使用）</h2>
+<h3>Stage A：策展工作台 v0（近零後端，2–3 個建置日等級）</h3>
+<ul>
+<li>形態：靜態站（沿用 Netlify）＋每活動一份資料 JSON。發起與 gate 仍由 Claude 代行（Blocking #2 MVP 裁決不變），產出＝xlsx＋預覽連結（titanium-preview 的通用化：<code>/preview/{活動id}/</code>）。</li>
+<li>編修：面板編修→變更暫存於瀏覽器→<strong>匯出「變更單」</strong>（xlsx 差異檔或逐欄清單）→ 由 Claude 代行/人工回寫 Sheets——尚非直連，但跨部門已可「看真視覺＋提編修」。</li>
+<li>讀路徑升級（A+）：Sheets「發佈到網路」→ 平台直讀（唯讀直連零憑證）——<strong>Sheets 改了、預覽就變</strong>，先把「連動」做到讀這一半。</li>
+<li>風險：寫回是人工斷點；公開 Netlify 的機密性（→§5）。</li>
+</ul>
+<h3>Stage B：半自動直連（GAS／service account，EP-3 規格＋輕開發）</h3>
+<ul>
+<li>寫路徑接通：Google Apps Script Web App（綁 Sheets 本體、天然同域權限）承接平台的欄位寫回＋R5 註記＋欄位級預檢；完整 gate 由 Claude 代行排程或 GAS 觸發（gate 移植性評估＝EP-3 規格項）。</li>
+<li>對應 N-9「Sheets 直寫升級位」的落地形態之一；認證用 Google 帳號（跨部門即 Yahoo Google Workspace 帳號，權限＝Sheets 共用設定，零新帳號系統）。</li>
+<li>R2 核可流轉在平台上操作（改狀態欄），發布仍 export-only（12 號文件裁決前提不變）。</li>
+</ul>
+<h3>Stage C：後台 v1（EP-4，Gate：M3 全過＋使用者確認）</h3>
+<ul>
+<li>正式工作台：多活動列表、權限分級、審核流、版本 diff、發布 pipeline。本文件 §2 介面即其規格草圖；Stage A/B 的使用回饋作為 EP-4 需求輸入。</li>
+</ul>
+<h3>階段評估表</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Stage A（v0）</th>
+<th>Stage B（直連）</th>
+<th>Stage C（後台 v1）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>適用性</td>
+<td>立即讓跨部門「看得到、提得動」</td>
+<td>日常營運可自助編修</td>
+<td>量產多活動治理</td>
+</tr>
+<tr>
+<td>建置成本</td>
+<td>低（複用 FrameTest＋靜態站）</td>
+<td>中（GAS＋gate 移植評估）</td>
+<td>高（EP-4 正式開發）</td>
+</tr>
+<tr>
+<td>維護成本</td>
+<td>低；斷點靠 SOP</td>
+<td>中；GAS 版本與 Sheets 結構耦合</td>
+<td>專職維護</td>
+</tr>
+<tr>
+<td>主要風險</td>
+<td>寫回人工斷點、公開站機密性</td>
+<td>gate 旁路風險（直寫繞過驗證）→指紋＋建置時複驗兜底</td>
+<td>過早開發被規則變動返工（沿 R-1）</td>
+</tr>
+</tbody>
+</table>
+<h2>§5 治理與機密性（平台化的新增風險，需正視）</h2>
+<ol>
+<li><strong>站點可見性</strong>：現行 Netlify 站公開無認證。內部價格策略/檔期若上平台，<strong>必須先裁決</strong>：(a) Netlify 密碼保護/Identity（低成本）(b) 內網部署 (c) 接受公開（僅 demo 資料）。<strong>建議 (a) 起步</strong>。</li>
+<li><strong>真值鐵律 UI 化</strong>：🔒 欄在任何階段都不開放手改（§2-3）；平台寫回一律走欄位白名單（✍️/🎚 清單由 Schema 權限欄生成）。</li>
+<li><strong>審計</strong>：所有平台寫回帶 R5 註記（誰/何時/原值→新值）；Sheets 版本歷史為兜底。</li>
+<li><strong>單一真相不分岔</strong>：平台永不持有獨立資料庫——JSON 一律由 Sheets/pipeline 產出，避免第二真相源。</li>
+</ol>
+<h2>§6 待使用者裁決</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>問題</th>
+<th>建議</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PF-1</td>
+<td>Stage A 先行範圍：只做「預覽通用化＋變更單」？還是含 A+ 的 Sheets 唯讀直連？</td>
+<td>含 A+（連動感的關鍵）</td>
+</tr>
+<tr>
+<td>PF-2</td>
+<td>站點認證形態（公開/密碼/內網）</td>
+<td>Netlify 密碼保護起步</td>
+</tr>
+<tr>
+<td>PF-3</td>
+<td>與 M1 凍結的先後：平台 v0 是否等 M1（08-15）後動工？</td>
+<td>預覽通用化可先行（複用既有版型）；編修面板等 M1</td>
+</tr>
+<tr>
+<td>PF-4</td>
+<td>gate 執行位（Claude 代行常駐 vs GAS 移植）——影響 Stage B 形態</td>
+<td>Stage B 先 Claude 代行排程</td>
+</tr>
+<tr>
+<td>PF-5</td>
+<td>Sheets 文件結構：單一總表 vs 每活動一份 Sheets？</td>
+<td>每活動一份（權限/歷史乾淨），總表做索引</td>
+</tr>
+</tbody>
+</table>
+<h2>§7 銜接</h2>
+<ul>
+<li>追蹤板：本文件掛 EP-3（P3-1 規格前身）；P2-4 field-to-UI matrix 升為 Stage A 前置；N-6（xlsx 首跑）/N-9（直寫升級位）路線不變、被本規劃收編為 Stage A/B 的一部分。</li>
+<li>12 號文件 §推廣：MVP 三件套 → Stage A 取代其中「demo 連結」為「預覽通用化連結」。</li>
+<li>鈦案＝Stage A 的第一個實例資料（titanium-preview 即 v0 預覽的手工版）。</li>
+</ul>
+<hr />
+<h1>v0.2 擴充（2026-07-19 使用者需求三則：HTML 匯出／SEO／無障礙）</h1>
+<h2>§8 建置輸出：完整 HTML 匯出（核可後）</h2>
+<ul>
+<li><strong>觸發</strong>：R2 狀態「待建置」核可 → 建置器（FrameTest 版型引擎＋該活動資料層）產出<strong>單檔自包含 HTML</strong>（CSS/JS inline、商品圖沿用 img.yec.tw 外鏈）→ 平台提供「📋 複製完整 HTML」與「下載 .html」。</li>
+<li><strong>建置版與 demo 版分流（關鍵前置）</strong>：現行 FrameTest 混有實驗面板（exp-panel）、自測（#exp=test）、裝置預覽等開發工具——建置輸出必須走<strong>淨化模板</strong>（剝離全部 dev 代碼、只留版型＋資料＋必要互動 JS）。此分流＝建置器的第一個工項。</li>
+<li><strong>溯源</strong>：輸出檔 head 內嵌 meta（活動 id、Sheets 版本/R5、gate 報告 sha256、建置時間）——任何上線頁可回查資料與驗證紀錄。</li>
+<li><strong>邊界</strong>：export-only 原則不變（12 號裁決前提）——平台交付 HTML、不直接發布；上線走既有發布通道。</li>
+</ul>
+<h2>§9 SEO 欄位群：AI 策展時同步產出＋人工可編修</h2>
+<ul>
+<li><strong>P1 新增欄位群</strong>（Schema v1.3 提案；AI 初稿→✍️ 人工編修→gate 檢查）：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>欄位</th>
+<th>權限</th>
+<th>初稿邏輯</th>
+<th>gate 檢查</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>seoTitle</code>（<title>）</td>
+<td>✍️</td>
+<td>活動主題＋品類關鍵字（≈全形 28 字內）</td>
+<td>長度、優惠詞真值掃描（同標題規則）</td>
+</tr>
+<tr>
+<td><code>seoDescription</code></td>
+<td>✍️</td>
+<td>策展主題＋樓層要點＋行動語（全形 70–90）</td>
+<td>長度、真值掃描</td>
+</tr>
+<tr>
+<td><code>ogTitle/ogDescription/ogImage</code></td>
+<td>✍️／圖預設 KV 主圖</td>
+<td>沿 seo 欄縮寫</td>
+<td>ogImage HTTP 200（CP-04）</td>
+</tr>
+<tr>
+<td><code>jsonLd</code> 結構化資料</td>
+<td>🔒 系統生成</td>
+<td>ItemList＋Product（名稱/價格/幣別/連結＝真值直出）＋BreadcrumbList</td>
+<td>價格與 P2 一致性（真值鐵律延伸——結構化資料的數字不可手改）</td>
+</tr>
+<tr>
+<td>- <strong>版型層</strong>：h1＝KV 活動主標、h2＝樓層標題的 heading 階層檢查入 CP（現行 FrameTest 需盤點）；canonical、lang="zh-Hant" 等建置版模板標配。</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- <strong>誠實邊界</strong>：平台管 on-page（標題/描述/結構化資料/語意結構）；實際排名另受站域權重、收錄提交（Search Console）、站外因素影響——不承諾名次、承諾「規格正確可收錄」。</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2>§10 無障礙規範：視障者螢幕報讀（VoiceOver／TalkBack）正確可用</h2>
+<ul>
+<li><strong>原則</strong>：活動頁所有欄位開發同步評估報讀體驗——視障者用「聽的」要能得到與視覺同等的資訊，順序正確、語意正確。</li>
+<li><strong>版型契約層規範</strong>（入 02/04，隨建置版模板落實）：</li>
+<li>語意地標：<code>header/nav/main/section/footer</code>；每樓層 <code>section</code> 綁 <code>aria-labelledby</code>＝樓層標題（報讀器可跳節）。</li>
+<li>圖片替代文字：商品圖 <code>alt</code>＝品名（資料層既有欄自動生成，P2 增可選 <code>altOverride</code> ✍️ 欄）；情境/KV 圖 alt＝活動主題語句（AI 初稿✍️）；純裝飾（顆粒底圖等）<code>alt=""</code> 靜默。</li>
+<li>互動元件：dock 錨點＝<code>button</code>＋<code>aria-current</code> 標當前；TOP＝<code>aria-label="回到頁首"</code>；KV 輪播進度點＝tab 語意＋「第 N 件，共 M 件」；倒數計時（FlashSale）<code>aria-live</code> 節流評估（防連續報數干擾）。</li>
+<li>焦點與對比：鍵盤/切換焦點順序＝視覺順序；可見 focus 樣式；文字對比 WCAG AA 4.5:1——與色彩系統 R10 QA gate 銜接（新家族入庫五步增列對比檢核既有）。</li>
+<li>動效：<code>prefers-reduced-motion</code> 既有支援沿用（跑馬燈停滾、掀牌靜態）。</li>
+<li><strong>檢查點</strong>：新增 <strong>CP-07 無障礙</strong>＝axe-core 自動掃描（建置後必跑）＋VoiceOver/TalkBack 抽測 SOP（每版型變更抽一資料集）；FrameTest 現況先跑一輪 a11y 盤點列缺口（建議入佇列 N-12）。</li>
+<li><strong>AI×人工</strong>：alt/aria 文案與 SEO 同軌——AI 產初稿、Sheets 欄位化、人工可編修、gate 驗長度與真值。</li>
+</ul>
+<h2>§6 補充裁決項</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>問題</th>
+<th>建議</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PF-6</td>
+<td>HTML 輸出形態：單檔自包含（圖外鏈）夠嗎？還是要含圖資產包？</td>
+<td>單檔＋圖外鏈（與現行資料鏈一致）</td>
+</tr>
+<tr>
+<td>PF-7</td>
+<td>無障礙驗收基準</td>
+<td>WCAG 2.1 AA（對比/替代文字/語意/鍵盤）＋CP-07</td>
+</tr>
+<tr>
+<td>PF-8</td>
+<td>SEO 欄位語言與長度基準是否照 §9 表定案</td>
+<td>照表，收斂會核可</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>v0.3 對抗審查修訂（2026-07-19 雙視角審查：可行性/營運風險＋跨部門 UX——19 項發現全數採納）</h1>
+<h2>§11 修訂條目（依主題歸併；「→」＝對本文件的修正效力）</h2>
+<h3>A. 機密性與資料通道（含 2 項阻斷級）</h3>
+<ol>
+<li><strong>讀路徑矛盾（阻斷）</strong>：§4A+ 用 Sheets「發佈到網路」＝公開 URL、必然暴露於頁面原始碼——站點密碼形同虛設。→ PF-2 裁決範圍擴大為「站點＋資料端點」一起裁；資料含內部價格策略時 A+ 改走 (a) pipeline 建置時匯出 JSON 進站（同受站點保護、失去即時性）或 (b) 代理讀取（帶認證）。另：Yahoo Workspace 管理政策可能停用「發佈到網路」——<strong>A+ 動工前先驗證此開關存在</strong>。</li>
+<li>「發佈到網路」有約 5 分鐘快取＋需手動重整——§4A+「Sheets 改了預覽就變」屬誇大 → 誠實標注分鐘級延遲；即時性需求直接指向 Stage B API 讀路徑。</li>
+<li>Netlify 密碼保護＝付費 Pro 功能、Identity 已 deprecated → PF-2 選項補實際條件：Pro 費用，或免費替代（Cloudflare Access／edge basic auth／內網部署）。</li>
+</ol>
+<h3>B. 寫回通道（1 項阻斷級）</h3>
+<ol>
+<li><strong>GAS 認證模型不成立（阻斷）</strong>：Netlify 靜態站跨域呼叫「網域限定」GAS Web App 會被登入重導＋CORS 擋；部署成匿名則寫入端點公開、審計「誰」無來源。→ Stage B 動工前置「GAS 認證 spike」實測；備案 (a) 編修 UI 直接以 GAS HtmlService 承載 (b) Netlify Functions＋service account 走 Sheets API。GAS 配額限制（單次 6 分鐘、無 npm、UrlFetch 日配額）入階段評估表。</li>
+<li>變更單併發基準：匯出時帶資料 sha256 基準指紋；回寫時基準不符→逐欄人工比對，禁止直接套用（Stage B 寫回 API 沿用同機制）。</li>
+</ol>
+<h3>C. 成本誠實重估</h3>
+<ol>
+<li>「預覽通用化」原估過低：FrameTest 資料層 hardcode（~16 全域＋位置型 tuple＋apply 內直改 DOM）、無外部 JSON 載入路徑 → Stage A 拆三工項重估 <strong>3–5 天（僅預覽）</strong>：①資料層 JSON schema 契約化（P2-4 等級）②JSON loader 取代 ds.apply()③<strong>KV 素材（選圖＋去背）生成 SOP</strong>——目前是人工工序、原稿完全未編列，跨部門自助在 KV 段不成立、必須明列人工節點。</li>
+<li><strong>N-6 前置阻斷</strong>：目前 pipeline 只產本機 xlsx、尚無任何通路寫入 Sheets——「初稿→gate→寫入 Sheets」是未驗證假設 → 「xlsx→Sheets 匯入通路驗證」列 Stage A 前置阻斷項；驗證前 §3 資料流圖的「寫入 Sheets」註記＝人工。</li>
+</ol>
+<h3>D. 治理補強</h3>
+<ol>
+<li>雙入口 × 真值鐵律：Sheets 入口對 🔒 欄不設防、未過 gate 的手改會即時渲染成擬真頁流通 → ①用 <strong>Sheets 原生「受保護範圍」</strong>鎖 🔒 欄與 R2 狀態欄（零開發成本，入 §5）②預覽頁常駐徽章「本預覽資料尚未過 gate／最後通過版本指紋 X」③R2 核可後再改動＝指紋失效自動退回「待建置」。</li>
+<li>gate 跑在單一使用者本機＝跨部門核可流程的 SPOF → 評估表 Stage B 風險欄補列；過渡緩解＝gate 執行 SLA＋代理人 SOP；優先評估 <strong>GitHub Actions 雲端跑 pipeline</strong>（node 腳本近原樣可跑，比 GAS 移植便宜）。</li>
+<li>前端預檢與 gate 雙實作必漂移 → 規則單一來源化：gate.js 匯出 rules.json（字元上限表/優惠詞清單/必填）供前端載入——列 Stage A 驗收條件。</li>
+</ol>
+<h3>E. 跨部門介面補強（1 項阻斷級）</h3>
+<ol>
+<li><strong>發起態缺失（阻斷）</strong>：主使用者旅程第 0 步「貼 URL」在介面上不存在 → §2 補發起態規格：工作台常駐「＋發起新活動」入口（Stage A 可為申請表單＋SOP：管道/接手人/預覽連結交付時限）；T1/T2 以白話呈現（「只給網址」vs「網址＋想主打什麼」）。</li>
+<li><strong>變更單體感（阻斷）</strong>：瀏覽器暫存會遺失、A+ 重整會吃掉本地編修、匯出後無下文＝信任殺手 → Stage A 補：變更單收件人與回寫 SLA（匯出自動送指定信箱/頻道）、回寫完成可見確認、有未送出變更時鎖自動重整＋醒目提示；<strong>對外話術降級：Stage A＝「看真視覺＋提編修單」，「所見即所得」保留給 Stage B</strong>。</li>
+<li>活動索引頁提前為 Stage A 交付項（活動名/狀態/預覽連結/負責人一頁靜態列表；資料源＝PF-5 總表索引）——決定平台是「一個站」還是「一堆連結」。</li>
+<li>狀態列分階段點亮：Stage A 顯示「變更單：未匯出 N 筆/已匯出待回寫/已回寫」；「同步時間/待推送」B 階段才出現（防誤導）。</li>
+<li>筆電上的預覽：mobile 以真實 375 viewport 等比縮放＋標示比例；面板可收合的全幅預覽模式；<strong>每活動預覽連結附 QR code</strong>（真機路徑，成本近零）。</li>
+<li>核可者視角：gate 報告加白話摘要層（沿理由行做法）；「距上次核可的變更清單」（R5 資料現成）提前至 Stage A 變更單與 Stage B 核可畫面；補 R2 完整狀態流轉圖與各階段核可操作位置。</li>
+<li>UI 顯示語翻譯層（入 P2-4 加欄）：actid/gdid → 賣場/商品名稱（ID 收 tooltip）；titleSource → 「標題來源：官方優惠文字🔵／AI 撰寫🟡」；「重抓」→「向來源更新最新價格」；R5/指紋只留審計視圖。</li>
+<li>理由行改「模組層摘要常駐＋欄位層 ⓘ 展開」；AI 信心低或 gate WARN 的欄位自動展開。</li>
+<li>✍️/🔒/🎚 面板頂部常駐圖例＋🔒 hover 白話說明。</li>
+</ol>
+<h2>§6 裁決表（v0.3 增補）</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>問題</th>
+<th>建議</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PF-2（改）</td>
+<td>站點＋資料端點可見性一起裁（公開/Cloudflare Access/Netlify Pro 密碼/內網）</td>
+<td>資料機密等級先定（→PF-9）</td>
+</tr>
+<tr>
+<td>PF-9</td>
+<td>資料機密等級認定：活動頁資料（價格/檔期/理由行）算內部機密還是可公開？——決定 A+ 可否用「發佈到網路」與站點防護等級</td>
+<td>真活動資料視為內部（demo 資料可公開）</td>
+</tr>
+<tr>
+<td>PF-10</td>
+<td>gate 雲端執行位評估（GitHub Actions 跑 pipeline）是否先行？</td>
+<td>是——Stage B 前完成，解 SPOF</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>v0.4 增補：Stage B-內網變體（2026-07-19 使用者需求：資料鎖公司內網）</h1>
+<h2>§12 Stage B-內網：資料不出公司網路邊界的直連方案</h2>
+<h3>§12.0 先決裁決：「內網」的邊界定義（PF-11）</h3>
+<p>「連動 Google Sheets」與「資料鎖內網」互斥於嚴格定義——Sheets 本體在 Google 雲。兩種姿態擇一：</p>
+<table>
+<thead>
+<tr>
+<th>姿態</th>
+<th>定義</th>
+<th>Sheets 去留</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>B-i1 企業雲即邊界</strong></td>
+<td>公司 Google Workspace（網域限定共用＋停用對外分享/發佈到網路）視同公司資料邊界——多數企業資安政策接受</td>
+<td><strong>保留 Sheets</strong>：平台改內網自架、經 server-side service account 讀寫 Sheets API（資料經 TLS 往返 Google 雲）</td>
+</tr>
+<tr>
+<td><strong>B-i2 嚴格內網</strong></td>
+<td>資料靜態與動態都不離開公司網路</td>
+<td><strong>Sheets 由內網試算表層取代</strong>（→§12.2）；「連動雲端文件」需求改由內網等價物滿足</td>
+</tr>
+</tbody>
+</table>
+<p>以下按 <strong>B-i2 嚴格內網</strong>規劃（B-i1＝原 Stage B 把 GAS 換成內網 API service＋service account，較單純、風險見 v0.3 §11-B）。</p>
+<h3>§12.1 B-i2 架構（全組件內網、僅 pipeline 有出網抓取）</h3>
+<pre><code>┌─ 公司內網（corp SSO 後）───────────────────────────────┐
+│ ①工作台前端（內網靜態站）⇄ ②資料層（自架試算表服務：Grist/NocoDB） │
+│        │                        ▲ REST API＋webhook          │
+│        ▼                        │                            │
+│ ③建置/gate runner（內網 CI 或排程 VM：跑既有 node pipeline）────┘  │
+│        │ 出網 egress（僅此組件）：抓 tw.buy.yahoo.com 來源真值        │
+│ ④HTML 匯出產物庫（內網檔案服務；商品圖沿用 img.yec.tw 公開 CDN 外鏈）   │
+└──────────────────────────────────────────────────┘
+</code></pre>
+<ul>
+<li><strong>①前端</strong>：三欄工作台（§2 規格不變），部署內網 web 主機，認證＝公司 SSO——v0.3 的站點防護/PF-2 問題整組消失（邊界即防護）。</li>
+<li><strong>②資料層＝自架試算表服務</strong>：建議 <strong>Grist</strong>（開源 Apache-2.0、自架、試算表 UX、欄級權限 ACL、REST API、快照版本、webhook）或 NocoDB。Schema P1~P4 → 對應表；營運同事仍是「開試算表編欄位」的體驗——<strong>「連動雲端文件維護」的精神由內網等價物承接</strong>。</li>
+<li><strong>③gate/pipeline runner</strong>：既有 node 腳本近原樣搬內網 CI/VM 排程——同時解掉 v0.3 §11-9 的本機 SPOF；出網僅限抓取來源頁（egress 白名單 tw.buy.yahoo.com／img.yec.tw）。</li>
+<li><strong>④匯出</strong>：核可後建置產單檔 HTML 入內網產物庫＋「複製 HTML」（§8 規格不變）。</li>
+</ul>
+<h3>§12.2 Google Sheets 能力 → 內網等價物對照</h3>
+<table>
+<thead>
+<tr>
+<th>原依賴</th>
+<th>B-i2 替代</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>儲存格協作編輯</td>
+<td>Grist/NocoDB 表格 UI</td>
+<td>體驗近似；公式較弱（本案欄位多為文字/枚舉，影響小）</td>
+</tr>
+<tr>
+<td>受保護範圍（🔒/R2 鎖）</td>
+<td>欄級/表級 ACL</td>
+<td><strong>比 Sheets 更細</strong>（v0.3 §11-8 直接升級解）</td>
+</tr>
+<tr>
+<td>版本歷史</td>
+<td>快照＋審計日誌</td>
+<td>R5 註記可由 API 寫入結構化 log</td>
+</tr>
+<tr>
+<td>「發佈到網路」讀路徑</td>
+<td>內網 REST 直讀</td>
+<td>即時、無 5 分鐘快取問題（v0.3 §11-2 消失）</td>
+</tr>
+<tr>
+<td>xlsx 匯入（N-6）</td>
+<td>pipeline 直寫 REST</td>
+<td>write_xlsx 改 write_api（欄位契約不變、Schema v1.1 沿用）</td>
+</tr>
+<tr>
+<td>GAS 寫回（Stage B 原案）</td>
+<td>平台→資料層 REST（同內網、無跨域認證問題）</td>
+<td>v0.3 §11-4 GAS spike 整項作廢</td>
+</tr>
+</tbody>
+</table>
+<h3>§12.3 評估（相對雲端 Stage B）</h3>
+<ul>
+<li><strong>優</strong>：機密性根本解（PF-2/PF-9 消滅）；讀寫即時；權限粒度更細；gate 上 CI 解 SPOF；無 GAS 配額/認證泥沼。</li>
+<li><strong>劣/成本</strong>：自架運維歸屬（容器/VM、備份、升級——需 IT 或工程 owner，<strong>新增的組織成本是本方案最大變數</strong>）；內網主機與 SSO 接入的申請流程（前置時間不可控）；離開 Google 生態（與其他部門既有 Sheets 工作流的交換改走匯出）。</li>
+<li><strong>風險</strong>：資料層選型被組織既有標準否決（若公司已有指定內部工具，選型讓位）；內網 CI 出網白名單申請被拒→抓取退回人工節點。</li>
+</ul>
+<h3>§12.4 遷移與階段調整</h3>
+<ol>
+<li>Stage A 不變（本機 pipeline＋靜態預覽——A 的「Netlify 公開站」在內網需求下改部署內網主機或先限 demo 資料）。</li>
+<li>B-i2 前置 spike ×3：①內網主機＋SSO 申請可行性 ②Grist/NocoDB 選型 PoC（Schema P1~P4 建表＋ACL 驗證）③CI 出網白名單。</li>
+<li>既有鈦案/LC xlsx → 一次性匯入資料層（欄位契約同構）。</li>
+</ol>
+<h3>§6 裁決表（v0.4 增補）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>問題</th>
+<th>建議</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PF-11</td>
+<td>內網邊界定義：B-i1 企業雲即邊界 vs B-i2 嚴格內網</td>
+<td>先問公司資安政策——若 Workspace 網域限定被接受，B-i1 成本低一個量級</td>
+</tr>
+<tr>
+<td>PF-12</td>
+<td>B-i2 資料層選型與運維歸屬（Grist/NocoDB/公司既有內部工具；誰維運）</td>
+<td>Grist PoC＋確認 IT owner</td>
+</tr>
+<tr>
+<td>PF-13</td>
+<td>內網 CI/VM 出網白名單（抓取來源）可申請性</td>
+<td>spike 驗證</td>
+</tr>
+</tbody>
+</table></body></html>
