@@ -933,9 +933,9 @@ html[data-device="mobile"] .anchor-item.top{ /* TOP 44×44 固定右端＋tonal 
   position:sticky;right:0;z-index:2;width:44px;padding:0;justify-content:center;
   font-size:0;background:transparent;
 }
-html[data-device="mobile"] .anchor-item.top::before{ /* 2026-07-19 使用者回報：TOP 懸浮壓住 rail 選項半透穿插——加不透明 dock 底色板，滑過的錨點完整遮蔽（同桌機 TOP 坐在 dock 底上）；分線由底板 border-left 承載；rail-fade.r 提示右側仍有項目、捲到底最後一顆在 TOP 左側可點 */
-  content:"";position:absolute;top:-8px;bottom:-8px;left:-1px;right:-8px;background:#000;z-index:-1;
-  border-left:1px solid var(--campaign-line-tonal);
+html[data-device="mobile"] .anchor-item.top::before{ /* 2026-07-19 使用者裁決二修：分線移除＋底板改半透明漸層 scrim（左緣 0%→鈕下 92%）——滑過的錨點漸進柔化遮蔽、無硬邊；捲到底最後一顆在 TOP 左側可點 */
+  content:"";position:absolute;top:-8px;bottom:-8px;left:-26px;right:-8px;z-index:-1;
+  background:linear-gradient(90deg,rgba(0,0,0,0) 0,rgba(0,0,0,.92) 24px,rgba(0,0,0,.92) 100%);
 }
 html[data-device="mobile"] .anchor-item.top::after{content:"↑";font-size:20px;width:44px;height:44px;border-radius:50%;background:var(--color-nav-idle-bg);display:flex;align-items:center;justify-content:center}
 /* rail-fade 溢出提示（2026-07-19 使用者需求：mobile 導覽連動）：零流寬 sticky＋負 margin 抵 flex gap；spy 連動置中由 updateSpy 處理 */
