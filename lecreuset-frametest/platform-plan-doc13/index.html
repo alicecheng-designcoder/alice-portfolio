@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="only light"><title>13｜活動創建平台規劃（v0.4 全文）</title>
+<meta name="color-scheme" content="only light"><meta name="robots" content="noindex"><title>13｜活動創建平台規劃（v0.5 全文）</title>
 <style>body{font-family:"PingFang TC",sans-serif;max-width:860px;margin:0 auto;padding:16px;line-height:1.75;color:#232a31;background:#fff}
 table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}th,td{border:1px solid #d5dbe1;padding:6px 10px;text-align:left;vertical-align:top}th{background:#f0f3f5}
 pre{background:#f5f8fa;padding:12px;overflow-x:auto;border-radius:8px;font-size:12px}h1{font-size:22px}h2{font-size:18px;border-left:4px solid #232a31;padding-left:8px}h3{font-size:16px}
@@ -496,4 +496,78 @@ a{color:#2c5c88}</style></head><body>
 <td>spike 驗證</td>
 </tr>
 </tbody>
-</table></body></html>
+</table>
+<hr />
+<h1>v0.5 裁決紀錄（2026-07-19 使用者：「你的建議我都接受」——PF 全數依建議定案）</h1>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>裁決</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PF-1</td>
+<td><strong>A</strong>：Stage A＝預覽通用化＋活動索引頁＋變更單（不含 Sheets 直讀）</td>
+</tr>
+<tr>
+<td>PF-2</td>
+<td><strong>過渡二段式</strong>（→§12.5）：立即＝Netlify edge basic auth（限敏感子路徑）→ 測試圈擴大前＝Cloudflare Pages＋Access（@yahooinc.com OTP、免費 ≤50 人）；正式版隨 PF-11 內網部署</td>
+</tr>
+<tr>
+<td>PF-3</td>
+<td><strong>A</strong>：預覽通用化先行、編修面板等 M1（08-15）後</td>
+</tr>
+<tr>
+<td>PF-4/PF-10</td>
+<td><strong>A</strong>：pipeline/gate 上雲端或內網 CI（過渡期 Claude 代行＋SLA）</td>
+</tr>
+<tr>
+<td>PF-5</td>
+<td><strong>A</strong>：每活動一份＋總表索引</td>
+</tr>
+<tr>
+<td>PF-6</td>
+<td><strong>A</strong>：HTML 匯出＝單檔自包含＋商品圖外鏈</td>
+</tr>
+<tr>
+<td>PF-7</td>
+<td><strong>A</strong>：WCAG 2.1 AA＋CP-07（axe-core＋報讀抽測）；FrameTest a11y 盤點列 N-12</td>
+</tr>
+<tr>
+<td>PF-8</td>
+<td><strong>A</strong>：SEO 欄位照 §9 表（Schema v1.3 提案基準）</td>
+</tr>
+<tr>
+<td>PF-9</td>
+<td><strong>A</strong>：真活動資料＝內部機密、demo 資料可公開</td>
+</tr>
+<tr>
+<td>PF-11</td>
+<td><strong>B</strong>：B-i2 嚴格內網（若公司資安日後認可「Workspace＝邊界」可降級 B-i1 省一級成本——降級點在 Stage B spike 前）</td>
+</tr>
+<tr>
+<td>PF-12</td>
+<td><strong>A</strong>：Grist 自架 PoC＋確認 IT 運維 owner</td>
+</tr>
+<tr>
+<td>PF-13</td>
+<td><strong>A</strong>：內網 CI 出網白名單先行驗證</td>
+</tr>
+</tbody>
+</table>
+<h2>§12.5 過渡期方案（PF-1=A 配套；不等公司內網帳號、可即測、資料夠安全）</h2>
+<p>依據：Stage A 資料 JSON 打包在站內、無獨立資料端點——防護收斂為站點入口一道門。</p>
+<ol>
+<li><strong>立即段（當天級）</strong>：現有 Netlify 站加 edge function basic auth，<strong>僅鎖敏感子路徑</strong>（<code>/titanium-preview/</code>、未來 <code>/preview/*</code>、<code>/platform-*</code>）——LC demo（demo 資料，PF-9 可公開）與作品站本體不受影響；共享密碼、noindex。</li>
+<li><strong>Access 段（一天級，測試圈擴大或放未公開檔期前）</strong>：站搬 Cloudflare Pages（同 git push 部署）＋Cloudflare Access 免費層：@yahooinc.com 信箱 OTP、每人身分＋存取紀錄。<strong>全程不依賴公司 IT 申請</strong>；內網/SSO 申請平行進行，批准後遷 B-i2、資料層契約不變。</li>
+<li>邊界紀律：共享密碼段不放正式量產活動的未公開檔期；變更單走指定信箱/頻道回收。</li>
+</ol>
+<h2>Stage A 工項佇列（依裁決展開；建議入行事曆 N-13～N-16）</h2>
+<ol>
+<li>N-13 資料層 JSON schema 契約化＋loader 取代 ds.apply()（3–5 天主體；P2-4 等級）＋KV 素材人工節點 SOP 文件化</li>
+<li>N-14 活動索引頁＋發起入口（申請表單＋SOP）＋變更單格式（含基準指紋、收件通道、回寫 SLA）</li>
+<li>N-15 過渡防護立即段（basic auth 子路徑）——<strong>先於 N-13 上線</strong></li>
+<li>N-16 rules.json 規則單一來源（gate.js 匯出前端預檢規則）＝Stage A 驗收條件</li>
+</ol></body></html>
