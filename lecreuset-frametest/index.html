@@ -796,7 +796,7 @@ html[data-device="mobile"]{
   --m-name-size:14px;    --m-name-line:20px;
   --m-price-size:18px;   --m-price-line:24px;   /* type/price-major mobile 20→18（2026-07-17） */
   --m-orig-size:14px;    --m-orig-line:18px;    /* price-original 16→14（隨價格降階維持層級：價格＞原價；09 §1.2 特升 16 由本輪取代） */
-  --m-tag-size:16px;     --m-tag-line:20px;     /* 14→16（2026-07-19 使用者裁決：特色標 +2px，跨裝置一致）；單行 nowrap 沿用 */
+  --m-tag-size:14px;     --m-tag-line:20px;     /* Q2c 裁決 2026-07-19：mobile 維持 14 零截斷（desktop/tablet 16 維持 +2px 裁決）；單行 nowrap 沿用 */
   --m-caption-size:12px; --m-caption-line:16px; /* A 案：caption 12 僅限非互動小字 */
   /* 2026-07-16 fx4 全模組文字縮放輪（03 Responsive 比例基準、下限 12；硬底線 2026-07-17 v2：品名 14/價格 18（原 ≥16 由使用者修訂）、輔助 ≥12、標籤 14 單行、marquee 16 不動） */
   --m-floor-title-size:20px; --m-floor-title-line:24px; /* 樓層標題 28→20（03 token 既有值） */
@@ -831,7 +831,7 @@ html[data-device="mobile"] .kv-offer-box .cn{font-size:12px;line-height:16px} /*
 html[data-device="mobile"] .kv-offer-box .latin{margin-right:6px} /* block 流取代 flex gap */
 html[data-device="mobile"] .kv-offer-box + .kv-title-row{grid-area:3/1}
 html[data-device="mobile"] .kv-title-row + .kv-title-row{grid-area:4/1;margin-top:4px} /* 兩標題板間距 12→4（2026-07-19 使用者裁決：mobile 字級小、12 顯散——4≈desktop gap/板高比例，兩行成同一群組；眉標→標題與標題→日期維持 12 保群組層次） */
-html[data-device="mobile"] .kv-title-row{width:100%;margin-top:12px;padding:12px 0;display:flex;align-items:center;justify-content:center} /* 板寬＝左欄滿寬；板高＝fit 字級＋12×2 等比（padding 恆 12）；flex 置中＝標題與行內起徽任意字級垂直對齊；板間距 8→12＝與 desktop flex gap 12 一致（2026-07-19 使用者裁決） */
+html[data-device="mobile"] .kv-title-row{width:100%;margin-top:12px;padding:8px 0;display:flex;align-items:center;justify-content:center} /* 板寬＝左欄滿寬；板高＝fit 字級＋8×2（Q3b 附帶裁決 2026-07-19：板高縮減 12→8）；flex 置中＝標題與行內起徽任意字級垂直對齊；板間 4／群組間 12（07-19 裁決） */
 html[data-device="mobile"] .kv-title{font-size:36px;line-height:1;display:inline-block} /* 36＝上限（2026-07-17 字級縮小：44→36）；實際字級由 fitKvTitles 依左欄寬 fit×0.9（下限 20 記 warning）；inline-block＝與行內起徽同列置中 */
 html[data-device="mobile"] .kv-badge-qi{position:static;display:inline-flex;flex:none;vertical-align:middle;margin-left:6px;width:24px;height:24px;font-size:14px} /* 起徽行內化（2026-07-17 使用者指定）：貼折數字尾（修板角錨定錯位）；32→24 隨字級縮；flex:none＝防 flex 擠壓成橢圓（評審面板 blocker） */
 html[data-device="mobile"] .kv-date{grid-area:5/1;width:100%;margin-top:12px;font-size:14px;line-height:20px} /* 日期 16→14（2026-07-17 字級縮小）；置中隨板；4→5 列（眉標回歸連動）；間距 8→12 隨板間節奏（2026-07-19） */
@@ -934,6 +934,16 @@ html[data-device="mobile"] .anchor-item.top{ /* TOP 44×44 固定右端＋tonal 
   font-size:0;box-shadow:-9px 0 0 -8px var(--campaign-line-tonal);
 }
 html[data-device="mobile"] .anchor-item.top::after{content:"↑";font-size:20px}
+/* rail-fade 溢出提示（2026-07-19 使用者需求：mobile 導覽連動）：零流寬 sticky＋負 margin 抵 flex gap；spy 連動置中由 updateSpy 處理 */
+.rail-fade{display:none}
+html[data-device="mobile"] .rail-fade{display:block;flex:none;width:0;margin:0 -8px;align-self:stretch;position:sticky;pointer-events:none;z-index:1}
+html[data-device="mobile"] .rail-fade.l{left:0}
+html[data-device="mobile"] .rail-fade.r{right:52px} /* 貼 sticky TOP（44）＋分線 8 左側 */
+html[data-device="mobile"] .rail-fade::before{content:"";position:absolute;top:-8px;bottom:-8px;width:28px;opacity:0;transition:opacity .25s}
+html[data-device="mobile"] .rail-fade.l::before{left:0;background:linear-gradient(90deg,#000 15%,rgba(0,0,0,0))}
+html[data-device="mobile"] .rail-fade.r::before{right:0;background:linear-gradient(270deg,#000 15%,rgba(0,0,0,0))}
+html[data-device="mobile"] #sec-anchornav-floating.fade-l .rail-fade.l::before,
+html[data-device="mobile"] #sec-anchornav-floating.fade-r .rail-fade.r::before{opacity:1}
 /* 舊版文字鎖陣 mobile 首過版（2026-07-16 fx2 補丁5：兩版 KV 皆保留、裝置預覽照常可切）：
    鎖陣置中、字級 62→40（52 盒）＋--lock-scale 實測縮（fitLegacyLock 單行鎖定沿用）、
    「起」徽等比縮、左右去背舞台改鎖陣下方 4 件橫排（每側 2 件、各 68）、微動效果停用 */
@@ -1062,7 +1072,7 @@ html[data-device="tablet"] .kv-cutout img{max-height:240px}
       <div class="kv-canvas">
         <!-- 文案由 kvContent 資料驅動（Sheets「KV 文案」欄位對應）；init 時 renderKvContent() 填入並自動縮字 -->
         <div class="kv-new-lock">
-          <div class="kv-offer-box"><span class="latin" id="kv-eyebrow-latin">LE CREUSET</span><span class="cn" id="kv-eyebrow-cn">新色搶先看</span></div>
+          <div class="kv-offer-box"><span class="latin" id="kv-eyebrow-latin">LE CREUSET</span><span class="cn" id="kv-eyebrow-cn">新色</span></div>
           <div class="kv-title-row"><span class="kv-title" id="kv-title-1">法式餐桌</span></div>
           <div class="kv-title-row"><span class="kv-title" id="kv-title-2">鍋具68折</span><span class="kv-badge-qi" id="kv-badge">起</span></div>
           <div class="kv-date" id="kv-date">活動日期：<span class="num">2026.07.03 ~ 08.01</span></div>
@@ -1089,7 +1099,7 @@ html[data-device="tablet"] .kv-cutout img{max-height:240px}
         <span class="kv-outline-word" style="left:-24px;top:150px;font-size:120px">FRENCH</span>
         <span class="kv-outline-word" style="right:-16px;bottom:40px;font-size:110px">PICKS</span>
         <div class="kv-legacy-lock">
-          <div class="kv-legacy-offer"><span class="latin">LE CREUSET</span><span class="cn">新色搶先看</span></div>
+          <div class="kv-legacy-offer"><span class="latin">LE CREUSET</span><span class="cn">新色</span></div>
           <div class="kv-lock-row" id="kv-lock-row-1"></div>
           <div class="kv-lock-row" id="kv-lock-row-2"></div>
           <div class="kv-legacy-date" id="kv-legacy-date"></div>
@@ -1339,7 +1349,7 @@ const pickImg = (slot, fallback) => (slot && slot.override) || fallback;
 /* KV 文案（Sheets「KV 文案」欄位對應）——折扣值與檔期為設計稿給定，上線前須綁來源資料。
    資訊架構耐受性：titleLine 建議 ≤4 字；4 字以上自動縮字（行高固定 76 → 板高恆 108px，不影響下方排版） */
 let kvContent = {
-  eyebrowLatin: "LE CREUSET", eyebrowCn: "新色搶先看",
+  eyebrowLatin: "LE CREUSET", eyebrowCn: "新色", /* Q1b 裁決 2026-07-19：眉標縮短（新色搶先看→新色）＝mobile 12px 不折行完整顯示；營運欄位、逐活動可改 */
   titleLine1: "法式餐桌", titleLine2: "鍋具68折", /* 2026-07-17 真值初稿套用（使用者核可）：773133「Le Creuset下殺68折」活動標題＋商品池實算最低折數 68 互證（快照 qa/84-url-curation-demo/） */
   /* 「起」字＝價格優惠後綴：僅 titleLine2 含價格優惠（如「7折」「88折起」語意）時顯示。
      Sheets 欄位需求（2026-07-15 使用者定義）：「起字顯示」獨立選項（是/否），預設依文案是否含優惠自動建議 */
@@ -1512,7 +1522,7 @@ function fitKvTitles(){
   const dev = document.documentElement.dataset.device;
   const base = dev === "mobile" ? 36 : dev === "tablet" ? 48 : 68;
   const minPx = dev === "mobile" ? 20 : dev === "tablet" ? 28 : 0;
-  const factor = dev === "mobile" ? 0.9 : 1;
+  const factor = 1; /* mobile 0.9 係數取消（Q3b 裁決 2026-07-19：字級回升 ~11%、欄寬 −10% 維持） */
   const fallbackW = dev === "mobile" ? 123 : dev === "tablet" ? 320 : 368; /* mobile＝左欄寬 137→123（2026-07-19 使用者裁決：左文欄佔比 −10%、主圓 210） */
   const els = [...document.querySelectorAll(".kv-variant-new .kv-title")];
   // CP-05 v3（2026-07-18 使用者指示修正）：desktop 原「逐列 fit 塞滿板寬＋起徽絕對定位」造成起徽撞字（LC/鍵盤皆重現，gap -23px）
@@ -1525,7 +1535,7 @@ function fitKvTitles(){
     let avail = ((row && row.clientWidth) || fallbackW) - breath * 2;
     const badge = row && row.querySelector(".kv-badge-qi");
     const hasInlineBadge = badge && getComputedStyle(badge).display !== "none" && getComputedStyle(badge).position === "static";
-    if (hasInlineBadge) avail -= (badge.offsetWidth + parseFloat(getComputedStyle(badge).marginLeft || "0") + (dev ? 8 : 0)); // 行內起徽佔寬預留（tablet/mobile 另加 8px 呼吸；desktop 已有 breath）
+    if (hasInlineBadge) avail -= (badge.offsetWidth + parseFloat(getComputedStyle(badge).marginLeft || "0") + (dev === "tablet" ? 8 : 0)); // 行內起徽佔寬預留（tablet 另加 8px 呼吸；desktop 已有 breath；mobile 8px 預留移除＝Q3b 裁決 2026-07-19 字級回升——起徽行才是 LC/keyboard 的實際約束、×0.9 只管無徽行） */
     else if (dev) avail *= factor; // tablet/mobile 無起徽列才乘 fit 係數（防雙重縮小）
     const w = el.scrollWidth;
     if (w > avail) unified = Math.min(unified, Math.floor(base * avail / w) - 1);
@@ -1893,7 +1903,7 @@ const DEMO_DATASETS = {
     url: CAMP_URL, theme: "green-light", short: "KAZMI 野外露營品牌頁", customCutouts: true,
     note: "14 件真值商品，8 件實際折扣含原價；策展主題「野外露營」→ 悠然綠；無整檔檔期 → 日期降級隱藏",
     apply(){ // 野外露營（KAZMI 韓國）：戶外生活策展 → 悠然綠（色彩決策 T2a）
-      kvContent = { eyebrowLatin:"KAZMI KOREA", eyebrowCn:"野外露營選品", titleLine1:"野外露營", titleLine2:"裝備選品",
+      kvContent = { eyebrowLatin:"KAZMI", eyebrowCn:"露營選品", /* Q1b 縮短 */ titleLine1:"野外露營", titleLine2:"裝備選品",
         titleSuffix:"起", showTitleSuffix:false, /* 標題無價格文案 → 起字隱藏 */
         titleFlip:true, showMarquee:true, dateLabel:"", dateValue:"" };
       promoEntries = structuredClone(CAMP_ENTRIES);
@@ -1948,7 +1958,7 @@ const DEMO_DATASETS = {
     url: KB_URL, theme: "blue-dark", short: "鍵盤/滑鼠分類頁 39920181", customCutouts: true,
     note: "14 件真值商品全數實際折扣含原價（最低 43 折）；策展主題「桌面升級」→ 沉靜藍 dark；無整檔檔期 → 日期降級隱藏",
     apply(){ // 鍵盤/滑鼠（羅技為主）：3C 科技策展 → 沉靜藍 dark（色彩決策 T3）；「43折」＝入選商品實際最低折數（254/599）
-      kvContent = { eyebrowLatin:"KEYBOARD GEAR", eyebrowCn:"鍵盤選品", titleLine1:"桌面升級", titleLine2:"鍵盤43折",
+      kvContent = { eyebrowLatin:"KEYBOARD", eyebrowCn:"選品", /* Q1b 縮短 */ titleLine1:"桌面升級", titleLine2:"鍵盤43折",
         titleSuffix:"起", showTitleSuffix:true, /* 真值折扣 → 起字顯示 */
         titleFlip:true, showMarquee:true, dateLabel:"", dateValue:"" };
       promoEntries = structuredClone(KB_ENTRIES);
@@ -2003,7 +2013,7 @@ const DEMO_DATASETS = {
     url: FA_URL, theme: "gold-light", short: "en-suey 銀穗女裝品牌頁 53626524", customCutouts: true,
     note: "14 件真值商品，10 件實際折扣含原價（最低 5 折）＋挑戰低價 ×3；檔期真值 2026.07.09~07.26（盛夏折扣季 2件9折/3件85折）；策展主題「盛夏折扣」→ 金棕",
     apply(){ // 流行女裝（en-suey 銀穗）：時尚質感策展 → 金棕（色彩決策 T1）；檔期/折扣取自頁面 ec_promotions 與真實價格
-      kvContent = { eyebrowLatin:"EN-SUEY", eyebrowCn:"銀穗女裝", titleLine1:"盛夏折扣", titleLine2:"服飾5折",
+      kvContent = { eyebrowLatin:"EN-SUEY", eyebrowCn:"銀穗", /* Q1b 縮短 */ titleLine1:"盛夏折扣", titleLine2:"服飾5折",
         titleSuffix:"起", showTitleSuffix:true, /* 「5折」＝入選商品實際最低折數（$1,740/$3,480）→ 起字顯示 */
         titleFlip:true, showMarquee:true, dateLabel:"活動期間：", dateValue:"2026.07.09~07.26" /* ec_promotions 起迄真值 */ };
       promoEntries = structuredClone(FA_ENTRIES);
@@ -2120,9 +2130,9 @@ function clearProductUrl(silent){
 
 function renderDock(){
   const nav = document.getElementById("sec-anchornav-floating");
-  nav.innerHTML = dockAnchors().map(a =>
+  nav.innerHTML = `<span class="rail-fade l" aria-hidden="true"></span>` + dockAnchors().map(a =>
     `<button class="anchor-item" type="button" data-target="${a.target}">${esc(a.label)}</button>`
-  ).join("") + `<button class="anchor-item top" type="button" data-top="1">TOP ↑</button>`;
+  ).join("") + `<span class="rail-fade r" aria-hidden="true"></span><button class="anchor-item top" type="button" data-top="1">TOP ↑</button>`; /* rail-fade＝溢出提示（2026-07-19 使用者需求：mobile 導覽連動；零流寬 sticky、不影響錨點計數與 textContent） */
   if (nav.dataset.bound) return; nav.dataset.bound = "1"; // 重繪不重複綁事件
   nav.addEventListener("click", ev => {
     const btn = ev.target.closest(".anchor-item");
@@ -2389,6 +2399,12 @@ function dockModeChanged(){
     heroObserver.observe(document.getElementById("sec-hero"));
   } else { dock.classList.add("is-visible"); }
 }
+let spyActive = null, railHoldUntil = 0; // railHoldUntil＝使用者手滑 rail 時暫停自動捲（1.6s 讓手，防拉鋸）
+function updateDockFades(){ // 溢出提示（2026-07-19 使用者需求：讓 user 知道導覽左右還有未呈現項）
+  const over = dock.scrollWidth > dock.clientWidth + 4;
+  dock.classList.toggle("fade-l", over && dock.scrollLeft > 4);
+  dock.classList.toggle("fade-r", over && dock.scrollLeft < dock.scrollWidth - dock.clientWidth - 4);
+}
 function updateSpy(){
   const pos = dockAnchors()
     .map(a => ({ a, top: document.getElementById(a.target).getBoundingClientRect().top }))
@@ -2397,8 +2413,19 @@ function updateSpy(){
   const active = pos.length ? pos[pos.length - 1].a.target : null;
   document.querySelectorAll(".anchor-item[data-target]").forEach(el =>
     el.classList.toggle("is-active", el.dataset.target === active));
+  if (active !== spyActive) { // 2026-07-19 使用者需求：頁面滑動→導覽 rail 連動，把當前錨點捲進可視範圍（置中＝左右皆露鄰項 peek）
+    spyActive = active;
+    const el = dock.querySelector(".anchor-item.is-active");
+    if (el && dock.scrollWidth > dock.clientWidth + 4 && performance.now() > railHoldUntil) {
+      const topW = 52; // sticky TOP 鈕佔位（44＋分線 8）
+      dock.scrollTo({ left: Math.max(0, el.offsetLeft - (dock.clientWidth - topW - el.offsetWidth) / 2), behavior: "smooth" });
+    }
+  }
+  updateDockFades();
 }
 window.addEventListener("scroll", updateSpy, { passive:true });
+dock.addEventListener("scroll", updateDockFades, { passive:true });
+dock.addEventListener("pointerdown", () => { railHoldUntil = performance.now() + 1600; }, { passive:true });
 
 /* ============================================================ 自測模式（#exp=test:1）============================================================ */
 async function runSelfTest(){
