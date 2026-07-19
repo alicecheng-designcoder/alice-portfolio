@@ -800,7 +800,8 @@ html[data-device="mobile"]{
   --m-caption-size:12px; --m-caption-line:16px; /* A 案：caption 12 僅限非互動小字 */
   /* 2026-07-16 fx4 全模組文字縮放輪（03 Responsive 比例基準、下限 12；硬底線 2026-07-17 v2：品名 14/價格 18（原 ≥16 由使用者修訂）、輔助 ≥12、標籤 14 單行、marquee 16 不動） */
   --m-floor-title-size:20px; --m-floor-title-line:24px; /* 樓層標題 28→20（03 token 既有值） */
-  --m-label-size:12px;   --m-label-line:16px;   /* 標籤堆疊主題句／導覽卡標題／頁尾標題 16→12（×0.75 取 4pt 梯） */
+  --m-label-size:12px;   --m-label-line:16px;   /* 導覽卡標題／頁尾標題 16→12（×0.75 取 4pt 梯） */
+  --m-labelbox-size:14px; --m-labelbox-line:20px; /* 貼紙堆疊主題句 16→14（2026-07-19 使用者裁決，N-1 走查：12 與 tag 同級難分主次；14/20 對齊品名級。適用＝主打活動四圓／編輯精選圓卡／主打精選情境卡） */
 }
 /* B 案 CSS 已移除（2026-07-17）：MVP v1＝A 案 v2 唯一基準 */
 /* 版心與容器 */
@@ -810,14 +811,15 @@ html[data-device="mobile"] .content{width:auto;margin:0 16px}
 html[data-device="mobile"] .group-card{width:auto;margin:0 16px;padding:16px 12px} /* space/card-padding mobile 12 */
 /* KV：kv-orbit mobile 維持左文右圖兩欄（2026-07-16 fx2 裁決：不做單欄堆疊；fx3 二輪：比例改 4:6）——
    2026-07-17 使用者指定改版：眉標隱藏、起徽行內化貼折數字尾、資訊卡移右欄圓上方（與圓置中對齊、靠下對齊、距圓 20）。
-   grid 兩欄：左欄（~137）＝標題板×2→日期（上下 1fr 填充列垂直置中）、右欄＝資訊卡→主圓 196→進度點 */
+   grid 兩欄：左欄（~123）＝標題板×2→日期（上下 1fr 填充列垂直置中）、右欄＝資訊卡→主圓 210→進度點
+   （2026-07-19 使用者裁決：左文欄佔螢幕寬佔比縮小 10%——主圓 196→210、左欄 137→123＝36.5%→32.9%，延續 07-16「主圓放大」方向） */
 html[data-device="mobile"] #sec-hero{height:auto;overflow:visible;padding-bottom:24px}
 html[data-device="mobile"] .kv{position:static}
 html[data-device="mobile"] .kv-marquee{position:static;height:32px} /* 09 §2.4 M：高 32、字 16 恆定 */
 html[data-device="mobile"] .kv-canvas{
   width:100%;height:auto;margin:0;padding:16px 16px 0;
   display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:1fr auto auto auto auto 1fr;
-  column-gap:10px;align-items:center; /* 左欄 fit 餘寬／右欄照主圓 196；列 1/6＝1fr 填充 → 左欄簇群（標題×2＋日期＋頁數點）對右欄垂直置中 */
+  column-gap:10px;align-items:center; /* 左欄 fit 餘寬／右欄照主圓 210（2026-07-19 裁決）；列 1/6＝1fr 填充 → 左欄簇群（標題×2＋日期＋頁數點）對右欄垂直置中 */
 }
 html[data-device="mobile"] .kv-new-lock{display:contents} /* 打平鎖陣：子項直接成 grid item，逐項落格 */
 html[data-device="mobile"] .kv-offer-box{display:none} /* 眉標隱藏（2026-07-17 使用者指定：mobile 不顯示品牌眉標行） */
@@ -828,14 +830,14 @@ html[data-device="mobile"] .kv-title{font-size:36px;line-height:1;display:inline
 html[data-device="mobile"] .kv-badge-qi{position:static;display:inline-flex;flex:none;vertical-align:middle;margin-left:6px;width:24px;height:24px;font-size:14px} /* 起徽行內化（2026-07-17 使用者指定）：貼折數字尾（修板角錨定錯位）；32→24 隨字級縮；flex:none＝防 flex 擠壓成橢圓（評審面板 blocker） */
 html[data-device="mobile"] .kv-date{grid-area:4/1;width:100%;margin-top:8px;font-size:14px;line-height:20px} /* 日期 16→14（2026-07-17 字級縮小）；置中隨板 */
 html[data-device="mobile"] .kv-date .num{white-space:nowrap} /* 日期數字段不拆行：折行點落在「活動日期：」標籤後（防 2026.08.30 中段斷行） */
-html[data-device="mobile"] .kv-media{grid-area:1/2/7/3;position:relative;right:auto;top:auto;width:196px;height:auto;align-self:center;display:flex;flex-direction:column;align-items:center} /* 右欄＝主圓（資訊卡絕對疊上）；跨全部列 */
+html[data-device="mobile"] .kv-media{grid-area:1/2/7/3;position:relative;right:auto;top:auto;width:210px;height:auto;align-self:center;display:flex;flex-direction:column;align-items:center} /* 右欄＝主圓（資訊卡絕對疊上）；跨全部列；196→210＝左文欄 −10%（2026-07-19 使用者裁決） */
 html[data-device="mobile"] .kv-fig{animation:none} /* 漂浮／輸送帶等重動畫 mobile 停用改靜態（09 §1.5） */
-html[data-device="mobile"] .kv-slot-main{position:static;width:196px;border-width:0} /* 主圓入流（槽位類別輪換不影響：當前 main 即入流、其餘 display:none） */
+html[data-device="mobile"] .kv-slot-main{position:static;width:210px;border-width:0} /* 主圓入流（槽位類別輪換不影響：當前 main 即入流、其餘 display:none）；196→210（2026-07-19） */
 html[data-device="mobile"] .kv-slot-sm,
 html[data-device="mobile"] .kv-slot-md{display:none} /* 副圓槽位恆不出，降為進度點（09 §2.5 M） */
 html[data-device="mobile"] .kv-dots{grid-area:5/1;justify-self:center;margin-top:8px} /* 2026-07-17 使用者指定：頁數點比照 desktop 置標題（日期）下方——左欄簇群末位 */
 html[data-device="mobile"] .kv-key-product{
-  position:absolute;top:66.67%;bottom:auto;left:-8px;right:-8px;margin:0 auto;width:fit-content;max-width:212px;z-index:3; /* 資訊卡＝重疊於圓形商品圖上（2026-07-17 v3 使用者指定）：卡頂錨定圓高 2/3 處＝遮蔽恆 ≤1/3（卡身向下長、與卡高無關，取代 v2 bottom:12 錨底）、寬高隨內容自適應（fit-content；max-width 212 防壓左欄）、與圓置中——left/right 外擴 8px 成 212 軌道再 margin:auto（卡寬＞media 196 時 auto 置中才不會貼左緣；kp-in 動畫佔用 transform，不可用 translateX）；bottom:auto/top 覆寫 desktop 基準（top:321/防超約束） */
+  position:absolute;top:66.67%;bottom:auto;left:-8px;right:-8px;margin:0 auto;width:fit-content;max-width:226px;z-index:3; /* 212→226 隨主圓 210 連動（軌道＝圓寬+外擴 8×2） */ /* 資訊卡＝重疊於圓形商品圖上（2026-07-17 v3 使用者指定）：卡頂錨定圓高 2/3 處＝遮蔽恆 ≤1/3（卡身向下長、與卡高無關，取代 v2 bottom:12 錨底）、寬高隨內容自適應（fit-content；max-width 212 防壓左欄）、與圓置中——left/right 外擴 8px 成 212 軌道再 margin:auto（卡寬＞media 196 時 auto 置中才不會貼左緣；kp-in 動畫佔用 transform，不可用 translateX）；bottom:auto/top 覆寫 desktop 基準（top:321/防超約束） */
   background:var(--campaign-surface-floor-b);box-shadow:var(--shadow-floating); /* 卡底綁 theme floor-b（8 主題含 dark 自動跟色；零硬編碼色）；浮出靠既有 shadow token */
 }
 html[data-device="mobile"] .kv-key-product .kp-note{display:none} /* 2026-07-16 fx3：mobile 只留商品名＋價格，聲明列隱藏（desktop/tablet 照舊；卡圓角/padding/陰影不變、高度隨兩行自然縮） */
@@ -857,10 +859,10 @@ html[data-device="mobile"] .editor-circle .label-stack{
 }
 html[data-device="mobile"] .promo-entry .label-stack .label-box.date,
 html[data-device="mobile"] .editor-circle .label-stack .label-box.date{display:none} /* 2026-07-17 使用者指定：圓形模組第三排（日期列，如 2026.07.11 ~ 07.25）mobile 隱藏；主打精選照片卡與 desktop/tablet 不動 */
-html[data-device="mobile"] .label-box:not(.tag):not(.date){ /* 窄卡標籤主盒最多兩行（09 G-C7：mobile 標籤佔比收斂）；主題句 16→12（fx4 縮放輪） */
+html[data-device="mobile"] .label-box:not(.tag):not(.date){ /* 窄卡標籤主盒最多兩行（09 G-C7：mobile 標籤佔比收斂）；主題句 16→14（2026-07-19 使用者裁決取代 fx4 的 12） */
   position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  font-size:var(--m-label-size);line-height:var(--m-label-line);
-  max-height:calc(2*var(--m-label-line) + 15px); /* 2 行＋padding 12＋框線 3（1.5px 框＝既有豁免值）；隨 A/B 變數連動 */
+  font-size:var(--m-labelbox-size);line-height:var(--m-labelbox-line);
+  max-height:calc(2*var(--m-labelbox-line) + 15px); /* 2 行＋padding 12＋框線 3（1.5px 框＝既有豁免值）；隨變數連動 */
 }
 html[data-device="mobile"] .label-box:not(.tag):not(.date)::after{ /* 蓋掉 clamp 殘行滲入底部 padding 的字頂（-webkit-box 以 padding box 裁切的引擎行為）；底色繼承、零新色 */
   content:"";position:absolute;left:0;right:0;bottom:0;height:6px;background:inherit;
@@ -903,7 +905,7 @@ html[data-device="mobile"] .wall-row{display:grid;grid-template-columns:repeat(2
 html[data-device="mobile"] .explore-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 html[data-device="mobile"] .explore-item{flex-direction:column;justify-content:center;text-align:center;gap:8px;min-width:0;min-height:120px;padding:12px}
 html[data-device="mobile"] .explore-item .circle-media{width:56px}
-html[data-device="mobile"] .explore-item .lbl{font-size:var(--m-label-size);line-height:var(--m-label-line)} /* 導覽卡標題 16→12（fx4 縮放輪；下限 12） */
+html[data-device="mobile"] .explore-item .lbl{font-size:16px;line-height:20px} /* 導覽卡標題維持 16（2026-07-19 使用者裁決 N-1 走查：至少 16px——推翻 fx4 縮放輪的 12、回歸 09 §2.12 M 原規格 16/20；寬 141.5 內長題允許折兩行） */
 html[data-device="mobile"] .explore-item .sub{font-size:var(--m-caption-size);line-height:var(--m-caption-line);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* 注意事項＋footer（09 §2.3 M：底部淨空 76＋safe-area 防 dock 蓋法務字） */
 html[data-device="mobile"] #sec-notice{padding:32px 0}
@@ -1505,7 +1507,7 @@ function fitKvTitles(){
   const base = dev === "mobile" ? 36 : dev === "tablet" ? 48 : 68;
   const minPx = dev === "mobile" ? 20 : dev === "tablet" ? 28 : 0;
   const factor = dev === "mobile" ? 0.9 : 1;
-  const fallbackW = dev === "mobile" ? 137 : dev === "tablet" ? 320 : 368; /* mobile＝4:6 左欄寬（fx3） */
+  const fallbackW = dev === "mobile" ? 123 : dev === "tablet" ? 320 : 368; /* mobile＝左欄寬 137→123（2026-07-19 使用者裁決：左文欄佔比 −10%、主圓 210） */
   const els = [...document.querySelectorAll(".kv-variant-new .kv-title")];
   // CP-05 v3（2026-07-18 使用者指示修正）：desktop 原「逐列 fit 塞滿板寬＋起徽絕對定位」造成起徽撞字（LC/鍵盤皆重現，gap -23px）
   // 與兩列留白失衡（27.6 vs 3.4px）——改與 tablet/mobile 同一機制：兩列統一字級＋行內起徽預留＋呼吸邊距 16×2（368 板 → 336 可用，比例≈mobile 0.9）
