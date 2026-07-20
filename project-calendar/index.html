@@ -351,7 +351,7 @@
 <script id="calendar-data" type="application/json">
 {
   "version": 3,
-  "updated": "2026-07-19",
+  "updated": "2026-07-20",
   "source": "05_Project_Tracker.md v2.0（2026-07-15 全量同步；v1 行事曆資料已合併）＋v3 資訊分層＋本日收工同步（2026-07-16）＋本日收工同步（2026-07-17：tracker §8 十四條＋demo 部署上線）＋2026-07-18 同步整理（07-17 尾三條補入、N-2/B-DOCK 結案、新佇列 N-6~N-9、過時註記更新）＋07-18 裁決：C×4 便當盒移除、archive 清除＋07-18 收斂會落地＋07-18 收工部署同步（行事曆上線＋儀表板重產部署）",
   "stages": [
     {
@@ -1781,7 +1781,7 @@
       "rev": "使用者",
       "dep": "14 號文件；橫跨 EP-2／EP-3",
       "out": "契約 v0 定版；loader 改造點 4 個列債",
-      "note": "14 號文件；頂層 5 欄＋9 tuple 具名化＋鈦案資料集驗證通過。本輪契約完成、loader 未建——loader 改造 4 個點列入技術債"
+      "note": "14 號文件；頂層 5 欄＋9 tuple 具名化＋鈦案資料集驗證通過。本輪契約完成、loader 未建——loader 改造 4 個點列入技術債；2026-07-20：loader 未建維持技術債；14 號契約已至 0.3.0（promoSourceMode/promoModuleTitle/dockPromoLabel/categoryWallCount/themeFit/品牌維度 circle/walls 3~5）"
     },
     {
       "id": "N-14",
@@ -1859,7 +1859,20 @@
       "rev": "使用者",
       "dep": "已入 xlsx，待匯入 Sheets",
       "out": "kvVariant（BI）＋KV 商品頁 URL（BJ/BK/BL）＋P0 資訊架構分頁入庫；回寫 Schema v1.2/1.3 定版",
-      "note": "欄位已入 xlsx，待匯入 Sheets 並回寫 Schema v1.2/1.3 定版"
+      "note": "欄位已入 xlsx，待匯入 Sheets 並回寫 Schema v1.2/1.3 定版；2026-07-20：匯入檔演進至 v5（write_xlsx v6 整檔重生，草稿 agent 進行中）；v2 佚失（Downloads 消失）待使用者確認"
+    },
+    {
+      "id": "N-20",
+      "epic": "EP-1",
+      "name": "品類牆/本期活動 3 則版型 tablet·mobile 行為凍結（G-C10）＋U14 主題契合閘正式版（標題映射＋B/C 併判）＋U15/U18 Sheets 欄位化殘項",
+      "start": "",
+      "end": "",
+      "status": "todo",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "U14/U15/U17/U18 裁決（2026-07-20）；09 G-C10 開放項",
+      "out": "G-C10 凍結回寫 09；主題契合閘正式版入 gate；U15/U18 殘項入 Schema/Sheets 欄位",
+      "note": "2026-07-20 新增：U17 entries--3 等比版型的 tablet/mobile 2+1 行為待凍結（G-C10）；U14 契合閘現為校準版（B≥0.25/C≥0.20），正式版需標題映射＋B/C 併判；U15 品牌維度編輯精選與 U18 牆數（3~5 可選）尚有 Sheets 欄位化殘項"
     },
     {
       "id": "L-0719a",
@@ -1874,6 +1887,104 @@
       "dep": "—",
       "out": "",
       "note": "Netlify 額度凍結 → 主站遷 Cloudflare Pages；ai-design-sharing.pages.dev（wrangler direct upload）；過渡防護見 N-15；PF-1~13 平台裁決全落盤 13 號文件 v0.5"
+    },
+    {
+      "id": "L-0720a",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "十八點裁決第一批 U1~U7 落地＋五集重策展＋部署（commit 2c0d8ed＋d105cf3）：U1 同模組去重／U2 入口圖＝活動首商品首圖／U3 過期換檔（鈦案 776312/776556→774962/776371/709977、LC 樓層 765062~67→773133/772815、五集重策展＝Q5 執行、首張變更單 CO-20260720-01）／U4 主打精選 h2＋dock 注入／U5 混填制／U6 promo-more 移除／U7 眉標 mobile 自動降級（C9 欄）；自測 78→83→90 ×5 資料集全 PASS",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "tier-2 補位替換：LC 入口3→11642382；部署 ai-design-sharing.pages.dev/lecreuset-frametest/"
+    },
+    {
+      "id": "L-0720b",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "第二批增量 U8/U9＋匯入檔 v4：U8 三層優先序＋E0 欄（workflow 04 §7 混填三層／§7.1 E0）／U9 欄名一致性由建構保證（P0 資訊架構分頁改 write_xlsx 程式化生成）；使用者匯入檔升 v4（手工合併）",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "U8~U18 隨 commit 588675d 部署（見 L-0720d）"
+    },
+    {
+      "id": "L-0720c",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "設計反饋批 U10~U15：U10 KV＝商品頁第二張圖／U11 跨模組去重（修訂 U1 範圍、refEntry 廢止）／U12 樓層 URL 唯一（brandIds 分流）／U13 文案去工程字眼／U14 主題契合閘（772695 nile 選錯品類根因修正、CP-14 校準 B≥0.25/C≥0.20）／U15 品牌維度編輯精選（North Field 41169864＋Keith 41166654，代表品第二張圖）",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "U14 正式版（標題映射＋B/C 併判）掛 N-20"
+    },
+    {
+      "id": "L-0720d",
+      "kind": "log",
+      "epic": "EP-1",
+      "name": "標題/版型批 U16~U18＋第二批部署（commit 588675d）：U16 promoModuleTitle＋dockPromoLabel（鍵盤集「本期活動」四字依規則消失）／U17 本期活動 3~4 則＋entries--3 等比版型／U18 品類牆預設 2→3 組（3~5 可選；五集第三面牆 27 件新品、dock 6→7）；自測 →94→100→103 ×5 全 PASS、線上驗證全綠",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "U17 tablet/mobile 2+1 列開放項 G-C10（掛 N-20）"
+    },
+    {
+      "id": "L-0720e",
+      "kind": "log",
+      "epic": "EP-2",
+      "name": "pipeline 升版：gate.js v3→v6 規則 17→30（新增 CP-06~CP-16 十一檢查點：跨模組去重/過期/入口圖/商品型分流/E0 一致性/KV 圖源/樓層 URL/工程字串/主題契合/入口數 3~4/牆數 3~5；rules.json 單一來源重匯出）＋write_xlsx v3→v6（C9/E0/E6/牆6~8/categoryWallCount 欄＋kvVariant/D7~D9 收編＋P0 分頁程式化生成=U9）＋fetch_parse 三態存活判定（404 封存頁/sw 保護檔）＋檔期抽取＋hasActivityData()",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "—",
+      "out": "",
+      "note": "CP-06~16 登錄 workflow 00 檢查點登記表 v1.2"
+    },
+    {
+      "id": "L-0720f",
+      "kind": "log",
+      "epic": "EP-0",
+      "name": "文件升版總覽：workflow 04 v1.0→v1.2.4（§2.2 主題契合閘/§3 實作註記/§4.2/§4.4 編輯精選/§4.5 品類牆/§6.3-6.6/§7 混填三層/§7.1 E0/§10 U8~U18 裁決紀錄）／03 Schema v1.1→v1.2 提案擴充（C9/E0/E6/F6/牆6~8/D 區第二張圖/§0.1 命名規約）／14 號契約 0.1.0→0.3.0／02 v1.2 三次修訂（§7 PromoCard 三層混填/§15 EditorTopic 新設/KV 圖源）／09 §2.10/§2.11 增補＋G-C10 開放項／modules.json promo/featured/category_groups 同步",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "使用者",
+      "dep": "—",
+      "out": "",
+      "note": "14 號契約新欄：promoSourceMode/promoModuleTitle/dockPromoLabel/categoryWallCount/themeFit/品牌維度 circle/walls 3~5"
+    },
+    {
+      "id": "L-0720g",
+      "kind": "log",
+      "epic": "EP-2",
+      "name": "變更單制度首用＋xlsx 檔案注記：CO-20260720-01 首張變更單（U3 過期換檔＋五集重策展，格式循 05_變更單格式_v0）；早上解答 Sheets「kvVariant 欄在哪」＝v2 xlsx BI 欄；匯入檔 v4→v5（write_xlsx v6 整檔重生，草稿 agent 進行中）；xlsx v2 從 Downloads 消失待使用者確認是否自刪",
+      "start": "2026-07-20",
+      "end": "2026-07-20",
+      "status": "done",
+      "owner": "Tofu + Claude",
+      "rev": "—",
+      "dep": "—",
+      "out": "",
+      "note": "早上另及平台 13/14 號背景說明"
     }
   ]
 }
