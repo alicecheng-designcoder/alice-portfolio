@@ -23,7 +23,8 @@
   自測模式：#exp=test:1（結果寫入 document.title 與 #selftest-results）
   鐵律：商品名/價格/折扣/actid/URL 全數取自 MVP_Phase1_LeCreuset_活動頁Prototype.html 真值資料。
   KV 折數與檔期＝真值（2026-07-17 套用：773133「下殺68折」＋2026.07.03~08.01，快照 qa/84；原 Figma 給定值已汰換）。
-  註：本期活動入口 ×4 仍為 2026-07-13 快照真值（actid 765062/765064/765066/765067）——與 KV 分屬兩次快照，首次全流程建置時將整頁換用同一快照。
+  註：本期活動入口 ×4＝2026-07-20 重策展真值（actid 772815/773133＋2 商品型入口，U5 混填制）——
+  2026-07-20 使用者裁決 U3「活動過期＝內容失效，須更新為在線活動；本次五個資料集全部重策展」＋U5「在線活動 <3 個→混填制：真活動保留排前（帶檔期列），不足 4 格用符合策展主題的關鍵商品補滿」。
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -829,6 +830,7 @@ html[data-device="mobile"] .kv-offer-box{ /* 眉標回歸（2026-07-19 使用者
 html[data-device="mobile"] .kv-offer-box .latin,
 html[data-device="mobile"] .kv-offer-box .cn{font-size:12px;line-height:16px} /* 2026-07-19 使用者裁決：12px */
 html[data-device="mobile"] .kv-offer-box .latin{margin-right:6px} /* block 流取代 flex gap */
+html[data-device="mobile"] .kv-offer-box.hide-cn .cn{display:none} /* U7 2026-07-20 使用者裁決⑦：「mobile 下 kv-offer-box 放不下時自動隱藏中文眉標（#kv-eyebrow-cn），拉丁眉標仍放不下→ellipsis 截斷為最後防線」——hide-cn 由 fitKvEyebrow() 依 C9 欄（auto|hide|show）掛載；拉丁溢出續由上方既有 ellipsis 防護網接手 */
 html[data-device="mobile"] .kv-offer-box + .kv-title-row{grid-area:3/1}
 html[data-device="mobile"] .kv-title-row + .kv-title-row{grid-area:4/1;margin-top:4px} /* 兩標題板間距 12→4（2026-07-19 使用者裁決：mobile 字級小、12 顯散——4≈desktop gap/板高比例，兩行成同一群組；眉標→標題與標題→日期維持 12 保群組層次） */
 html[data-device="mobile"] .kv-title-row{width:100%;margin-top:12px;padding:8px 0;display:flex;align-items:center;justify-content:center} /* 板寬＝左欄滿寬；板高＝fit 字級＋8×2（Q3b 附帶裁決 2026-07-19：板高縮減 12→8）；flex 置中＝標題與行內起徽任意字級垂直對齊；板間 4／群組間 12（07-19 裁決） */
@@ -1116,7 +1118,7 @@ html[data-device="tablet"] .kv-cutout img{max-height:240px}
 
   <section id="sec-promodeal">
     <div class="content">
-      <div class="sec-header"><h2>本期活動</h2><a class="more" id="promo-more" href="https://tw.buy.yahoo.com/brands/41166677?cid=29588048" target="_blank" rel="noopener">看更多 ›</a></div>
+      <div class="sec-header"><h2>本期活動</h2></div><!-- U6 2026-07-20 使用者裁決⑥：「本期活動模組右上『看更多 ›』移除；moreUrl 欄位保留（主打精選/品類牆/延伸探索仍使用）」 -->
       <div class="entries" id="promo-entries"></div>
     </div>
   </section>
@@ -1289,15 +1291,13 @@ const productGroups = [
   ]}
 ];
 
-const promoDeals = [
+const promoDeals = [ // 2026-07-20 重策展（U3「活動過期＝內容失效，須更新為在線活動」）：舊 4 檔（已下線）全替換；[0]/[1]＝來源頁 ec_promotions 逐字、[2]＝無在線活動樓層 → 合輯詞＋品牌頁 URL（禁優惠數字詞，04 §3）；舊 [3] 刪除、陣列 4→3
   { title:"LC/Staub/寶迪鍋具結帳享97折", discount:"滿1件享97折",
-    url:"https://tw.buy.yahoo.com/activity/onsale?actid=765066" },
-  { title:"LC任2件64折/任3件62折/任4件6折", discount:"滿4件享6折",
-    url:"https://tw.buy.yahoo.com/activity/onsale?actid=765064" },
-  { title:"LC/Staub/寶迪鍋具結帳享95折", discount:"滿1件享95折",
-    url:"https://tw.buy.yahoo.com/activity/onsale?actid=765067" },
-  { title:"LC 任選2件 1688", discount:"任選2件1688",
-    url:"https://tw.buy.yahoo.com/activity/onsale?actid=765062" }
+    url:"https://tw.buy.yahoo.com/activity/onsale?actid=772815" }, // servesFloor 2（featuredDealSections[1] 引用）
+  { title:"Le Creuset下殺68折，任2件再享96折", discount:"滿2件享96折",
+    url:"https://tw.buy.yahoo.com/activity/onsale?actid=773133" }, // servesFloor 1（featuredDealSections[0] 引用）
+  { title:"法式杯具合輯", discount:"馬克杯・茶壺選品",
+    url:"https://tw.buy.yahoo.com/brands/41166677?cid=29588048" }  // servesFloor 3（ai-curated：飲品杯具樓層無在線活動）
 ];
 
 const marketMeta = {
@@ -1355,6 +1355,7 @@ const pickImg = (slot, fallback) => (slot && slot.override) || fallback;
    資訊架構耐受性：titleLine 建議 ≤4 字；4 字以上自動縮字（行高固定 76 → 板高恆 108px，不影響下方排版） */
 let kvContent = {
   eyebrowLatin: "LE CREUSET", eyebrowCn: "新色", /* Q1b 裁決 2026-07-19：眉標縮短（新色搶先看→新色）＝mobile 12px 不折行完整顯示；營運欄位、逐活動可改 */
+  eyebrowCnMobile: "auto", /* U7 2026-07-20 使用者裁決⑦：「mobile 下 kv-offer-box 放不下時自動隱藏中文眉標；自動偵測為預設」＝Sheets C 區 🎚 欄（邏輯編號 C9、xlsx 物理位置 BM 表尾）：枚舉 auto|hide|show、預設 auto；欄位註記「以手機寬度 430px（iPhone 16 Plus）為主」 */
   titleLine1: "法式餐桌", titleLine2: "鍋具68折", /* 2026-07-17 真值初稿套用（使用者核可）：773133「Le Creuset下殺68折」活動標題＋商品池實算最低折數 68 互證（快照 qa/84-url-curation-demo/） */
   /* 「起」字＝價格優惠後綴：僅 titleLine2 含價格優惠（如「7折」「88折起」語意）時顯示。
      Sheets 欄位需求（2026-07-15 使用者定義）：「起字顯示」獨立選項（是/否），預設依文案是否含優惠自動建議 */
@@ -1364,13 +1365,15 @@ let kvContent = {
   dateLabel: "活動日期：", dateValue: "2026.07.03 ~ 08.01" /* 773133 start/end_time 真值（同上快照） */
 };
 
-/* 本期活動圓形入口——文案取自 Figma 手動版（使用者編輯內容，逐字沿用）；連結導品牌頁（真值）；
-   img 欄位值＝預設商品/情境圖（Sheets 未指定時的 fallback），init 時由 themeImages 覆蓋 */
+/* 本期活動圓形入口——2026-07-20 重策展（U3/Q5「五個資料集全部重策展」＋U5 混填制「真活動保留排前（帶檔期列），不足 4 格用符合策展主題的關鍵商品補滿；商品型入口連商品頁、圖＝該商品第一張商品圖、無檔期列」）：
+   在線活動 2 檔（772815/773133）＋商品型入口 2 格（單品詞 chip、禁優惠與檔期詞彙＝Q4 定案）；
+   img＝預設層（U2「活動入口圖預設＝該活動 URL 商品池第一件商品的第一張商品圖 imageSet[0][0]」；商品型＝該商品第一張商品圖）；
+   LC 專屬：init 時仍由 themeImages.promodeal override 覆蓋（U2 下屬人工覆寫級通道、保留） */
 let promoEntries = [
-  { tag:"新品上市", copy:"Le Creuset春季新色「迷霧灰」讓你的餐桌很時髦！", date:"2026.07.11 ~ 07.25", img:"assets/scene-cutouts/drinkware-src.jpg", url:BRAND_URL },
-  { tag:"夢幻廚具顏色", copy:"Le Creuset新色「悠然綠」為餐桌妝點法式綠意太美", date:"2026.07.25 搶先上市", img:"assets/scene-cutouts/tableware-src.jpg", url:BRAND_URL },
-  { tag:"法國時尚廚具", copy:"餐桌上的花見時光 LE CREUSET 推出花漾系列鑄鐵鍋", date:"2026.09.10 獨家販售", img:"https://img.yec.tw/zp/MerchandiseImages/9BFB48ECFC-SP-14117046.jpg", url:BRAND_URL },
-  { tag:"酷炫上新", copy:"從爐上到餐桌的法式日常。", date:"電影品牌聯名合作", img:"assets/scene-cutouts/cookware-src.jpg", url:BRAND_URL }
+  { tag:"結帳享97折", copy:"LC/Staub/寶迪鍋具結帳享97折", date:"2026.07.02 ~ 08.01", img:"https://img.yec.tw/zp/MerchandiseImages/07F18BD089-SP-18128087.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=772815" },
+  { tag:"下殺68折", copy:"Le Creuset下殺68折，任2件再享96折", date:"2026.07.03 ~ 08.01", img:"https://img.yec.tw/zp/MerchandiseImages/5DA5B4CABC-SP-22501844.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=773133" },
+  { tag:"鑄鐵鍋", copy:"山茶花鑄鐵鍋 海岸藍，法式經典鍋色上桌", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/372694543D-SP-20035995.jpg", url:"https://tw.buy.yahoo.com/gdsale/Le-Creuset-山茶花鑄鐵鍋-海岸藍-20cm-法國製-湯鍋-燉鍋-電磁爐-IH爐可用-11614542.html" },
+  { tag:"餐盤組", copy:"花形深盤組 20cm 5入，五色花形盤妝點餐桌", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/8d48e1cb48-Gd-11642419.jpg", url:"https://tw.buy.yahoo.com/gdsale/Le-Creuset-花形深盤組-20cm-5入-薔薇粉-迷霧灰-蛋白霜-錦葵紫-極光午夜藍-餐盤-11642419.html" }
 ];
 
 /* 主打精選 ×3：情境卡 stack＋商品 tuple 直掛（可替換資料層；LC 預設＝真值 actid 檔期） */
@@ -1393,9 +1396,9 @@ let categorySections = [
 
 let exploreItems = [
   { lbl:"前往 Le Creuset 品牌館", sub:"60+ 件品牌商品", img:"assets/lecreuset-hero-source.jpg", url:BRAND_URL },
-  { lbl:"看更多優惠商品", sub:"檔期優惠一覽", img:"assets/scene-cutouts/cookware-src.jpg", url:promoDeals[0].url }
+  { lbl:"看更多優惠商品", sub:"檔期優惠一覽", img:"assets/scene-cutouts/cookware-src.jpg", url:promoDeals[0].url } /* 2026-07-20 隨新 promoDeals[0]＝772815 更新（舊值已 404 過期；引用式寫法自動跟隨） */
 ];
-let moreUrl = BRAND_URL;                                   /* 「看更多」統一導向（隨資料集切換） */
+let moreUrl = BRAND_URL;                                   /* 「看更多」導向（隨資料集切換；主打精選/品類牆/延伸探索使用）——U6 2026-07-20：本期活動右上「看更多 ›」移除、moreUrl 欄位保留 */
 let productBrandPrefix = "法國Le Creuset ";                 /* 商品卡品名前綴（隨資料集切換） */
 let kvCornerImgs = [ // 2026-07-16 使用者指定四商品（第 4 件＝萬用窈窕鍋入此）
   { img:"https://img.yec.tw/zp/MerchandiseImages/a0766b3f58-Gd-10309671.jpg", name:"法國Le Creuset 花型盤 中 雪紡粉", url:"https://tw.buy.yahoo.com/gdsale/法國Le-Creuset-花型盤-中-雪紡粉-10309671.html" },
@@ -1421,13 +1424,17 @@ let kvCutouts = { // 舊版 KV 左右舞台（2026-07-16 v5）：單張去背圖
 };
 
 let dockHeroLabel = "品牌精選";              // 資料集可覆寫（清除時還原）
+/* U4（2026-07-20 使用者裁決④）：「主打精選 h2 標題隨 AI 策展變換（floors[].title 逐樓層注入，遵循 04 §3 titleSource 規則）；
+   dock 錨點用 ≤5 全形字短標欄位 dockFeaturedLabel（LC 預設『主打推薦』）」——沿 dockHeroLabel 模式：資料集 apply() 覆寫、clearProductUrl 還原 */
+let floorTitles = ["Le Creuset下殺68折", "鍋具結帳享97折", "法式杯具時光"]; // LC 預設（2026-07-20 重策展）：樓層1/2＝promo-truth（773133/772815 活動標題逐字子串）、樓層3＝ai-curated（無在線活動樓層、無數字優惠詞）
+let dockFeaturedLabel = "主打推薦";           // U4：dock 錨點短標（≤5 全形字；LC 預設「主打推薦」）
 let footerTitle = "法式餐桌與經典鍋具精選";     // 頁尾標題＝資料層內容（Sheets P1 欄位 footerTitle：AI 初稿→營運調修）
 const NOTICE_BOILERPLATE = "商品價格、優惠條件、活動期間與可售狀態，請以商品頁與結帳頁顯示為準。\n不同商品可能適用不同優惠、配送方式與庫存狀態。\n點擊商品卡後可前往商品頁查看完整規格、付款方式、配送資訊與最新優惠。"; // AI 初稿共用法務樣板：正式版由 pipeline 逐活動產出
 let noticeText = NOTICE_BOILERPLATE;          // 注意事項內文＝資料層內容（2026-07-19 使用者指示欄位化：Sheets P1 欄位 noticeText，營運可逐活動調修）
 function dockAnchors(){ // 2026-07-16 修正：導航文字隨資料層生成（分類樓層標題直接取自 categorySections，資料集切換即同步）
   return [
     { label: dockHeroLabel, target:"sec-hero" },
-    { label:"主打推薦", target:"sec-featureddeal-1" },
+    { label: dockFeaturedLabel, target:"sec-featureddeal-1" }, /* U4 2026-07-20：短標欄位取代硬編碼「主打推薦」 */
     { label:"本期活動", target:"sec-promodeal" },
     { label: categorySections[0].title, target:"sec-categorygroup-tableware" },
     { label: categorySections[1].title, target:"sec-categorygroup-cookware" }
@@ -1474,8 +1481,9 @@ function renderFeatured(){
     const s = featuredDealSections[+card.dataset.fd];
     card.closest("section").style.display = s ? "" : "none";
     if (!s) return;
+    // U4 2026-07-20 使用者裁決④：「主打精選 h2 標題隨 AI 策展變換（floors[].title 逐樓層注入）」——缺值 fallback「主打精選」
     card.innerHTML = `
-      <div class="sec-header"><h2>主打精選</h2><a class="more" href="${esc(moreUrl)}" target="_blank" rel="noopener">看更多 ›</a></div>
+      <div class="sec-header"><h2>${esc(floorTitles[+card.dataset.fd] || "主打精選")}</h2><a class="more" href="${esc(moreUrl)}" target="_blank" rel="noopener">看更多 ›</a></div>
       <div class="featured-row">
         <a class="scene-card" href="${esc(s.stack.url)}" target="_blank" rel="noopener">
           ${imgTag(s.scene, s.stack.title)}
@@ -1564,6 +1572,24 @@ function fitLegacyLock(){
     if (need < 1) lock.style.setProperty("--lock-scale", need.toFixed(3));
   }
 }
+/* U7（2026-07-20 使用者裁決⑦）：「mobile 下 kv-offer-box 放不下時自動隱藏中文眉標（#kv-eyebrow-cn），拉丁眉標仍放不下→ellipsis 截斷為最後防線；自動偵測為預設」——
+   模式來源＝kvContent.eyebrowCnMobile（Sheets C 區 🎚 欄，邏輯編號 C9；枚舉 auto|hide|show、預設 auto；欄位註記「以手機寬度 430px（iPhone 16 Plus）為主」，實作依實際容器寬量測）。
+   僅 mobile 生效（desktop/tablet 零影響）；hide→掛 hide-cn；show→移除 hide-cn、溢出交 ellipsis；auto→先移除 hide-cn 全顯量測，
+   scrollWidth>clientWidth（或子元素合計寬>容器寬）＝溢出 → 掛 hide-cn；隱藏 cn 後拉丁仍溢出＝既有 ellipsis 防護網自然接手，不再額外處理。 */
+function fitKvEyebrow(){
+  const box = document.querySelector(".kv-variant-new .kv-offer-box");
+  if (!box) return;
+  if (document.documentElement.dataset.device !== "mobile") { box.classList.remove("hide-cn"); return; }
+  const mode = (kvContent && kvContent.eyebrowCnMobile) || "auto";
+  if (mode === "hide") { box.classList.add("hide-cn"); return; }
+  if (mode === "show") { box.classList.remove("hide-cn"); return; }
+  box.classList.remove("hide-cn"); // auto：全顯量測（冪等，可重入）
+  const kidsW = [...box.children].reduce((w, el) => {
+    const cs = getComputedStyle(el);
+    return w + el.offsetWidth + (parseFloat(cs.marginLeft) || 0) + (parseFloat(cs.marginRight) || 0);
+  }, 0);
+  if (box.scrollWidth > box.clientWidth + 1 || kidsW > box.clientWidth + 1) box.classList.add("hide-cn");
+}
 function renderKvContent(){
   document.getElementById("kv-eyebrow-latin").textContent = kvContent.eyebrowLatin;
   document.getElementById("kv-eyebrow-cn").textContent = kvContent.eyebrowCn;
@@ -1594,6 +1620,7 @@ function renderKvContent(){
   renderKvMarquee();
   fitKvTitles();
   fitLegacyLock();
+  fitKvEyebrow(); // U7 2026-07-20：文案重渲染後重量測（INIT 首渲染與 rerenderData 皆經此入口）
 }
 /* POPEYE 式跑馬燈內容：活動主題文案串接（・分隔），單元 ×3 為半段、半段 ×2 供 -50% 無縫循環 */
 function renderKvMarquee(){
@@ -1791,11 +1818,11 @@ const CAMP_PRODUCTS = [ // 真值：tw.buy.yahoo.com/brands/41169049（KAZMI 韓
 Object.assign(marketMeta, { // 原價（真值；僅實際有折扣者）
   "【KAZMI】KZM 多功能單人帳Ⅱ(200×75×h110cm).個人帳篷.帳棚/ K221T3T01": { listPrice: "$4,380" }, "【KAZMI】KZM 萬用燒烤卡式爐組(瓦斯爐+烤盤+鍋蓋+瀝油盤+爐架+收納袋)": { listPrice: "$6,580" }, "【KAZMI】KZM 鋼網圍爐桌.料理桌.露營野餐桌.折合桌.烤肉桌": { listPrice: "$4,580" }, "【KAZMI】KZM IMS三折合鋼網折疊桌含收納袋.料理桌.露營野餐桌.折合桌/K20T3U005": { listPrice: "$3,680" }, "【KAZMI】KZM 工業風六段折疊椅.休閒椅.導演椅.折合椅.露營椅/ K24T1C01 KH 軍綠": { listPrice: "$2,980" }, "【KAZMI】KZM 個性可開式手拉車(網).折疊式露營裝備拖車.置物手推車/ K25T3F02": { listPrice: "$3,980" }, "【KAZMI】KZM 工業風裝備收納袋80L.露營工具攜行袋.置物袋.行李包.旅行袋/ K22T3B05": { listPrice: "$1,380" }, "【KAZMI】KZM 工業風低座折疊椅.休閒椅.導演椅.折合椅.露營椅/ K23T1C02 KH 軍綠": { listPrice: "$1,980" }
 });
-const CAMP_ENTRIES = [ // 圓形入口＝活動內容欄位 → 取商品圖第一張情境圖（tuple[5]，2026-07-16 使用者定義）
-  { tag:"指南 01", copy:"紮營帳篷：單人帳、家庭帳與野餐帳怎麼選", date:"", img:CAMP_PRODUCTS[1][5], url:CAMP_URL },
-  { tag:"指南 02", copy:"營地廚房：卡式爐、圍爐桌與餐廚器具", date:"", img:CAMP_PRODUCTS[4][5], url:CAMP_URL },
-  { tag:"指南 03", copy:"桌椅休憩：折疊椅與折疊桌的輕量組合", date:"", img:CAMP_PRODUCTS[9][5], url:CAMP_URL },
-  { tag:"指南 04", copy:"裝備收納：拖車、收納袋與保冷袋一起打包", date:"", img:CAMP_PRODUCTS[10][5], url:CAMP_URL }
+const CAMP_ENTRIES = [ // 2026-07-20 重策展（U3/Q5＋U5 混填制）：在線活動 3 檔（排序＝折數最深優先 88折→9折→92折、帶檔期列）＋第 4 格商品補位（營地廚房主題關鍵品、無檔期列）；img＝U2 預設層（活動＝商品池第一件商品第一張商品圖／商品型＝CAMP_PRODUCTS[4] tuple[5]）
+  { tag:"限時88折", copy:"戶外精選限時88折↘", date:"2026.07.02 ~ 2026.08.01", img:"https://img.yec.tw/zp/MerchandiseImages/8C5550E62D-SP-21511162.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=772670" },
+  { tag:"限時9折", copy:"戶外精選限時9折↘", date:"2026.07.02 ~ 2026.08.01", img:"https://img.yec.tw/zp/MerchandiseImages/EB09DAE197-SP-20129244.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=772695" },
+  { tag:"限時92折", copy:"戶外精選限時92折↘", date:"2026.07.02 ~ 2026.08.01", img:"https://img.yec.tw/zp/MerchandiseImages/48499CB3A9-SP-22841697.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=772687" },
+  { tag:"卡式爐組", copy:"營地開伙：萬用燒烤卡式爐組一組到位", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/91348C2F0A-SP-22819983.jpg", url:"https://tw.buy.yahoo.com/gdsale/gdsale.asp?gdid=12126030" }
 ];
 const KB_URL = "https://tw.buy.yahoo.com/category/39920181";
 const KB_PRODUCTS = [ // 真值：tw.buy.yahoo.com/category/39920181（鍵盤/滑鼠/繪圖板分類頁，2026-07-16 抓取；價格/原價/URL 逐字取自頁面內嵌列表 JSON）
@@ -1860,17 +1887,17 @@ Object.assign(marketMeta, { // 原價（真值；僅實際有折扣者）
   "【en-suey 銀穗】EU手繪感印花格紋長裙": { listPrice: "$4,980" },
   "【en-suey 銀穗】EU渲染手繪感飄逸蛋糕長裙": { listPrice: "$3,980" }
 });
-const KB_ENTRIES = [ // 選物指南（2026-07-16 使用者指定四商品；圖/連結＝真值商品頁，文案依商品實況改寫）；分類頁無整檔檔期 → date 空（降級隱藏）
-  { tag:"指南 01", copy:"機械手感：ALTO KEYS 無線機械鍵盤", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/E6E741F7A6-Product-38383042.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-logitech-ALTO-KEYS-K98M-機械式無線鍵盤-11767080.html" },
-  { tag:"指南 02", copy:"效率辦公：K650 簡約無線輸入", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/083F7E9CE2-SP-12052897.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-K650-無線鍵盤-10191898.html" },
-  { tag:"指南 03", copy:"人體工學：Wave Keys 波浪曲線", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/9B64BEB651-Product-34435532.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-Wave-Keys-人體工學鍵盤-玫瑰粉-10987175.html" },
-  { tag:"指南 04", copy:"跨平台輕巧：K380s 圓鍵藍牙", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/D4CEA8A400-Product-33561517.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-K380s-跨平台藍牙鍵盤-珍珠白-10818599.html" }
+const KB_ENTRIES = [ // 2026-07-20 重策展（U3/Q5＋U5）：來源分類頁 0 在線活動（live-check 證實）→ 4 件商品型入口（chip＝單品詞、禁優惠與檔期詞彙＝Q4 定案）；img＝U2 預設層（商品頁主圖庫第一張 imageSet[0][0]，og:image 錨定）；date 空＝隱藏
+  { tag:"機械鍵盤", copy:"機械手感：ALTO KEYS 無線機械鍵盤", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/34A1E454CE-Product-38383053.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-logitech-ALTO-KEYS-K98M-機械式無線鍵盤-11767080.html" },
+  { tag:"無線鍵盤", copy:"效率辦公：K650 簡約無線輸入", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/653BA8205B-Product-30630175.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-K650-無線鍵盤-10191898.html" },
+  { tag:"人體工學鍵盤", copy:"人體工學：Wave Keys 波浪曲線", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/7758630794-Product-34435532.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-Wave-Keys-人體工學鍵盤-玫瑰粉-10987175.html" },
+  { tag:"藍牙鍵盤", copy:"跨平台輕巧：K380s 圓鍵藍牙", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/F2176399D5-Product-33561517.jpg", url:"https://tw.buy.yahoo.com/gdsale/羅技-K380s-跨平台藍牙鍵盤-珍珠白-10818599.html" }
 ];
-const FA_ENTRIES = [ // 選物指南（主題文案改寫；商品事實不虛構）
-  { tag:"指南 01", copy:"洋裝：A-LINE、綁帶與工裝風剪裁", date:"", img:FA_PRODUCTS[0][5], url:FA_URL },
-  { tag:"指南 02", copy:"上衣：電繡、蕾絲與條紋細節", date:"", img:FA_PRODUCTS[3][5], url:FA_URL },
-  { tag:"指南 03", copy:"下著：涼感與撞色線條", date:"", img:FA_PRODUCTS[9][5], url:FA_URL },
-  { tag:"指南 04", copy:"長裙：手繪印花與飄逸百褶", date:"", img:FA_PRODUCTS[12][5], url:FA_URL }
+const FA_ENTRIES = [ // 2026-07-20 重策展（U3/Q5＋U5 混填制）：在線活動 1 檔（774144 盛夏折扣季、排前帶檔期列）＋3 格商品補位（單品詞 chip、禁優惠與檔期詞彙＝Q4 定案、無檔期列）；img＝U2 預設層（活動＝商品池第一件商品第一張商品圖／商品型＝該商品第一張商品圖）
+  { tag:"2件9折/3件85折", copy:"en-suey 盛夏折扣季 2件9折/3件85折", date:"2026.07.09 ~ 2026.07.26", img:"https://img.yec.tw/zp/MerchandiseImages/B9909F7767-SP-22954878.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=774144" },
+  { tag:"洋裝", copy:"洋裝：立體提織橫條 A-LINE 剪裁", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/304F3C94B3-SP-22855496.jpg", url:"https://tw.buy.yahoo.com/gdsale/gdsale.asp?gdid=12128733" },
+  { tag:"休閒短褲", copy:"下著：熱帶葉片印花休閒短褲", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/35F253E7A0-SP-22862408.jpg", url:"https://tw.buy.yahoo.com/gdsale/gdsale.asp?gdid=12131012" },
+  { tag:"長裙", copy:"長裙：渲染手繪感飄逸蛋糕裙襬", date:"", img:"https://img.yec.tw/zp/MerchandiseImages/C8F022F865-SP-22905131.jpg", url:"https://tw.buy.yahoo.com/gdsale/gdsale.asp?gdid=12139414" }
 ];
 /* 健康生活鈦度（純鈦選品）：分類策展 T2 → mono-light（色彩決策 2026-07-19 裁決①）。真值＝2026-07-19-titanium pipeline run（draft.json/snapshot.json，gate PASS）。
    36 件商品＝三樓層×8＋兩牆×6；tuple[2]＝商品卡圖（img）／tuple[5]＝情境圖（sceneImg，scene 背景與 KV 用）；tuple[4]＝實算折數標籤（price/listprice，禁生成）。 */
@@ -1957,11 +1984,11 @@ Object.assign(marketMeta, { // 原價（真值 marketPrice；全 36 件皆有折
   "日本Belmont 鈦瀝水杯蓋(M) BM-445 迷你鈦砧板/雪拉杯蓋/露營多功能餐具": { listPrice:"$900" },
   "鎧斯Keith Ti5326純鈦輕量環保折疊握把湯碗.鈦金屬摺疊握把柄飯菜湯麵碗隨身餐具": { listPrice:"$860" }
 });
-const TI_ENTRIES = [ // 本期活動＝draft.json 3 檔真活動（destinationType=activity；tag=活動短語/copy=標題逐字/url=onsale?actid 逐字）；第 4 格＝重複最強檔 776312 並標記（4 格不足補位）
-  { tag:"本檔主打", copy:"鈦安x鈦工坊 純鈦餐具5折起 買就送超贈點3%", date:"2026.07.16 ~ 2026.07.20", img:"https://img.yec.tw/zp/MipBanners/4781386F55-776312.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=776312" },
-  { tag:"夜殺限時", copy:"(夜殺)康寧/BH結帳92折", date:"2026.07.17 ~ 2026.07.20", img:"https://img.yec.tw/zp/MipBanners/4FEF9EEF43-776556.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=776556" },
-  { tag:"滿額出貨", copy:"滿額390出貨", date:"2025.10.15 ~ 2029.08.23", img:"https://img.yec.tw/zp/MipBanners/4FEF9EEF43-709977.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=709977&sw=51de89ae6d529887" },
-  { tag:"主打加碼", copy:"鈦安x鈦工坊 純鈦餐具5折起 買就送超贈點3%", date:"2026.07.16 ~ 2026.07.20", img:"https://img.yec.tw/zp/MipBanners/4781386F55-776312.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=776312" }
+const TI_ENTRIES = [ // 本期活動＝在線 4 檔真活動（774962/776371/772695/709977），4 格互異（U1 零重複＝Blocking 0 容忍）——2026-07-20 重策展（U3「活動過期＝內容失效，須更新為在線活動」：舊過期短檔換檔＝推翻 2026-07-19 裁決③「短檔保留」，變更單留痕）；img＝U2 預設層（該活動 URL 商品池第一件商品第一張商品圖 imageSet[0][0]，取代舊 MipBanners 活動 banner＝降為人工覆寫級）
+  { tag:"特價229元起", copy:"鍋太后精選商品 全系列特價229元起", date:"2026.07.15 ~ 2026.08.14", img:"https://img.yec.tw/zp/MerchandiseImages/DACDD582BF-SP-17278136.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=774962" },
+  { tag:"夜殺9折起", copy:"鍋寶夜殺9折起，指定品滿額贈好禮", date:"2026.07.17 ~ 2026.08.01", img:"https://img.yec.tw/zp/MerchandiseImages/EF033BB5BD-SP-16847365.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=776371" },
+  { tag:"限時9折", copy:"戶外精選限時9折↘", date:"2026.07.02 ~ 2026.08.01", img:"https://img.yec.tw/zp/MerchandiseImages/EB09DAE197-SP-20129244.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=772695" },
+  { tag:"滿額390出貨", copy:"滿額390出貨", date:"2025.10.15 ~ 2029.08.23", img:"https://img.yec.tw/zp/MerchandiseImages/B9E13C6A3B-SP-21135097.jpg", url:"https://tw.buy.yahoo.com/activity/onsale?actid=709977&sw=51de89ae6d529887" }
 ];
 const URL_DATASETS = [
   { match: /lecreuset|29588048|41166677/i, key: "lecreuset", label: "Le Creuset 品牌頁" },
@@ -1979,7 +2006,8 @@ function snapshotDefaults(){
     editorWall: structuredClone(editorWall), editorTitleLines: structuredClone(editorTitleLines),
     categorySections: structuredClone(categorySections), exploreItems: structuredClone(exploreItems),
     moreUrl, productBrandPrefix, kvCornerImgs: structuredClone(kvCornerImgs),
-    dockHeroLabel, footerTitle, noticeText, kvFigUrls: structuredClone(kvFigUrls), kvCutouts: structuredClone(kvCutouts), kvKeyProducts: structuredClone(kvKeyProducts),
+    dockHeroLabel, dockFeaturedLabel, floorTitles: structuredClone(floorTitles), /* U4 2026-07-20：樓層標題/dock 短標入快照（沿 dockHeroLabel 模式） */
+    footerTitle, noticeText, kvFigUrls: structuredClone(kvFigUrls), kvCutouts: structuredClone(kvCutouts), kvKeyProducts: structuredClone(kvKeyProducts),
     kvImgs: ["kv-img-main", "kv-img-sub1", "kv-img-sub2"].map(id => document.getElementById(id).src),
     theme: "pink-light"
   };
@@ -1990,7 +2018,7 @@ function rerenderData(){
   renderDock(); // 導航文字隨資料集更新（2026-07-16 修正）
   document.getElementById("footer-title").textContent = footerTitle;
   document.getElementById("notice-text").textContent = noticeText; // 欄位化（2026-07-19）：純文字寫入＋pre-line 換行（＝Sheets 儲存格語意）
-  document.getElementById("promo-more").href = moreUrl;
+  // U6 2026-07-20：本期活動右上「看更多 ›」已移除 → 原 href 賦值一併刪除（moreUrl 仍供主打精選/品類牆看更多使用）
   playKvFlip();
 }
 function setUrlStatus(msg, kind){ const el = document.getElementById("ep-url-status"); el.textContent = msg; el.className = kind || ""; }
@@ -1998,11 +2026,12 @@ function setUrlStatus(msg, kind){ const el = document.getElementById("ep-url-sta
 const DEMO_DATASETS = {
   camping: {
     url: CAMP_URL, theme: "green-light", short: "KAZMI 野外露營品牌頁", customCutouts: true,
-    note: "14 件真值商品，8 件實際折扣含原價；策展主題「野外露營」→ 悠然綠；無整檔檔期 → 日期降級隱藏",
+    note: "14 件真值商品，8 件實際折扣含原價；策展主題「野外露營」→ 悠然綠；KV 無整檔檔期 → 日期降級隱藏；本期活動＝3 檔在線活動＋1 商品補位（2026-07-20 U5 混填制）",
     apply(){ // 野外露營（KAZMI 韓國）：戶外生活策展 → 悠然綠（色彩決策 T2a）
-      kvContent = { eyebrowLatin:"KAZMI", eyebrowCn:"露營選品", /* Q1b 縮短 */ titleLine1:"野外露營", titleLine2:"裝備選品",
+      kvContent = { eyebrowLatin:"KAZMI", eyebrowCn:"露營選品", /* Q1b 縮短 */ eyebrowCnMobile:"auto", /* U7 2026-07-20 */ titleLine1:"野外露營", titleLine2:"裝備選品",
         titleSuffix:"起", showTitleSuffix:false, /* 標題無價格文案 → 起字隱藏 */
         titleFlip:true, showMarquee:true, dateLabel:"", dateValue:"" };
+      floorTitles = ["帳篷紮營選物", "營地廚房開伙", "桌椅收納輕量打包"]; dockFeaturedLabel = "裝備嚴選"; /* U4 2026-07-20：ai-curated 樓層標題＋dock 短標（≤5 全形字） */
       promoEntries = structuredClone(CAMP_ENTRIES);
       featuredDealSections = [
         { stack:{ tag:"GUIDE 01", title:"紮營第一步：一頂好帳篷", sub:"單人帳到別墅帳都備齊", url:CAMP_URL }, scene:CAMP_PRODUCTS[1][5], products:[CAMP_PRODUCTS[0], CAMP_PRODUCTS[2], CAMP_PRODUCTS[3]] },
@@ -2053,11 +2082,12 @@ const DEMO_DATASETS = {
   },
   keyboard: {
     url: KB_URL, theme: "blue-dark", short: "鍵盤/滑鼠分類頁 39920181", customCutouts: true,
-    note: "14 件真值商品全數實際折扣含原價（最低 43 折）；策展主題「桌面升級」→ 沉靜藍 dark；無整檔檔期 → 日期降級隱藏",
+    note: "14 件真值商品全數實際折扣含原價（最低 43 折）；策展主題「桌面升級」→ 沉靜藍 dark；無整檔檔期 → 日期降級隱藏；本期活動＝4 商品型入口（來源 0 在線活動，2026-07-20 U5）",
     apply(){ // 鍵盤/滑鼠（羅技為主）：3C 科技策展 → 沉靜藍 dark（色彩決策 T3）；「43折」＝入選商品實際最低折數（254/599）
-      kvContent = { eyebrowLatin:"KEYBOARD", eyebrowCn:"選品", /* Q1b 縮短 */ titleLine1:"桌面升級", titleLine2:"鍵盤43折",
+      kvContent = { eyebrowLatin:"KEYBOARD", eyebrowCn:"選品", /* Q1b 縮短 */ eyebrowCnMobile:"auto", /* U7 2026-07-20 */ titleLine1:"桌面升級", titleLine2:"鍵盤43折",
         titleSuffix:"起", showTitleSuffix:true, /* 真值折扣 → 起字顯示 */
         titleFlip:true, showMarquee:true, dateLabel:"", dateValue:"" };
+      floorTitles = ["電競戰備桌面", "效率辦公桌面", "造型與入門選物"]; dockFeaturedLabel = "鍵盤嚴選"; /* U4 2026-07-20：ai-curated 樓層標題＋dock 短標 */
       promoEntries = structuredClone(KB_ENTRIES);
       featuredDealSections = [ /* 情境卡（最左第一格）＝2026-07-16 使用者指定三商品圖＋真值連結 */
         { stack:{ tag:"GUIDE 01", title:"電競戰備桌面", sub:"RGB、機械軸與磁性鍵軸", url:"https://tw.buy.yahoo.com/gdsale/羅技-G713-美型炫光機械式鍵盤-10627349.html" }, scene:"https://img.yec.tw/zp/MerchandiseImages/8F1D6B7EE7-Product-32616704.jpg", products:[KB_PRODUCTS[1], KB_PRODUCTS[2], KB_PRODUCTS[3]] },
@@ -2110,9 +2140,10 @@ const DEMO_DATASETS = {
     url: FA_URL, theme: "gold-light", short: "en-suey 銀穗女裝品牌頁 53626524", customCutouts: true,
     note: "14 件真值商品，10 件實際折扣含原價（最低 5 折）＋挑戰低價 ×3；檔期真值 2026.07.09~07.26（盛夏折扣季 2件9折/3件85折）；策展主題「盛夏折扣」→ 金棕",
     apply(){ // 流行女裝（en-suey 銀穗）：時尚質感策展 → 金棕（色彩決策 T1）；檔期/折扣取自頁面 ec_promotions 與真實價格
-      kvContent = { eyebrowLatin:"EN-SUEY", eyebrowCn:"銀穗", /* Q1b 縮短 */ titleLine1:"盛夏折扣", titleLine2:"服飾5折",
+      kvContent = { eyebrowLatin:"EN-SUEY", eyebrowCn:"銀穗", /* Q1b 縮短 */ eyebrowCnMobile:"auto", /* U7 2026-07-20 */ titleLine1:"盛夏折扣", titleLine2:"服飾5折",
         titleSuffix:"起", showTitleSuffix:true, /* 「5折」＝入選商品實際最低折數（$1,740/$3,480）→ 起字顯示 */
         titleFlip:true, showMarquee:true, dateLabel:"活動期間：", dateValue:"2026.07.09~07.26" /* ec_promotions 起迄真值 */ };
+      floorTitles = ["盛夏折扣季2件9折", "上衣細節工藝", "涼感下著選物"]; dockFeaturedLabel = "盛夏嚴選"; /* U4 2026-07-20：樓層1＝promo-truth（774144 標題真值組裝）、樓層2/3＝ai-curated */
       promoEntries = structuredClone(FA_ENTRIES);
       featuredDealSections = [
         { stack:{ tag:"GUIDE 01", title:"洋裝與長裙提案", sub:"A-LINE、綁帶、手繪印花", url:FA_URL }, scene:FA_PRODUCTS[0][5], products:[FA_PRODUCTS[1], FA_PRODUCTS[2], FA_PRODUCTS[12]] },
@@ -2156,18 +2187,19 @@ const DEMO_DATASETS = {
   },
   titanium: {
     url: TITANIUM_URL, theme: "mono-light", short: "健康生活鈦度 純鈦選品", customCutouts: false,
-    note: "36 件真值商品（三樓層×8＋兩牆×6），全數實際折扣含原價（最低 41 折）；T2 分類策展「健康生活鈦度」→ mono-light（2026-07-19 裁決①）；KV 標題純主題（ai-curated 無數字→起字隱藏）；本期活動 3 檔真活動（776312/776556/709977）；無去背素材→退回程序化 KV",
+    note: "36 件真值商品（三樓層×8＋兩牆×6），全數實際折扣含原價（最低 41 折）；T2 分類策展「健康生活鈦度」→ mono-light（2026-07-19 裁決①）；KV 標題純主題（ai-curated 無數字→起字隱藏）；本期活動 4 檔在線真活動（774962/776371/772695/709977，2026-07-20 U3 重策展、U1 零重複）；無去背素材→退回程序化 KV",
     apply(){ // 健康生活鈦度（純鈦杯具/餐具＋鈦鍋 搜尋策展）：分類策展 → mono-light（色彩決策 T2b 使用者指定鈦金屬銀灰）
-      kvContent = { eyebrowLatin:"TITANIUM SELECTION", eyebrowCn:"純鈦餐具選品", titleLine1:"健康生活", titleLine2:"鈦度好物",
+      kvContent = { eyebrowLatin:"TITANIUM SELECTION", eyebrowCn:"純鈦餐具選品", eyebrowCnMobile:"auto", /* U7 2026-07-20 */ titleLine1:"健康生活", titleLine2:"鈦度好物",
         titleSuffix:"起", showTitleSuffix:false, /* KV 標題＝ai-curated 純主題文案、無數字優惠詞 → 起字隱藏 */
         titleFlip:true, showMarquee:true, dateLabel:"", dateValue:"" /* KV 不綁 actid/檔期（降級鏈不顯示日期） */ };
+      floorTitles = ["「鈦」划算了吧！", "「鈦」好喝了吧！", '鍋"鈦"民安']; dockFeaturedLabel = "鈦度嚴選"; /* U4 2026-07-20：ai-curated＝沿用現有樓層名逐字（第 3 樓原始字面即半形雙引號） */
       promoEntries = structuredClone(TI_ENTRIES);
       featuredDealSections = [
         { stack:{ tag:"嚴選", title:"「鈦」划算了吧！", sub:"純鈦好物一次備齊", url:TITANIUM_URL }, scene:TITANIUM_PRODUCTS[2][5], products:[TITANIUM_PRODUCTS[0], TITANIUM_PRODUCTS[1], TITANIUM_PRODUCTS[2]] },
         { stack:{ tag:"鈦杯", title:"「鈦」好喝了吧！", sub:"鈦杯裝什麼都對味", url:TITANIUM_URL }, scene:TITANIUM_PRODUCTS[8][5], products:[TITANIUM_PRODUCTS[8], TITANIUM_PRODUCTS[9], TITANIUM_PRODUCTS[10]] },
         { stack:{ tag:"鈦鍋", title:'鍋"鈦"民安', sub:"鈦鍋開伙更安心", url:TITANIUM_POT_URL }, scene:TITANIUM_PRODUCTS[23][5], products:[TITANIUM_PRODUCTS[16], TITANIUM_PRODUCTS[17], TITANIUM_PRODUCTS[18]] }
       ];
-      editorCircles = [promoEntries[0], promoEntries[1]]; // 主打 776312 ＋ 夜殺 776556（兩圓相異）
+      editorCircles = [promoEntries[0], promoEntries[1]]; // 特價 774962 ＋ 夜殺 776371（兩圓相異；U1 2026-07-20：跨模組引用屬設計語意、允許保留）
       editorWall = TITANIUM_PRODUCTS.slice(24, 36); // 牆①②合併＝12 件（輕量堅固／導熱快）
       editorTitleLines = ["Titanium Merit", "鈦製餐具的優點", "輕量堅固・無毒好清潔！"];
       categorySections = [
@@ -2251,6 +2283,7 @@ function clearProductUrl(silent){
   exploreItems = structuredClone(DEFAULT_STATE.exploreItems);
   moreUrl = DEFAULT_STATE.moreUrl; productBrandPrefix = DEFAULT_STATE.productBrandPrefix;
   dockHeroLabel = DEFAULT_STATE.dockHeroLabel; footerTitle = DEFAULT_STATE.footerTitle; noticeText = DEFAULT_STATE.noticeText;
+  dockFeaturedLabel = DEFAULT_STATE.dockFeaturedLabel; floorTitles = structuredClone(DEFAULT_STATE.floorTitles); /* U4 2026-07-20：清除時還原 LC 預設 */
   kvFigUrls = structuredClone(DEFAULT_STATE.kvFigUrls);
   kvCutouts = structuredClone(DEFAULT_STATE.kvCutouts);
   kvKeyProducts = structuredClone(DEFAULT_STATE.kvKeyProducts);
@@ -2430,7 +2463,7 @@ function checkTheme(key){
   const bodyBg = cs(document.body).backgroundColor;
   add("頁底 = surface/page（dark 保彩 870）", bodyBg === rgbStr(exp.page), bodyBg);
   const floorBg = cs(document.getElementById("sec-promodeal")).backgroundColor;
-  add("本期活動 = page（與主打精選一致）", floorBg === rgbStr(exp.page), floorBg);
+  add("本期活動 = page（與主打樓層一致）", floorBg === rgbStr(exp.page), floorBg);
   const heroBg = cs(document.getElementById("sec-hero")).backgroundColor;
   add("主視覺底 = floor-b", heroBg === rgbStr(exp.floorB), heroBg);
   add("主視覺紙張顆粒紋理（multiply 滲入主題色）", getComputedStyle(document.getElementById("sec-hero"), "::before").backgroundImage.includes("data:image/svg"));
@@ -2709,6 +2742,11 @@ async function runSelfTest(){
     ok("URL 套用：女裝資料集（en-suey 銀穗）＋金棕主題＋檔期真值顯示", applyProductUrl("https://tw.buy.yahoo.com/brands/53626524") === true &&
       document.body.classList.contains("campaign-gold-light") && getComputedStyle(document.getElementById("kv-date")).display !== "none" &&
       document.body.innerHTML.includes("2026.07.09~07.26") && location.hash.includes("dataset:fashion"));
+    // U4 2026-07-20：「主打精選 h2 標題隨 AI 策展變換（floors[].title 逐樓層注入）；dock 錨點用 ≤5 全形字短標欄位 dockFeaturedLabel」
+    ok("URL 套用：鈦度資料集＋U4 樓層 h2＝floorTitles 注入（首例）＋dock 短標", applyProductUrl("https://tw.buy.yahoo.com/search/product?p=鈦杯+鈦餐具") === true &&
+      document.body.classList.contains("campaign-mono-light") &&
+      document.querySelector('[data-fd="0"] .sec-header h2').textContent.includes("「鈦」划算了吧！") &&
+      dockText().includes("鈦度嚴選"));
     clearProductUrl();
     ok("URL 清除：hash 移除 dataset 旗標", !location.hash.includes("dataset:"));
     // 2026-07-19 header 行為＋注意事項欄位化（使用者指示三則＋QA finding 80）
@@ -2748,16 +2786,25 @@ async function runSelfTest(){
     setExp("dock", "after");
     // 渲染數量
     ok("本期活動 4 圓形入口", document.querySelectorAll(".promo-entry").length === 4);
-    ok("主打精選 3 樓層 ×（1 情境卡＋3 商品卡）", document.querySelectorAll(".scene-card").length === 3 && document.querySelectorAll(".featured-row .product-card").length === 9);
+    ok("主打樓層 ×3（1 情境卡＋3 商品卡）", document.querySelectorAll(".scene-card").length === 3 && document.querySelectorAll(".featured-row .product-card").length === 9);
     ok("編輯精選牆 12 卡", document.querySelectorAll("#editor-wall .product-card").length === 12);
-    ok("dock 6 錨點", document.querySelectorAll(".anchor-item").length === 6);
+    ok("dock 6 錨點", document.querySelectorAll(".anchor-item").length === 6); /* U6 不動 dock：錨點數維持 6 */
+    // 2026-07-20 使用者七點裁決新增斷言（U1/U6/U7）
+    ok("U6 看更多移除：#promo-more 不存在（主打樓層 3＋品類牆 2＝5 處看更多保留）", !document.getElementById("promo-more") &&
+      document.querySelectorAll(".sec-header .more").length === 5);
+    const noDupUrl = arr => new Set(arr.map(e => e.url)).size === arr.length;
+    ok("U1 零重複（Blocking 0 容忍）：五資料集本期活動入口 URL 皆互異", noDupUrl(promoEntries) &&
+      noDupUrl(CAMP_ENTRIES) && noDupUrl(KB_ENTRIES) && noDupUrl(FA_ENTRIES) && noDupUrl(TI_ENTRIES));
+    ok("U7 眉標欄位：kvContent.eyebrowCnMobile 預設 auto（C9 🎚 欄）", kvContent.eyebrowCnMobile === "auto" &&
+      DEFAULT_STATE.kvContent.eyebrowCnMobile === "auto");
+    ok("U7 降級函式：fitKvEyebrow 存在（僅 mobile 生效；desktop 早退）", typeof fitKvEyebrow === "function");
     // 資料鐵律抽查
-    ok("actid 765064 存在且未改寫", document.body.innerHTML.includes("actid=765064"));
+    ok("actid 773133 存在且未改寫", document.body.innerHTML.includes("actid=773133")); /* 2026-07-20 重策展（U3）：舊錨點已 404 下線 → 新錨點＝樓層1 真值 actid（promoDeals[1]，featuredDealSections[0] 引用） */
     ok("價格 NT$4,917 未改寫", document.body.innerHTML.includes("NT$4,917"));
     // 模組主圖欄位機制（Theme-img-1 素材包 override）
     ok("KV 大圓已套用主圖 override", document.getElementById("kv-img-main").src === themeImages.kv.main.override); /* 2026-07-16：override 改指定商品第一張 */
     ok("本期活動入口已套用 override（4/4）", [...document.querySelectorAll(".promo-entry img")].filter(i => i.src.includes("sec-promodeal-img")).length === 4);
-    ok("主打精選僅情境卡套用 override（3 情境卡、商品卡 0）",
+    ok("主打樓層僅情境卡套用 override（3 情境卡、商品卡 0）",
       [...document.querySelectorAll(".scene-card img")].filter(i => i.src.includes("sec-featureddeal-img")).length === 3 &&
       [...document.querySelectorAll(".featured-row .product-card img")].every(i => i.src.includes("img.yec.tw")));
   } catch (e) { out.push("ERROR " + e.message); }
@@ -2787,8 +2834,9 @@ if (themeImages.background.editorTile) {
 renderKvContent(); renderPromoEntries(); renderFeatured(); renderEditorTopic(); renderCategories(); renderExplore(); renderLegacyCutouts(); renderDock();
 document.getElementById("notice-text").textContent = noticeText; // 首次渲染（boot 不走 rerenderData）
 snapshotDefaults(); // URL 清除的還原基準（含主圖 override 後的最終預設）
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitKvTitles(); fitLegacyLock(); playKvFlip(); }); // 字型就緒後重算縮字（新版＋舊版鎖陣）＋首播掀牌；此時 hash 的 kv:new|legacy 已套用
-if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", () => { fitKvTitles(); fitLegacyLock(); }); // CP-05 v3：Mochiy 等字型晚於 fonts.ready 載完時再重算（修「有時候正常有時候重疊」的字型競態；冪等、不重播掀牌）
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitKvTitles(); fitLegacyLock(); fitKvEyebrow(); playKvFlip(); }); // 字型就緒後重算縮字（新版＋舊版鎖陣）＋眉標降級量測（U7）＋首播掀牌；此時 hash 的 kv:new|legacy 已套用
+if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", () => { fitKvTitles(); fitLegacyLock(); fitKvEyebrow(); }); // CP-05 v3：Mochiy 等字型晚於 fonts.ready 載完時再重算（修「有時候正常有時候重疊」的字型競態；冪等、不重播掀牌）
+window.addEventListener("resize", fitKvEyebrow, { passive:true }); // U7 2026-07-20：視窗尺寸變動重量測（裝置切換＝?device= iframe 重載，走 INIT 首渲染路徑；desktop 呼叫＝早退零影響）
 const flags = parseHash();
 { // 2026-07-19 QA finding 80：手機同分頁點分享連結只換 hash＝same-document navigation 不重載→dataset/theme 增設 ?query 入口通道（不同 query 必整頁重載）。hash 與 query 並存時 hash 優先（hash＝頁內即時持久化狀態、query＝入口捷徑；dpSrc 已剝 query 防 stale 打架）
   const qs = new URLSearchParams(location.search);
