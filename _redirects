@@ -1,0 +1,4 @@
+# 2026-07-21 使用者裁決：AI 活動頁專案 canonical＝ai-auto-activity-page.netlify.app（唯一線上版本、舊版部署移除）
+# 舊分享連結 301 轉新站（新站自帶 basic auth 防護；本站 middleware 同日退場）
+/lecreuset-frametest/*  https://ai-auto-activity-page.netlify.app/lecreuset-frametest/:splat  301
+/project-calendar/*     https://ai-auto-activity-page.netlify.app/project-calendar/:splat     301
