@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>視覺化編輯後台：工作流程圖說（U26 提案）</title>
+  <style>
+    :root {
+      --ink: #20242a;
+      --muted: #667085;
+      --line: #d8dee8;
+      --soft: #f5f7fb;
+      --paper: #ffffff;
+      --teal: #1f9d8a;
+      --blue: #2f6fed;
+      --amber: #d89017;
+      --coral: #df5f55;
+      --violet: #6b5dd3;
+      --green: #4c956c;
+      --shadow: 0 18px 50px rgba(32, 36, 42, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        linear-gradient(rgba(216, 222, 232, 0.34) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(216, 222, 232, 0.34) 1px, transparent 1px),
+        #f8fafc;
+      background-size: 28px 28px;
+      letter-spacing: 0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    /* ---------- hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 42px;
+      align-items: center;
+      padding: 36px 0 20px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--teal);
+      font-size: 14px;
+      font-weight: 750;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 16px 0 0 var(--amber), 32px 0 0 var(--coral);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(36px, 5.4vw, 64px);
+      line-height: 1.06;
+    }
+
+    .hero p {
+      max-width: 760px;
+      color: #48515f;
+      font-size: 18px;
+      line-height: 1.75;
+      margin: 22px 0 0;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 18px;
+      border: 1px solid #ecd3a3;
+      background: #fdf3e2;
+      color: #9c6a0f;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .hero-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .panel-title { margin: 0 0 16px; font-size: 17px; font-weight: 850; }
+
+    .quick-nav { display: grid; gap: 10px; }
+
+    .quick-nav a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 46px;
+      padding: 10px 12px;
+      border: 1px solid #e4e9f1;
+      border-radius: 8px;
+      background: #fbfcfe;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .quick-nav span { color: var(--muted); font-size: 12px; font-weight: 700; }
+
+    /* ---------- sticky section nav ---------- */
+    .topnav {
+      position: sticky;
+      top: 10px;
+      z-index: 60;
+      display: flex;
+      gap: 6px;
+      width: max-content;
+      max-width: 100%;
+      overflow-x: auto;
+      margin: 6px auto 0;
+      padding: 7px;
+      background: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: 0 10px 26px rgba(32, 36, 42, 0.08);
+    }
+
+    .topnav a {
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 800;
+      color: #48515f;
+      border-radius: 999px;
+      padding: 7px 14px;
+    }
+
+    .topnav a.on { background: var(--ink); color: #fff; }
+
+    /* ---------- section frame ---------- */
+    section { margin-top: 46px; scroll-margin-top: 78px; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    h2 { margin: 0; font-size: 30px; line-height: 1.25; }
+
+    .section-head p { color: var(--muted); margin: 0; max-width: 520px; line-height: 1.65; }
+
+    .band {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(32, 36, 42, 0.06);
+    }
+
+    /* ---------- section 1: stats + swimlanes ---------- */
+    .stats {
+      display: grid;
+      grid-template-columns: 0.8fr 0.8fr 1.4fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 30px rgba(32, 36, 42, 0.06);
+    }
+
+    .stat .num { font-size: 36px; font-weight: 900; line-height: 1.1; }
+    .stat.now .num { color: var(--coral); }
+    .stat.next .num { color: var(--teal); }
+    .stat .cap { display: block; font-size: 12px; font-weight: 850; color: var(--muted); margin-bottom: 6px; }
+    .stat p { margin: 8px 0 0; font-size: 13px; color: #48515f; line-height: 1.6; }
+    .stat.delta { border-left: 5px solid var(--teal); }
+    .stat.delta .num { font-size: 24px; color: var(--ink); }
+
+    .flow-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 850;
+      margin: 4px 0 12px;
+    }
+
+    .flow-title .count {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
+      padding: 4px 11px;
+    }
+
+    .flow-title.now .count { background: var(--coral); }
+    .flow-title.next .count { background: var(--teal); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .lg {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 750;
+      color: #48515f;
+      border: 1px solid #e4e9f1;
+      background: #fbfcfe;
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+
+    .lg i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+    .lg.editor i { background: var(--teal); }
+    .lg.reviewer i { background: var(--violet); }
+    .lg.system i { background: var(--blue); }
+    .lg.pain i { background: var(--coral); border-radius: 50%; }
+    .lg.gain i { background: var(--green); border-radius: 50%; }
+
+    .swim-wrap { overflow-x: auto; padding-bottom: 8px; }
+
+    .swim {
+      display: grid;
+      gap: 8px;
+      align-items: stretch;
+      min-width: 980px;
+    }
+
+    .swim.now { grid-template-columns: 84px repeat(9, 1fr); }
+    .swim.next { grid-template-columns: 84px repeat(6, 1fr); }
+
+    .swim-role {
+      grid-column: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 850;
+      padding: 8px 4px;
+      min-height: 90px;
+    }
+
+    .swim-role.editor { background: var(--teal); }
+    .swim-role.reviewer { background: var(--violet); }
+    .swim-role.system { background: var(--blue); }
+
+    .swim-cell {
+      position: relative;
+      border: 1px solid #dfe5ee;
+      border-top-width: 3px;
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 10px 12px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #667085;
+      min-height: 90px;
+    }
+
+    .swim-cell.editor { border-top-color: var(--teal); }
+    .swim-cell.reviewer { border-top-color: var(--violet); }
+    .swim-cell.system { border-top-color: var(--blue); }
+
+    .swim-cell strong { display: block; color: var(--ink); font-size: 13px; margin: 6px 0 3px; line-height: 1.4; }
+
+    .swim-num {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .swim-cell.editor .swim-num { background: var(--teal); }
+    .swim-cell.reviewer .swim-num { background: var(--violet); }
+    .swim-cell.system .swim-num { background: var(--blue); }
+
+    .swim-cell:not(.noarr)::after {
+      content: ">";
+      position: absolute;
+      top: 50%;
+      right: -9px;
+      width: 18px;
+      height: 18px;
+      transform: translateY(-50%);
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      z-index: 2;
+    }
+
+    .swim-ghost {
+      border: 1px dashed #cfd6e2;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      min-height: 90px;
+    }
+
+    .flag {
+      display: inline-flex;
+      align-items: center;
+      width: max-content;
+      max-width: 100%;
+      margin-top: 7px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .flag.pain { background: #fdeceb; color: #b3392f; border: 1px solid #f3c4c0; }
+    .flag.gain { background: #e9f5ee; color: #2f6c4f; border: 1px solid #cae5d5; }
+
+    .flow-sep { border-top: 1px dashed var(--line); margin: 22px 0; }
+
+    .flow-note { margin: 12px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+
+    /* ---------- section 2: L1/L2/L3 mockups ---------- */
+    .viz-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+    .viz {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 30px rgba(32, 36, 42, 0.06);
+    }
+
+    .viz .lvl {
+      display: inline-flex;
+      align-items: center;
+      width: max-content;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
+      padding: 4px 11px;
+      margin-bottom: 10px;
+    }
+
+    .viz.l1 .lvl { background: var(--teal); }
+    .viz.l2 .lvl { background: var(--blue); }
+    .viz.l3 .lvl { background: var(--violet); }
+
+    .viz h3 { margin: 0 0 6px; font-size: 18px; line-height: 1.35; }
+    .viz > p { margin: 0 0 6px; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+
+    .mock {
+      border: 1px solid #dfe5ee;
+      border-radius: 8px;
+      background: #f2f5fa;
+      overflow: hidden;
+      margin: 10px 0 12px;
+    }
+
+    .mock-bar {
+      display: flex;
+      align-items: center;
+      background: #e6ebf3;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 750;
+      color: var(--muted);
+    }
+
+    .mock-bar::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--coral);
+      box-shadow: 13px 0 0 var(--amber), 26px 0 0 var(--green);
+    }
+
+    .mock-bar span { margin-left: 38px; }
+
+    .m-form { padding: 10px; display: grid; gap: 8px; }
+
+    .m-group { background: #fff; border: 1px solid #e2e7f0; border-radius: 6px; padding: 8px 9px; }
+
+    .m-gh {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 850;
+      color: var(--ink);
+    }
+
+    .m-gh em { font-style: normal; font-size: 10px; color: var(--muted); font-weight: 700; }
+
+    .m-row {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 6px;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 10.5px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .m-input { height: 18px; border: 1px solid #d8dee8; border-radius: 4px; background: #fbfcfe; position: relative; }
+
+    .m-input.filled::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 6px;
+      height: 5px;
+      width: 68%;
+      background: #c7d2e2;
+      border-radius: 3px;
+    }
+
+    .m-select {
+      height: 18px;
+      border: 1px solid #d8dee8;
+      border-radius: 4px;
+      background: #fbfcfe;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      font-size: 9.5px;
+      color: #48515f;
+      font-weight: 750;
+    }
+
+    .m-thumb { display: flex; gap: 6px; align-items: center; font-size: 9.5px; color: #48515f; }
+    .m-thumb i { width: 28px; height: 18px; border-radius: 3px; background: linear-gradient(135deg, var(--teal), var(--blue)); flex: none; }
+
+    .m-swatches { display: flex; gap: 5px; align-items: center; }
+    .m-swatches i { width: 14px; height: 14px; border-radius: 3px; }
+    .m-swatches i.on { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+    .m-row.editing .m-input { border-color: var(--teal); box-shadow: 0 0 0 2px rgba(31, 157, 138, 0.25); }
+
+    .m-split {
+      display: grid;
+      grid-template-columns: 1fr 36px 1.15fr;
+      gap: 0;
+      padding: 10px;
+      align-items: stretch;
+    }
+
+    .m-pane { background: #fff; border: 1px solid #e2e7f0; border-radius: 6px; padding: 8px 9px; }
+
+    .m-pane .m-ph { font-size: 10px; font-weight: 850; color: var(--ink); margin-bottom: 6px; }
+
+    .m-mid {
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 850;
+      color: var(--teal);
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .pv-kv {
+      height: 36px;
+      border-radius: 4px;
+      background: linear-gradient(120deg, var(--teal), var(--blue));
+      margin-bottom: 6px;
+    }
+
+    .pv-kv.glow { box-shadow: 0 0 0 2px var(--teal), 0 0 0 5px rgba(31, 157, 138, 0.18); }
+
+    .pv-floor { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 5px; }
+    .pv-floor i { height: 22px; background: #e8edf5; border-radius: 3px; }
+
+    .mock-foot {
+      padding: 7px 10px;
+      background: #eef7f4;
+      color: #1f7d6e;
+      font-size: 10.5px;
+      font-weight: 800;
+      border-top: 1px dashed #bfe0d8;
+    }
+
+    .m-visual { display: grid; grid-template-columns: 1.35fr 1fr; gap: 8px; padding: 10px; }
+
+    .pv-mod { height: 26px; border-radius: 4px; background: #e8edf5; margin-bottom: 7px; position: relative; }
+
+    .pv-mod.picked { background: #f6f4fd; border: 2px dashed var(--violet); }
+
+    .pv-tag {
+      position: absolute;
+      top: -9px;
+      left: 6px;
+      background: var(--violet);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 850;
+      border-radius: 999px;
+      padding: 1px 7px;
+      white-space: nowrap;
+    }
+
+    .pv-cursor {
+      position: absolute;
+      right: 10px;
+      bottom: -6px;
+      font-size: 13px;
+      color: var(--ink);
+      transform: rotate(-12deg);
+    }
+
+    .side-row {
+      border: 1px solid #e2e7f0;
+      border-radius: 4px;
+      background: #fbfcfe;
+      padding: 4px 6px;
+      font-size: 9.5px;
+      font-weight: 750;
+      color: #48515f;
+      margin-top: 5px;
+    }
+
+    .side-row.hot { border-color: var(--violet); box-shadow: 0 0 0 2px rgba(107, 93, 211, 0.2); }
+
+    .deps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 10px; }
+
+    .dep {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1px solid;
+      line-height: 1.5;
+    }
+
+    .dep.pre { background: #fdf3e2; color: #9c6a0f; border-color: #ecd3a3; }
+    .dep.map { background: #efecfb; color: #4f43ad; border-color: #d5cff2; }
+    .dep.ok { background: #e9f5ee; color: #2f6c4f; border-color: #cae5d5; }
+    .dep.warn { background: #fdeceb; color: #b3392f; border-color: #f3c4c0; }
+
+    /* ---------- section 3: architecture ---------- */
+    .arch-wrap { overflow-x: auto; padding-bottom: 6px; }
+    .arch-wrap svg { display: block; width: 100%; min-width: 920px; height: auto; }
+
+    .ironrule {
+      margin-top: 18px;
+      background: var(--ink);
+      color: #fff;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.65;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ironrule::before {
+      content: "!";
+      flex: none;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--amber);
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .callout {
+      margin-top: 12px;
+      border-left: 5px solid var(--teal);
+      background: #f0faf7;
+      padding: 16px 18px;
+      border-radius: 8px;
+      line-height: 1.7;
+      color: #355c55;
+      font-weight: 650;
+      font-size: 14px;
+    }
+
+    /* ---------- section 4: timeline ---------- */
+    .timeline {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      padding-top: 38px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 4%;
+      right: 4%;
+      height: 3px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--teal), var(--blue), var(--amber), var(--coral), var(--violet));
+    }
+
+    .phase {
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 30px rgba(32, 36, 42, 0.06);
+    }
+
+    .phase::before {
+      content: "";
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px #f8fafc;
+    }
+
+    .phase:nth-child(1)::before { background: var(--teal); }
+    .phase:nth-child(2)::before { background: var(--blue); }
+    .phase:nth-child(3)::before { background: var(--amber); }
+    .phase:nth-child(4)::before { background: var(--coral); }
+    .phase:nth-child(5)::before { background: var(--violet); }
+
+    .ph-chip {
+      display: inline-flex;
+      width: max-content;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
+      padding: 4px 11px;
+      margin-bottom: 10px;
+    }
+
+    .phase:nth-child(1) .ph-chip { background: var(--teal); }
+    .phase:nth-child(2) .ph-chip { background: var(--blue); }
+    .phase:nth-child(3) .ph-chip { background: var(--amber); }
+    .phase:nth-child(4) .ph-chip { background: var(--coral); }
+    .phase:nth-child(5) .ph-chip { background: var(--violet); }
+
+    .phase h3 { margin: 0 0 8px; font-size: 16.5px; line-height: 1.4; }
+
+    .phase ul {
+      padding-left: 17px;
+      margin: 0;
+      color: #48515f;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .phase ul li + li { margin-top: 4px; }
+
+    .accept {
+      margin-top: 12px;
+      border-top: 1px dashed var(--line);
+      padding-top: 9px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .accept b { color: var(--ink); }
+
+    .phase .deps { padding-top: 9px; }
+
+    /* ---------- footer ---------- */
+    .footer {
+      margin-top: 46px;
+      padding: 22px 0 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .footer b { color: var(--ink); }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat.delta { grid-column: 1 / -1; }
+      .viz-grid { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: 1fr 1fr; padding-top: 0; }
+      .timeline::before, .phase::before { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .page { width: min(100% - 24px, 1180px); }
+      .hero { padding-top: 16px; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 10px; }
+      .stats { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: 1fr; }
+      .band { padding: 16px; }
+      h2 { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Visual Editing Backoffice · 方案 A 圖說</div>
+        <h1>視覺化編輯後台：工作流程圖說</h1>
+        <p>
+          U26 裁決：MVP 維持 Sheets 入口不動；「方案 A：Headless CMS 自架（Directus／Strapi）」作為視覺化管理介面的建置待辦正式立案。本頁以四張圖說明：流程差在哪裡、三層視覺化各長什麼樣、系統接在哪個位置、以及 Phase 0～4 怎麼分階段建置。
+        </p>
+        <div class="status-chip">狀態：提案待審 · 2026-07-20 · 裁決 U26</div>
+      </div>
+      <aside class="hero-panel">
+        <h2 class="panel-title">快速瀏覽</h2>
+        <nav class="quick-nav">
+          <a href="#s1">現況 vs 未來 泳道對比 <span>9 步 → 6 步</span></a>
+          <a href="#s2">三層視覺化能力 <span>L1 / L2 / L3</span></a>
+          <a href="#s3">系統架構位置 <span>gate 不動</span></a>
+          <a href="#s4">建置時間軸 <span>Phase 0～4</span></a>
+        </nav>
+      </aside>
+    </header>
+
+    <nav class="topnav" id="topnav">
+      <a href="#s1" class="on">1 泳道對比</a>
+      <a href="#s2">2 三層能力</a>
+      <a href="#s3">3 架構圖</a>
+      <a href="#s4">4 時間軸</a>
+    </nav>
+
+    <!-- ================= 1. 現況 vs 未來 泳道對比 ================= -->
+    <section id="s1">
+      <div class="section-head">
+        <h2>1｜現況 vs 未來：三泳道流程對比</h2>
+        <p>同一件事「改一個活動欄位並看到結果」，現況要走 9 步且跑完整條管線才第一次看到頁面；CMS 表單入口讓「看到」提前到第 3 步。</p>
+      </div>
+
+      <div class="stats">
+        <div class="stat now">
+          <span class="cap">現況：Sheets 入口</span>
+          <span class="num">9 步</span>
+          <p>改後看不到，要等建置部署完成（第 9 步）才第一次看到頁面。</p>
+        </div>
+        <div class="stat next">
+          <span class="cap">未來：CMS 表單入口</span>
+          <span class="num">6 步</span>
+          <p>第 3 步 Live Preview 即看，送審與上線閘門照舊。</p>
+        </div>
+        <div class="stat delta">
+          <span class="cap">差異重點</span>
+          <span class="num">省 3 步，「看到頁面」從第 9 步提前到第 3 步</span>
+          <p>欄位對照從「翻 P0 文件逐欄比對」變成「表單分組直接呈現」；審核從「比對 xlsx 原檔」變成「CMS workflow 差異可視」。</p>
+        </div>
+      </div>
+
+      <div class="band">
+        <div class="legend">
+          <span class="lg editor"><i></i>編輯者</span>
+          <span class="lg reviewer"><i></i>審核者</span>
+          <span class="lg system"><i></i>系統</span>
+          <span class="lg pain"><i></i>痛點</span>
+          <span class="lg gain"><i></i>改善</span>
+        </div>
+
+        <div class="flow-title now">現況：Sheets 流程（U26 裁決維持之 MVP 版本）<span class="count">9 步</span></div>
+        <div class="swim-wrap">
+          <div class="swim now">
+            <div class="swim-role editor" style="grid-row: 1;">編輯者</div>
+            <div class="swim-role reviewer" style="grid-row: 2;">審核者</div>
+            <div class="swim-role system" style="grid-row: 3;">系統</div>
+
+            <div class="swim-cell editor" style="grid-column: 2; grid-row: 1;">
+              <span class="swim-num">1</span>
+              <strong>開 Sheets</strong>
+              整份試算表攤平呈現。
+            </div>
+            <div class="swim-cell editor" style="grid-column: 3; grid-row: 1;">
+              <span class="swim-num">2</span>
+              <strong>對照 P0 找欄位</strong>
+              翻文件逐欄比對定位。
+              <span class="flag pain">痛點：欄位對照難</span>
+            </div>
+            <div class="swim-cell editor" style="grid-column: 4; grid-row: 1;">
+              <span class="swim-num">3</span>
+              <strong>改值</strong>
+              純文字格子，無縮圖無色票。
+              <span class="flag pain">痛點：改後看不到</span>
+            </div>
+            <div class="swim-cell editor" style="grid-column: 5; grid-row: 1;">
+              <span class="swim-num">4</span>
+              <strong>下載 xlsx</strong>
+              匯出交付管線。
+            </div>
+            <div class="swim-ghost" style="grid-column: 6 / span 4; grid-row: 2;">
+              <span><b>審核者無固定介入點</b>：只能人工比對 xlsx 原檔與部署後截圖。</span>
+              <span class="flag pain" style="margin-top: 0;">痛點：逐欄比對費時、無視覺對照</span>
+            </div>
+            <div class="swim-cell system" style="grid-column: 6; grid-row: 3;">
+              <span class="swim-num">5</span>
+              <strong>跑管線</strong>
+              xlsx 匯入 → snapshot／draft。
+            </div>
+            <div class="swim-cell system" style="grid-column: 7; grid-row: 3;">
+              <span class="swim-num">6</span>
+              <strong>gate 30 規則</strong>
+              機器閘檢核。
+            </div>
+            <div class="swim-cell system" style="grid-column: 8; grid-row: 3;">
+              <span class="swim-num">7</span>
+              <strong>建置</strong>
+              產出頁面。
+            </div>
+            <div class="swim-cell system" style="grid-column: 9; grid-row: 3;">
+              <span class="swim-num">8</span>
+              <strong>部署</strong>
+              CF Pages。
+            </div>
+            <div class="swim-cell editor noarr" style="grid-column: 10; grid-row: 1;">
+              <span class="swim-num">9</span>
+              <strong>看結果</strong>
+              到這裡才第一次看到頁面。
+              <span class="flag pain">痛點：回饋迴圈太長</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-sep"></div>
+
+        <div class="flow-title next">未來：CMS 表單流程（方案 A 建置後）<span class="count">6 步</span></div>
+        <div class="swim-wrap">
+          <div class="swim next">
+            <div class="swim-role editor" style="grid-row: 1;">編輯者</div>
+            <div class="swim-role reviewer" style="grid-row: 2;">審核者</div>
+            <div class="swim-role system" style="grid-row: 3;">系統</div>
+
+            <div class="swim-cell editor" style="grid-column: 2; grid-row: 1;">
+              <span class="swim-num">1</span>
+              <strong>開 CMS 表單</strong>
+              KV 區／本期活動區／樓層區分組呈現。
+              <span class="flag gain">改善：不用翻 P0 對照</span>
+            </div>
+            <div class="swim-cell editor" style="grid-column: 3; grid-row: 1;">
+              <span class="swim-num">2</span>
+              <strong>改欄位</strong>
+              縮圖、下拉、色票、欄位級權限。
+              <span class="flag gain">改善：所見即所改</span>
+            </div>
+            <div class="swim-cell editor" style="grid-column: 4; grid-row: 1;">
+              <span class="swim-num">3</span>
+              <strong>Live Preview 即看</strong>
+              左改右看（?draftUrl= 預覽頁）。
+              <span class="flag gain">改善：第 3 步就看到頁面</span>
+            </div>
+            <div class="swim-cell reviewer" style="grid-column: 5; grid-row: 2;">
+              <span class="swim-num">4</span>
+              <strong>送審</strong>
+              CMS workflow，差異一目了然。
+              <span class="flag gain">改善：審核可視化</span>
+            </div>
+            <div class="swim-cell system" style="grid-column: 6; grid-row: 3;">
+              <span class="swim-num">5</span>
+              <strong>gate 30 規則</strong>
+              機器閘不動，仍是唯一上線關卡。
+            </div>
+            <div class="swim-cell system noarr" style="grid-column: 7; grid-row: 3;">
+              <span class="swim-num">6</span>
+              <strong>export 建置部署</strong>
+              產物與部署方式與現況相同。
+            </div>
+          </div>
+        </div>
+
+        <p class="flow-note">泳道圖在窄螢幕可左右滑動。兩條流程的 gate（30 規則）與建置部署完全相同——改變的只有「編輯入口」與「看見結果的時間點」。</p>
+      </div>
+    </section>
+
+    <!-- ================= 2. 三層視覺化能力 ================= -->
+    <section id="s2">
+      <div class="section-head">
+        <h2>2｜三層視覺化能力圖解</h2>
+        <p>L1 開箱即用、L2 需要預覽端點、L3 需要頁面埋點。每層的前置依賴都已對應到既有工項（N-13、field-map）。</p>
+      </div>
+
+      <div class="viz-grid">
+        <!-- L1 -->
+        <article class="viz l1">
+          <span class="lvl">L1 開箱即用</span>
+          <h3>視覺化表單後台</h3>
+          <p>欄位分組區塊、圖片縮圖、枚舉下拉、色票選擇器、媒體庫；欄位級權限 🔒✍️🎚 三級制可「真鎖」——Sheets 做不到。</p>
+          <div class="mock">
+            <div class="mock-bar"><span>CMS 表單後台（示意）</span></div>
+            <div class="m-form">
+              <div class="m-group">
+                <div class="m-gh">KV 區 <em>✍️ 可編修</em></div>
+                <div class="m-row"><span>主標文案 ✍️</span><span class="m-input filled"></span></div>
+                <div class="m-row"><span>主色 🎚</span>
+                  <span class="m-swatches"><i style="background:#1f9d8a;" class="on"></i><i style="background:#2f6fed;"></i><i style="background:#df5f55;"></i><i style="background:#d89017;"></i></span>
+                </div>
+              </div>
+              <div class="m-group">
+                <div class="m-gh">本期活動區 <em>🔒 部分鎖定</em></div>
+                <div class="m-row"><span>版型 🔒</span><span class="m-select">hero-3（鎖定）<b>▾</b></span></div>
+                <div class="m-row"><span>KV 圖 ✍️</span><span class="m-thumb"><i></i>kv_titanium.png</span></div>
+              </div>
+              <div class="m-group">
+                <div class="m-gh">樓層區 <em>✍️ 可編修</em></div>
+                <div class="m-row"><span>樓層標題 ✍️</span><span class="m-input filled"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="deps">
+            <span class="dep ok">開箱即用，無前置</span>
+            <span class="dep ok">權限 🔒✍️🎚 可真鎖</span>
+          </div>
+        </article>
+
+        <!-- L2 -->
+        <article class="viz l2">
+          <span class="lvl">L2 需預覽端點</span>
+          <h3>並排即時預覽</h3>
+          <p>左改欄位、右即看頁面。Directus Live Preview／Strapi Preview 內建，但預覽端點要自己供應＝13 號 §13（U24）Stage A+ 的 ?draftUrl= 預覽頁。</p>
+          <div class="mock">
+            <div class="mock-bar"><span>Live Preview（示意）</span></div>
+            <div class="m-split">
+              <div class="m-pane">
+                <div class="m-ph">表單</div>
+                <div class="m-row"><span>主標</span><span class="m-input filled"></span></div>
+                <div class="m-row editing"><span>KV 圖</span><span class="m-input filled"></span></div>
+                <div class="m-row"><span>樓層 1</span><span class="m-input filled"></span></div>
+              </div>
+              <div class="m-mid">改<br>→<br>看</div>
+              <div class="m-pane">
+                <div class="m-ph">預覽頁</div>
+                <div class="pv-kv glow"></div>
+                <div class="pv-floor"><i></i><i></i><i></i></div>
+                <div class="pv-floor"><i></i><i></i><i></i></div>
+              </div>
+            </div>
+            <div class="mock-foot">預覽端點：FrameTest ?draftUrl=（自行供應）</div>
+          </div>
+          <div class="deps">
+            <span class="dep pre">前置：N-13 loader（?draftUrl=）</span>
+            <span class="dep ok">Directus／Strapi 內建</span>
+          </div>
+        </article>
+
+        <!-- L3 -->
+        <article class="viz l3">
+          <span class="lvl">L3 需頁面埋點</span>
+          <h3>點頁面直接編輯</h3>
+          <p>Directus Visual Editing（較新版本）：在真實頁面點模組 → 側欄開啟對應欄位。需頁面埋「元素↔欄位」映射標記——U25 欄位視覺對照頁（field-map）的模組↔欄位映射就是埋點地基。</p>
+          <div class="mock">
+            <div class="mock-bar"><span>Visual Editing（示意）</span></div>
+            <div class="m-visual">
+              <div class="m-pane">
+                <div class="m-ph">真實頁面</div>
+                <div class="pv-mod" style="background: linear-gradient(120deg, #1f9d8a, #2f6fed);"></div>
+                <div class="pv-mod picked">
+                  <span class="pv-tag">本期活動模組</span>
+                  <span class="pv-cursor">➤</span>
+                </div>
+                <div class="pv-mod"></div>
+              </div>
+              <div class="m-pane">
+                <div class="m-ph">側欄編輯</div>
+                <div class="side-row hot">標題文案</div>
+                <div class="side-row hot">商品清單</div>
+                <div class="side-row">背景色 🎚</div>
+              </div>
+            </div>
+            <div class="mock-foot">頁面元素需帶 field-map 映射標記（data-field）</div>
+          </div>
+          <div class="deps">
+            <span class="dep pre">前置：N-13 loader</span>
+            <span class="dep map">埋點：field-map 模組↔欄位映射（U25）</span>
+            <span class="dep warn">僅 Directus（Strapi 無此層）</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= 3. 架構圖 ================= -->
+    <section id="s3">
+      <div class="section-head">
+        <h2>3｜架構圖：CMS 接在哪個位置</h2>
+        <p>CMS 只取代「編輯入口」：資料嚴格內網、經 API 匯出進既有 pipeline，snapshot／draft／gate 30 規則位置不變。</p>
+      </div>
+
+      <div class="band">
+        <div class="arch-wrap">
+          <svg viewBox="0 0 1120 452" role="img" aria-label="視覺化編輯後台架構圖">
+            <defs>
+              <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#20242a"></path>
+              </marker>
+              <marker id="arwTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#1f9d8a"></path>
+              </marker>
+            </defs>
+
+            <!-- 編輯者 -->
+            <circle cx="58" cy="112" r="14" fill="#1f9d8a"></circle>
+            <rect x="36" y="130" width="44" height="26" rx="13" fill="#1f9d8a"></rect>
+            <text x="58" y="180" text-anchor="middle" font-size="14" font-weight="800" fill="#20242a">編輯者</text>
+
+            <!-- 內網框 -->
+            <rect x="120" y="48" width="282" height="244" rx="10" fill="rgba(31,157,138,0.05)" stroke="#1f9d8a" stroke-width="1.6" stroke-dasharray="7 5"></rect>
+            <text x="136" y="74" font-size="13" font-weight="850" fill="#1f9d8a">內網邊界（PF-9／B-i2 前提）</text>
+            <text x="136" y="278" font-size="11" fill="#667085">SaaS 出雲方案不採 · 內網主機 owner＝PF-11</text>
+
+            <!-- CMS box -->
+            <rect x="140" y="92" width="242" height="126" rx="8" fill="#ffffff" stroke="#d8dee8"></rect>
+            <text x="261" y="121" text-anchor="middle" font-size="15" font-weight="850" fill="#20242a">Headless CMS（自架）</text>
+            <text x="261" y="146" text-anchor="middle" font-size="12.5" fill="#667085">表單後台 · 媒體庫</text>
+            <text x="261" y="166" text-anchor="middle" font-size="12.5" fill="#667085">欄位級權限 🔒✍️🎚</text>
+            <text x="261" y="186" text-anchor="middle" font-size="12.5" fill="#667085">Live Preview／Visual Editing</text>
+            <text x="261" y="207" text-anchor="middle" font-size="11" fill="#9aa3b0">Directus 優先 spike（與 Grist PoC 並列評測）</text>
+
+            <!-- 編輯者 -> CMS -->
+            <line x1="88" y1="145" x2="134" y2="145" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+
+            <!-- API box -->
+            <rect x="440" y="112" width="118" height="68" rx="8" fill="#eef3f8" stroke="#d8dee8"></rect>
+            <text x="499" y="141" text-anchor="middle" font-size="14" font-weight="850" fill="#20242a">API 匯出</text>
+            <text x="499" y="162" text-anchor="middle" font-size="11.5" fill="#667085">export-only</text>
+            <text x="499" y="206" text-anchor="middle" font-size="11" font-weight="750" fill="#df5f55">發布權限維持 export-only（至 R-5 裁決）</text>
+
+            <!-- CMS -> API -->
+            <line x1="404" y1="145" x2="434" y2="145" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+
+            <!-- pipeline 框 -->
+            <rect x="596" y="56" width="312" height="204" rx="10" fill="rgba(47,111,237,0.045)" stroke="#2f6fed" stroke-width="1.6" stroke-dasharray="7 5"></rect>
+            <text x="612" y="82" font-size="13" font-weight="850" fill="#2f6fed">pipeline（位置不變）</text>
+
+            <rect x="612" y="112" width="84" height="58" rx="6" fill="#ffffff" stroke="#d8dee8"></rect>
+            <text x="654" y="146" text-anchor="middle" font-size="12.5" font-weight="750" fill="#20242a">snapshot</text>
+
+            <rect x="708" y="112" width="72" height="58" rx="6" fill="#ffffff" stroke="#d8dee8"></rect>
+            <text x="744" y="146" text-anchor="middle" font-size="12.5" font-weight="750" fill="#20242a">draft</text>
+
+            <rect x="792" y="100" width="102" height="82" rx="6" fill="#fdf3e2" stroke="#d89017" stroke-width="2"></rect>
+            <text x="843" y="126" text-anchor="middle" font-size="14" font-weight="900" fill="#20242a">gate</text>
+            <text x="843" y="146" text-anchor="middle" font-size="12" font-weight="750" fill="#20242a">30 規則</text>
+            <text x="843" y="168" text-anchor="middle" font-size="10.5" font-weight="850" fill="#9c6a0f">唯一上線關卡</text>
+
+            <line x1="698" y1="141" x2="704" y2="141" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+            <line x1="782" y1="141" x2="788" y2="141" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+
+            <text x="612" y="242" font-size="11" fill="#667085">snapshot／draft／gate 流程不變，只換資料來源</text>
+
+            <!-- API -> pipeline -->
+            <line x1="558" y1="145" x2="590" y2="145" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+
+            <!-- 建置 -->
+            <rect x="932" y="112" width="76" height="68" rx="8" fill="#ffffff" stroke="#d8dee8"></rect>
+            <text x="970" y="152" text-anchor="middle" font-size="14" font-weight="850" fill="#20242a">建置</text>
+            <line x1="908" y1="145" x2="926" y2="145" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+
+            <!-- CF Pages -->
+            <rect x="1028" y="112" width="86" height="68" rx="8" fill="#20242a"></rect>
+            <text x="1071" y="141" text-anchor="middle" font-size="13" font-weight="850" fill="#ffffff">CF Pages</text>
+            <text x="1071" y="161" text-anchor="middle" font-size="10.5" fill="#c9d1dd">正式上線</text>
+            <line x1="1008" y1="145" x2="1022" y2="145" stroke="#20242a" stroke-width="1.8" marker-end="url(#arw)"></line>
+
+            <!-- 預覽回環 -->
+            <rect x="250" y="342" width="296" height="78" rx="8" fill="#f0faf7" stroke="#1f9d8a" stroke-width="1.6"></rect>
+            <text x="398" y="374" text-anchor="middle" font-size="14" font-weight="850" fill="#1f7d6e">?draftUrl= 預覽頁</text>
+            <text x="398" y="398" text-anchor="middle" font-size="11.5" fill="#3f7d72">FrameTest · 前置＝N-13 loader</text>
+
+            <path d="M300,218 C300,272 336,308 366,336" fill="none" stroke="#1f9d8a" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#arwTeal)"></path>
+            <text x="386" y="320" font-size="11.5" font-weight="750" fill="#1f9d8a">草稿即時預覽</text>
+
+            <path d="M244,381 C120,381 70,262 60,196" fill="none" stroke="#1f9d8a" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#arwTeal)"></path>
+            <text x="96" y="410" font-size="11.5" font-weight="750" fill="#1f9d8a">即看回環（改→看）</text>
+          </svg>
+        </div>
+
+        <div class="ironrule">
+          鐵律｜編輯 ≠ 發布：機器閘（gate 30 規則）是唯一上線關卡——CMS 只到 export，發布通道隔離；資料嚴格內網。
+        </div>
+        <div class="callout">
+          邊界：不做拖拉自由版型。版型受 02 號模板契約管控，是一致性優點而非限制；CMS 只管「欄位內容」，不開放自由排版。
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. 建置時間軸 ================= -->
+    <section id="s4">
+      <div class="section-head">
+        <h2>4｜建置時間軸：Phase 0～4</h2>
+        <p>先解前提（N-13／PF-11），再用約 2 週 spike 取證，裁決後才進建置與治理；每階段都有明確驗收。</p>
+      </div>
+
+      <div class="band">
+        <div class="timeline">
+          <article class="phase">
+            <span class="ph-chip">Phase 0</span>
+            <h3>前提工程</h3>
+            <ul>
+              <li>N-13 loader：?draftUrl= 預覽端點（視覺化路線總前置）</li>
+              <li>PF-11 資安確認：Workspace 邊界／內網主機 IT owner</li>
+            </ul>
+            <div class="deps">
+              <span class="dep pre">既有佇列：N-13</span>
+              <span class="dep pre">既有佇列：PF-11</span>
+            </div>
+            <div class="accept"><b>驗收</b>：預覽端點可用；內網主機與 owner 確定。</div>
+          </article>
+
+          <article class="phase">
+            <span class="ph-chip">Phase 1</span>
+            <h3>Spike（建議 2 週框）</h3>
+            <ul>
+              <li>Directus 內網試裝</li>
+              <li>03 Schema→內容模型映射 PoC（鈦案單案）</li>
+              <li>欄位級權限 🔒✍️🎚 真鎖實測</li>
+              <li>Live Preview 接 FrameTest「改→看」延遲實測</li>
+              <li>Visual Editing 可行性（field-map 埋點）</li>
+              <li>與 B-i2 Grist PoC 並列評測</li>
+            </ul>
+            <div class="accept"><b>驗收</b>：評測表（權限真鎖／gate 前置強制性／運維 owner／成本）。</div>
+          </article>
+
+          <article class="phase">
+            <span class="ph-chip">Phase 2</span>
+            <h3>裁決</h3>
+            <ul>
+              <li>Spike 報告提交</li>
+              <li>裁決收斂會定編輯入口形態：本案 vs Grist vs 維持 Sheets</li>
+            </ul>
+            <div class="accept"><b>驗收</b>：裁決紀錄成案（去向唯一）。</div>
+          </article>
+
+          <article class="phase">
+            <span class="ph-chip">Phase 3</span>
+            <h3>建置（若採納）</h3>
+            <ul>
+              <li>內容模型全遷；03 Schema 雙向同步治理機制</li>
+              <li>pipeline 改讀 CMS API（取代 xlsx 匯入；snapshot／draft／gate 不變）</li>
+              <li>變更單／審核流入 CMS workflow</li>
+              <li>L3 Visual Editing 埋點</li>
+            </ul>
+            <div class="accept"><b>驗收</b>：鈦案 E2E 走測通過；CI schema 比對防漂移。</div>
+          </article>
+
+          <article class="phase">
+            <span class="ph-chip">Phase 4</span>
+            <h3>治理</h3>
+            <ul>
+              <li>發布權限 R-5 裁決落地</li>
+              <li>跨部門培訓與 SOP</li>
+              <li>與 13 號 Stage C 薄工作台路線的取代／併軌決策</li>
+            </ul>
+            <div class="accept"><b>驗收</b>：SOP 發布；R-5 與併軌決策成案。</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <b>狀態：提案待審</b> · 2026-07-20 使用者裁決 U26 立案（維持 Sheets MVP 入口不動；「方案 A：Headless CMS 自架」列為視覺化管理介面建置待辦）。<br>
+      本頁為圖說輔助視圖；<b>單一真相以 15 號規劃文件《15_視覺化編輯後台_HeadlessCMS建置規劃.md》為準</b>，方案比較位於 13 號 Stage B，前置工項見 N-13／PF-11，欄位映射見 U25 field-map。
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      var links = Array.prototype.slice.call(document.querySelectorAll('#topnav a'));
+      var byId = {};
+      links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting && byId[e.target.id]) {
+              links.forEach(function (a) { a.classList.remove('on'); });
+              byId[e.target.id].classList.add('on');
+            }
+          });
+        }, { rootMargin: '-25% 0px -60% 0px' });
+        ['s1', 's2', 's3', 's4'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) io.observe(el);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

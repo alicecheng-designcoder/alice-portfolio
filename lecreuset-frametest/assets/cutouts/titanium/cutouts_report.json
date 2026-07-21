@@ -1,0 +1,107 @@
+{
+  "params": {
+    "BG_TH": 36,
+    "CORE_HI": 90,
+    "FEATHER_R": 3,
+    "PAD_RATIO": 0.04
+  },
+  "generatedAt": "2026-07-20T08:24:25.129Z",
+  "items": [
+    {
+      "gdid": "10689836",
+      "name": "North Field 550ml雙層純鈦杯",
+      "src": "https://img.yec.tw/zp/MerchandiseImages/B755EB9511-SP-14593548.jpg",
+      "file": "/Users/tofu/Documents/Codex/2026.06.15 - 內容自動運營專案( W:Yu-ting )/2026-AI自動化活動頁生成規劃/assets/cutouts/titanium/10689836.png",
+      "srcSize": "1000x1000",
+      "outSize": "777x718",
+      "pad": 29,
+      "bbox": {
+        "x0": 91,
+        "y0": 217,
+        "bw": 719,
+        "bh": 660
+      },
+      "srcBorderWhiteShare": 1,
+      "whiteBgGate": "pass",
+      "bgRemovedRatio": 0.6207,
+      "despeckledPx": 1,
+      "alphaRatio": 0.6745,
+      "featherRatio": 0.0102,
+      "edgeSamples": 2304,
+      "hardEdgeRatio": 0.0056,
+      "whiteHaloRatio": 0
+    },
+    {
+      "gdid": "8121236",
+      "name": "North Field 極輕純鈦杯 650ml",
+      "src": "https://img.yec.tw/zp/MerchandiseImages/451B974B5B-SP-6447356.jpg",
+      "file": "/Users/tofu/Documents/Codex/2026.06.15 - 內容自動運營專案( W:Yu-ting )/2026-AI自動化活動頁生成規劃/assets/cutouts/titanium/8121236.png",
+      "srcSize": "1000x1000",
+      "outSize": "834x684",
+      "pad": 31,
+      "bbox": {
+        "x0": 70,
+        "y0": 210,
+        "bw": 772,
+        "bh": 622
+      },
+      "srcBorderWhiteShare": 1,
+      "whiteBgGate": "pass",
+      "bgRemovedRatio": 0.6008,
+      "despeckledPx": 0,
+      "alphaRatio": 0.6976,
+      "featherRatio": 0.0041,
+      "edgeSamples": 2528,
+      "hardEdgeRatio": 0.1879,
+      "whiteHaloRatio": 0
+    },
+    {
+      "gdid": "11247672",
+      "name": "TiKOBO 純鈦方形空心筷 2入組",
+      "src": "https://img.yec.tw/zp/MerchandiseImages/5157895CD8-SP-17857285.jpg",
+      "file": "/Users/tofu/Documents/Codex/2026.06.15 - 內容自動運營專案( W:Yu-ting )/2026-AI自動化活動頁生成規劃/assets/cutouts/titanium/11247672.png",
+      "srcSize": "1000x1000",
+      "outSize": "778x765",
+      "pad": 29,
+      "bbox": {
+        "x0": 167,
+        "y0": 195,
+        "bw": 720,
+        "bh": 707
+      },
+      "srcBorderWhiteShare": 1,
+      "whiteBgGate": "pass",
+      "bgRemovedRatio": 0.9559,
+      "despeckledPx": 241,
+      "alphaRatio": 0.0535,
+      "featherRatio": 0.0296,
+      "edgeSamples": 7534,
+      "hardEdgeRatio": 0.0268,
+      "whiteHaloRatio": 0
+    },
+    {
+      "gdid": "11992407",
+      "name": "32CM雙面鈦盾不沾炒鍋",
+      "src": "https://img.yec.tw/zp/MerchandiseImages/7ECE397B60-SP-22096412.jpg",
+      "file": "/Users/tofu/Documents/Codex/2026.06.15 - 內容自動運營專案( W:Yu-ting )/2026-AI自動化活動頁生成規劃/assets/cutouts/titanium/11992407.png",
+      "srcSize": "1000x1000",
+      "outSize": "927x825",
+      "pad": 34,
+      "bbox": {
+        "x0": 66,
+        "y0": 117,
+        "bw": 859,
+        "bh": 757
+      },
+      "srcBorderWhiteShare": 1,
+      "whiteBgGate": "pass",
+      "bgRemovedRatio": 0.6143,
+      "despeckledPx": 3,
+      "alphaRatio": 0.503,
+      "featherRatio": 0.0025,
+      "edgeSamples": 2715,
+      "hardEdgeRatio": 0.4214,
+      "whiteHaloRatio": 0
+    }
+  ]
+}

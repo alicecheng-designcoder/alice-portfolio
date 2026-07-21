@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欄位視覺對照｜Google Sheets ↔ 活動頁模組（預覽版）</title>
+<!--
+  ============================================================================
+  欄位視覺對照頁（U25 2026-07-20 使用者需求）——單檔自足 HTML demo（預覽版，非過閘依據）
+  生成日：2026-07-20
+  資料來源（單一真相鏡像）：
+    1. pipeline/write_xlsx.js v6——P1COLS 欄位定義（代號/欄名/權限/下拉枚舉）＋P0 模組堆疊×欄位區對照
+    2. 03_GoogleSheets_Schema_v1.md v1.2——各欄一句話填寫說明摘要
+    3. MVP_Phase1_LeCreuset_活動頁Prototype_FrameTest.html——模組 section id 清單
+  日後同步方式：
+    - write_xlsx.js P1COLS/ENUMS/P0 堆疊表改版時，同步更新下方 <script> 內
+      ENUMS / NOTE_MAP / buildP1Fields() / MODULES（欄位順序與欄名須與 P1COLS 逐字一致，
+      並更新 GEN_META.generatedAt 與 sourceVersion）；規格真相仍在 03 Schema，本頁僅視覺鏡像。
+    - 截圖 fallback 素材過期時：重跑同夾 take-shots.js（需 puppeteer，見該檔頭註）→
+      shots/*.png 與 shots/rects.json 更新；rects 比例若有變，貼回本檔 EMBEDDED_RECTS
+      （部署後 http 環境會自動 fetch shots/rects.json 蓋掉內嵌值，file:// 則吃內嵌值）。
+  ============================================================================
+-->
+<style>
+  :root{
+    --ink:#222; --sub:#666; --line:#e3e0da; --bg:#f7f5f1; --card:#fff;
+    --accent:#0f6b5c; --hot:#ff5c35; --flash:#ffd54d;
+    /* 權限色＝write_xlsx.js FILL 逐字鏡像 */
+    --perm-lock:#D9D9D9; --perm-write:#FFF2CC; --perm-pick:#D0E0F0; --perm-sys:#EAD1DC;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;height:100%}
+  body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
+  header.app{background:#fff;border-bottom:1px solid var(--line);padding:10px 16px 8px;flex:none}
+  header.app h1{margin:0;font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  header.app h1 .pv{font-size:11px;font-weight:600;color:#8a5a00;background:#fff3d6;border:1px solid #e8c97a;border-radius:20px;padding:2px 8px}
+  .posline{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.6}
+  .posline b{color:#444}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .toolbar .grp{display:flex;align-items:center;gap:5px}
+  .toolbar label{font-size:11px;color:var(--sub);white-space:nowrap}
+  .toolbar input[type=text]{font-size:12px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;min-width:150px}
+  #url-input{flex:1;min-width:260px;font-family:ui-monospace,Menlo,monospace}
+  .btn{font-size:12px;padding:5px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;white-space:nowrap}
+  .btn:hover{border-color:#bbb}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+  .seg button{font-size:12px;padding:5px 10px;border:0;background:#fff;cursor:pointer;border-left:1px solid var(--line);white-space:nowrap}
+  .seg button:first-child{border-left:0}
+  .seg button.on{background:var(--accent);color:#fff}
+  #status-bar{font-size:12px;padding:6px 16px;border-bottom:1px solid var(--line);background:#eef4f2;color:#1c4f45;flex:none;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  #status-bar.warn{background:#fff6e8;color:#7a4b00}
+  #status-bar .dot{width:8px;height:8px;border-radius:50%;background:#2e9e7e;flex:none}
+  #status-bar.warn .dot{background:#e09a2f}
+  main{flex:1;display:flex;min-height:0}
+  /* ── 左：檢視區 ── */
+  #viewer{flex:1;min-width:0;position:relative;overflow:auto;background:#dedbd4;padding:14px}
+  #stage{position:relative;margin:0 auto;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+  #stage.desktop{width:1200px}
+  #stage.mobile{width:390px}
+  #frame{display:block;width:100%;border:0;background:#fff}
+  #shot-img{display:block;width:100%}
+  #overlay{position:absolute;inset:0;pointer-events:none;z-index:5}
+  .obox{position:absolute;border:2px solid rgba(15,107,92,.85);background:rgba(15,107,92,.07);border-radius:4px;transition:background .15s,border-color .15s}
+  .obox.hot{border-color:var(--hot);background:rgba(255,92,53,.14);z-index:2}
+  .obox.flash{animation:oflash 1.6s ease}
+  @keyframes oflash{0%,60%{border-color:var(--flash);background:rgba(255,213,77,.32);box-shadow:0 0 0 4px rgba(255,213,77,.5)}100%{}}
+  .obadge{position:absolute;top:0;left:0;transform:translateY(-1px);pointer-events:auto;cursor:pointer;font-size:11px;line-height:1;padding:4px 8px;background:rgba(15,107,92,.92);color:#fff;border-radius:3px 0 6px 0;white-space:nowrap;max-width:96%;overflow:hidden;text-overflow:ellipsis}
+  .obadge b{font-weight:700}
+  .obox.hot .obadge{background:var(--hot)}
+  /* ── 右：欄位面板 ── */
+  #panel{width:400px;flex:none;border-left:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;min-height:0}
+  #panel-head{flex:none;padding:10px 12px 8px;border-bottom:1px solid var(--line);background:#fbfaf7}
+  #panel-head .stats{font-size:11px;color:var(--sub);line-height:1.7}
+  #panel-head .stats b{color:var(--ink)}
+  .legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .legend span{font-size:10.5px;padding:2px 7px;border-radius:4px;border:1px solid rgba(0,0,0,.12)}
+  #field-search{width:100%;margin-top:8px;font-size:12px;padding:6px 9px;border:1px solid var(--line);border-radius:6px}
+  #groups{flex:1;overflow-y:auto;min-height:0;padding:8px 10px 30px}
+  .gcard{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:#fff;overflow:hidden}
+  .gcard.hl{border-color:var(--hot);box-shadow:0 0 0 2px rgba(255,92,53,.25)}
+  .ghead{display:flex;align-items:baseline;gap:6px;padding:8px 10px;background:#f4f2ec;cursor:pointer;user-select:none}
+  .gcard.linked .ghead:hover{background:#ece9e0}
+  .ghead .ord{font-size:10px;color:#fff;background:#8b877d;border-radius:4px;padding:2px 5px;flex:none}
+  .ghead .gtitle{font-size:13px;font-weight:700}
+  .ghead .gbadge{font-size:10.5px;color:var(--accent);font-weight:600;margin-left:auto;white-space:nowrap}
+  .ghead .jump{font-size:10px;color:var(--sub);flex:none}
+  .gnote{font-size:11px;color:var(--sub);padding:6px 10px;border-top:1px dashed var(--line);line-height:1.7}
+  .frow{display:flex;gap:8px;padding:6px 10px;border-top:1px solid #f0eee8;align-items:flex-start}
+  .frow.hl{background:#fff1ec}
+  .frow.dim{display:none}
+  .fcode{flex:none;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid rgba(0,0,0,.14);min-width:44px;text-align:center;font-family:ui-monospace,Menlo,monospace}
+  .fmain{min-width:0;flex:1}
+  .fname{font-size:12px;font-weight:600;line-height:1.4}
+  .fname .pos{font-size:10px;color:#999;font-weight:400;font-family:ui-monospace,Menlo,monospace;margin-left:5px}
+  .fnote{font-size:11px;color:var(--sub);line-height:1.6;margin-top:1px}
+  .fnote .enum{color:#3a6ea5}
+  .frow.proposal{background:#fbf8ff}
+  .frow.proposal .fcode{border-style:dashed}
+  .ptag{font-size:9.5px;color:#6a3fa0;border:1px dashed #b79ad6;border-radius:4px;padding:0 4px;margin-left:5px}
+  .p-lock{background:var(--perm-lock)} .p-write{background:var(--perm-write)} .p-pick{background:var(--perm-pick)} .p-sys{background:var(--perm-sys)}
+  #groups .foot{font-size:10.5px;color:#999;line-height:1.7;padding:10px 4px}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <h1>欄位視覺對照｜Google Sheets ↔ 活動頁模組 <span class="pv">預覽版・非過閘依據</span></h1>
+  <div class="posline">
+    <b>本頁定位：</b>欄位視覺對照＝P0 資訊架構分頁的視覺版（所見即所得）——左邊看活動頁模組、右邊看對應 Google Sheets 欄位；
+    <b>規格真相仍在 03_GoogleSheets_Schema_v1.md</b>，欄位定義鏡像自 write_xlsx.js P1COLS（生成日 2026-07-20）。
+    「預覽版」語彙紀律：本頁一切標註與欄位置皆為示意，<b>不作為建置過閘依據</b>。
+  </div>
+  <div class="toolbar">
+    <div class="grp" style="flex:1;min-width:300px">
+      <label>活動頁網址</label>
+      <input id="url-input" type="text" spellcheck="false">
+      <button class="btn" id="preset-online" title="部署後同源相對路徑（可即時標註）">預設：線上同源</button>
+      <button class="btn" id="preset-local" title="本機相對路徑（file:// 受瀏覽器安全限制，多半無法同源標註）">預設：本機檔案</button>
+      <button class="btn primary" id="btn-load">載入</button>
+    </div>
+    <div class="grp"><label>模式</label>
+      <div class="seg" id="seg-mode">
+        <button data-mode="iframe">iframe</button>
+        <button data-mode="shots">截圖</button>
+      </div>
+    </div>
+    <div class="grp"><label>資料集</label>
+      <div class="seg" id="seg-dataset">
+        <button data-ds="lecreuset">LC</button><button data-ds="camping">露營</button><button data-ds="keyboard">鍵盤</button><button data-ds="fashion">女裝</button><button data-ds="titanium">鈦</button>
+      </div>
+    </div>
+    <div class="grp"><label>裝置</label>
+      <div class="seg" id="seg-device">
+        <button data-dev="desktop">desktop 1200</button><button data-dev="mobile">mobile 390</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="status-bar"><span class="dot"></span><span id="status-text">初始化…</span></div>
+
+<main>
+  <div id="viewer">
+    <div id="stage" class="desktop">
+      <iframe id="frame" title="活動頁預覽" hidden></iframe>
+      <img id="shot-img" alt="活動頁全頁截圖" hidden>
+      <div id="overlay"></div>
+    </div>
+  </div>
+
+  <aside id="panel">
+    <div id="panel-head">
+      <div class="stats" id="panel-stats"></div>
+      <div class="legend">
+        <span class="p-lock">🔒 真值鎖定</span><span class="p-write">✍️ 文案可修</span><span class="p-pick">🎚 開關/選擇</span><span class="p-sys">sys 系統欄</span>
+      </div>
+      <input id="field-search" type="text" placeholder="搜尋欄位（代號／欄名／說明）…">
+    </div>
+    <div id="groups"></div>
+  </aside>
+</main>
+
+<script>
+/* ============================================================================
+ * 【內嵌資料】鏡像自 pipeline/write_xlsx.js v6（生成日 2026-07-20）＋03 Schema v1.2 摘要
+ * 同步方式見檔頭註解：write_xlsx P1COLS 改版 → 更新 ENUMS / NOTE_MAP / buildP1Fields / MODULES
+ * ==========================================================================*/
+const GEN_META = {
+  generatedAt: "2026-07-20",
+  sourceVersion: "write_xlsx.js v6（U18 收編後）＋03_GoogleSheets_Schema_v1.md v1.2＋FrameTest section id（2026-07-20 現況）",
+};
+
+/* P4 枚舉鏡像（逐字鏡像 write_xlsx.js ENUMS；真相來源＝03 schema＋02 色彩規劃，勿在此新增值） */
+const ENUMS = {
+  "狀態": ["草稿","調修中","待建置","已建置"],
+  "版型選擇": ["MVP-v1"],
+  "模組位置": ["kv","featured-1","featured-2","featured-3","wall-1","wall-2","wall-3","wall-4","wall-5","promodeal","explore"],
+  "標籤來源": ["offer","feature","無"],
+  "顯示開關": ["是","否"],
+  "hueFamily": ["pink-plum","gold-bronze","green-sage","blue-calm","mono"],
+  "surfaceMode": ["light","dark"],
+  "kvTitleStyle": ["vivid","deep"],
+  "moduleBorderStyle": ["none","theme","black"],
+  "labelStyle": ["deep-plate","bright-plate"],
+  "colorTheme": ["mono-light"],
+  "kvEyebrowCnMobile": ["auto","hide","show"],
+  "promoSourceMode": ["auto","promo-activity","brand-recommend","product-fallback"],
+  "kvVariant": ["kv-new","kv-legacy"],
+  "categoryWallCount": ["3","4","5"],
+};
+
+/* 每欄一句話填寫說明（摘自 03_GoogleSheets_Schema_v1.md v1.2；規格真相在 03） */
+const NOTE_MAP = {
+  "A1":"系統自動編號＝頁面唯一 ID，不需填寫。",
+  "A2":"活動頁名稱——AI 初稿後可自由改寫；對應 dock 主錨點短標（dockHeroLabel）。",
+  "A3":"頁面狀態——切「待建置」＝人工核可建置（R2 定案，表內留紀錄）。",
+  "A4":"流程起點——人工貼入來源頁 URL；域名限 tw.buy.yahoo.com，非法→warning 不建置。",
+  "A5":"系統自動——指向 P3 策展列＋qa 快照檔。",
+  "A6":"版型下拉——現僅 MVP-v1（擴充依 11 §9.3）。",
+  "B1":"主題色相家族——AI 依色彩決策路由自動建議後可改；枚舉單一來源＝02 色彩規劃＋Figma variables。",
+  "B2":"色彩主題——現定版 mono-light；其餘值 WP2b 定版後鏡像。",
+  "B3":"明暗模式。",
+  "B4":"KV 標題配色。",
+  "B5":"模組線框樣式。",
+  "B6":"標籤（chip）樣式。",
+  "C1":"KV 拉丁眉標——AI 初稿＝品牌名；mobile 不直接顯示（跑馬燈帶出），欄位照填。",
+  "C2":"KV 中文眉標——AI 初稿；mobile 顯示模式由表尾 C9 控制。",
+  "C3":"KV 標題第一行——建議 ≤4 字（fit 自動縮字兜底）；含折扣數字→數字部分視同 🔒 驗真值。",
+  "C4":"KV 標題第二行——折數＝真值互證（活動標題 vs 商品池實算最低折數）；數字部分 🔒。",
+  "C5":"「起」字顯示——文案含折數→自動建議「是」；無優惠文案時不得顯示。",
+  "C6":"活動日期——🔒 取 KV 主軸 actid 檔期，不得 AI 生成/手打；無真值→隱藏（降級鏈）。",
+  "C6a":"KV 主軸活動 actid——🔒 來源真值。",
+  "C7":"標題掀牌動畫開關——尊重 prefers-reduced-motion。",
+  "C8":"跑馬燈開關——內容自動生成（眉標＋標題＋檔期）。",
+  "C9":"mobile 中文眉標顯示——auto＝kv-offer-box 放不下自動隱藏（量測基準 430px／iPhone 16 Plus，U7）。",
+  "D0":"KV 版型——kv-new（新版＝預設）｜kv-legacy（舊版）；拼法統一案掛裁決收斂會。",
+  "D1":"KV 主圖（大圓）——預設＝該商品頁商品圖第二張 imageSet[1][0]（U10 白底語意）；可貼 URL 覆寫。",
+  "D2":"KV 副圖1——同 D1 規則。",
+  "D3":"KV 副圖2——同 D1 規則。",
+  "D4":"KV 主打商品1 gdid——🔒 對應 KV 圓圖商品；名/價/URL 皆真值，縮寫名另欄（P2 G6c）。",
+  "D5":"KV 主打商品2 gdid——同 D4。",
+  "D6":"KV 主打商品3 gdid——同 D4。",
+  "D7":"KV 主打商品1 商品頁 url——🔒 由 gdid 對應（與 P2 G9 同源）；改圖須成組連動（R12）。",
+  "D8":"KV 主打商品2 商品頁 url——同 D7。",
+  "D9":"KV 主打商品3 商品頁 url——同 D7。",
+  "E0":"本期活動來源模式——auto＝取可滿足 ≥3 則的最高優先層（U19 單一來源制）；三層＝優惠活動→品牌推薦→商品替補；其餘值＝強制單一來源。",
+  "E6":"本期活動模組 h2 標題——隨 AI 策展內容重寫、標題與內容同型（U19）；「本期活動」＝promo-truth 預設前綴、非固定文案；dock 短標另欄（dockPromoLabel）。",
+  "E1":"入口標籤 chip——AI 初稿＝活動屬性詞；商品型入口僅限單品詞、禁優惠與檔期詞彙（裁決⑤）。",
+  "E2":"入口文案——第三 chip 槽位語義＝日期/時效，勿混入屬性標籤。",
+  "E3":"入口檔期——🔒 各 actid 獨立檔期；無真值→隱藏；商品型入口無檔期列；mobile 日期列一律隱藏。",
+  "E4":"入口圖——預設＝該活動商品池第一件商品第一張圖（裁決②）；活動 banner 降為人工覆寫級。",
+  "E5":"入口連結——🔒 actid 活動頁 URL；商品型入口可為 gdsale 商品頁 URL（僅限單品詞）。",
+  "F1f":"樓層標題——AI 策展命名可改；自動連動 dock 錨點與頁尾；三樓層勿同名。",
+  "F1w":"品類牆標題（牆4~8＝品類牆1~5，樓層編號連續制）——填寫即啟用該牆；實填數與 categoryWallCount 一致性＝機器閘檢（U18）。",
+  "F1w-off":"品類牆標題（表尾附加欄）——值空＝未啟用；預設曝光 3 牆（U18）。",
+  "F2":"樓層情境卡圖（最左第一格）——僅情境卡可換圖；商品卡恆抓商品圖。",
+  "F3":"樓層情境卡文案——tag｜title｜sub 三段；促銷字串斷行注意（11 §6.3）。",
+  "CTA":"頁面 CTA 文案——AI 初稿可修；✍️ 通則禁工程字串（U13）。",
+  "GATE":"系統回填 gate.js 機器閘結果（PASS/FAIL＋WARN 數）；指紋綁定 draft/snapshot。",
+  "CWC":"品類牆數量 3｜4｜5、預設 3（U18：至少曝光 3 組至多 5 組）——與實填牆標題數一致性＝機器閘檢；dock 錨點隨牆數連動。",
+  "F4":"頁尾標題（v1.2 §8 提案欄、尚未入 P1 產表＝併 N-11 落地）——AI 依策展主題擬定、✍️ 可修；demo 已欄位驅動。",
+  "F5":"注意事項內文（v1.2 §8 提案欄、尚未入 P1 產表＝併 N-11 落地）——多行＝儲存格內換行、建置端 pre-line 渲染、純文字不解析 HTML。",
+};
+
+/* P1COLS 鏡像建構（順序/欄名與 write_xlsx.js v6 逐字一致；示意基準＝4 入口×3 樓層×3 牆 canonical draft）
+   —— 欄位總數與物理字母隨牆/樓層數浮動，以實際產出表頭定位（例：兩牆版 C9=BM、三牆版 C9=BN）。 */
+function buildP1Fields(){
+  const F = [];
+  const add = (code, name, perm, group, note, enumName, tail) =>
+    F.push({ code, name, perm, group, note, enumName: enumName || null, tail: !!tail });
+  // A 管理與來源＋B 主題配色＋C KV 文案開關＋D KV 視覺（基礎段）
+  add("A1","A1 頁面ID","sys","page",NOTE_MAP.A1);
+  add("A2","A2 活動頁名稱","✍️","page",NOTE_MAP.A2);
+  add("A3","A3 狀態","🎚","page",NOTE_MAP.A3,"狀態");
+  add("A4","A4 來源URL","🔒","page",NOTE_MAP.A4);
+  add("A5","A5 抓取快照","sys","page",NOTE_MAP.A5);
+  add("A6","A6 版型選擇","🎚","page",NOTE_MAP.A6,"版型選擇");
+  add("B1","B1 主題配色hueFamily","🎚","hero",NOTE_MAP.B1,"hueFamily");
+  add("B2","B2 色彩主題colorTheme","🎚","hero",NOTE_MAP.B2,"colorTheme");
+  add("B3","B3 明暗surfaceMode","🎚","hero",NOTE_MAP.B3,"surfaceMode");
+  add("B4","B4 標題配色kvTitleStyle","🎚","hero",NOTE_MAP.B4,"kvTitleStyle");
+  add("B5","B5 模組線框moduleBorderStyle","🎚","hero",NOTE_MAP.B5,"moduleBorderStyle");
+  add("B6","B6 標籤樣式labelStyle","🎚","hero",NOTE_MAP.B6,"labelStyle");
+  add("C1","C1 KV眉標(拉丁)","✍️","hero",NOTE_MAP.C1);
+  add("C2","C2 KV眉標(中文)","✍️","hero",NOTE_MAP.C2);
+  add("C3","C3 KV標題第一行","✍️","hero",NOTE_MAP.C3);
+  add("C4","C4 KV標題第二行(數字🔒)","✍️","hero",NOTE_MAP.C4);
+  add("C5","C5 起字顯示","🎚","hero",NOTE_MAP.C5,"顯示開關");
+  add("C6","C6 活動日期","🔒","hero",NOTE_MAP.C6);
+  add("C6a","C6a KV主軸actid","🔒","hero",NOTE_MAP.C6a);
+  add("C7","C7 標題掀牌titleFlip","🎚","hero",NOTE_MAP.C7,"顯示開關");
+  add("C8","C8 跑馬燈showMarquee","🎚","hero",NOTE_MAP.C8,"顯示開關");
+  add("D1","D1 KV主圖","🎚","hero",NOTE_MAP.D1);
+  add("D2","D2 KV副圖1","🎚","hero",NOTE_MAP.D2);
+  add("D3","D3 KV副圖2","🎚","hero",NOTE_MAP.D3);
+  add("D4","D4 KV主打商品1(gdid)","🔒","hero",NOTE_MAP.D4);
+  add("D5","D5 KV主打商品2(gdid)","🔒","hero",NOTE_MAP.D5);
+  add("D6","D6 KV主打商品3(gdid)","🔒","hero",NOTE_MAP.D6);
+  // E 本期活動入口 ×4（write_xlsx 迴圈鏡像）
+  for (let i = 1; i <= 4; i++) {
+    add(`E1.${i}`,`E1.${i} 入口${i}標籤chip`,"✍️","promo",NOTE_MAP.E1);
+    add(`E2.${i}`,`E2.${i} 入口${i}文案`,"✍️","promo",NOTE_MAP.E2);
+    add(`E3.${i}`,`E3.${i} 入口${i}檔期`,"🔒","promo",NOTE_MAP.E3);
+    add(`E4.${i}`,`E4.${i} 入口${i}圖`,"🎚","promo",NOTE_MAP.E4);
+    add(`E5.${i}`,`E5.${i} 入口${i}連結`,"🔒","promo",NOTE_MAP.E5);
+  }
+  // F 樓層（3 樓層＝主打精選；write_xlsx floorsAll 迴圈鏡像）
+  for (let i = 1; i <= 3; i++) {
+    add(`F1.${i}`,`F1.${i} 樓層${i}標題`,"✍️","featured",NOTE_MAP.F1f);
+    add(`F2.${i}`,`F2.${i} 樓層${i}情境卡圖`,"🎚","featured",NOTE_MAP.F2);
+    add(`F3.${i}`,`F3.${i} 樓層${i}情境卡文案`,"✍️","featured",NOTE_MAP.F3);
+  }
+  // F 牆（canonical draft 實有 3 牆＝就地生成 F1.4~F1.6）
+  for (let n = 4; n <= 6; n++) add(`F1.${n}`,`F1.${n} 牆${n}標題`,"✍️","walls",NOTE_MAP.F1w);
+  add("CTA文案","CTA文案","✍️","page",NOTE_MAP.CTA);
+  add("機器閘結果","機器閘結果","sys","page",NOTE_MAP.GATE);
+  // ── 表尾附加區（附加制、不插中段；順序＝kvVariant→D7~D9→C9→E0→E6→牆7/8→categoryWallCount）──
+  add("D0","D0 KV版型kvVariant","🎚","hero",NOTE_MAP.D0,"kvVariant",true);
+  for (let i = 1; i <= 3; i++) add(`D${6+i}`,`D${6+i} KV主打商品${i}商品頁url`,"🔒","hero",NOTE_MAP[`D${6+i}`],null,true);
+  add("C9","C9 KV眉標中文mobile顯示kvEyebrowCnMobile","🎚","hero",NOTE_MAP.C9,"kvEyebrowCnMobile",true);
+  add("E0","E0 本期活動來源模式promoSourceMode","🎚","promo",NOTE_MAP.E0,"promoSourceMode",true);
+  add("E6","E6 本期活動模組標題promoModuleTitle","✍️","promo",NOTE_MAP.E6,null,true);
+  for (let n = 7; n <= 8; n++) add(`F1.${n}`,`F1.${n} 牆${n}標題`,"✍️","walls",NOTE_MAP["F1w-off"],null,true);
+  add("categoryWallCount","categoryWallCount 品類牆數量","🎚","walls",NOTE_MAP.CWC,"categoryWallCount",true);
+  return F;
+}
+const P1_FIELDS = buildP1Fields();
+
+/* v1.2 §8 提案欄（尚未入 write_xlsx P1COLS 產表；demo 資料層已欄位驅動）——不計入 P1 總數 */
+const PROPOSAL_FIELDS = [
+  { code:"F4", name:"F4 頁尾標題footerTitle（提案）", perm:"✍️", group:"footer", note:NOTE_MAP.F4, proposal:true },
+  { code:"F5", name:"F5 注意事項noticeText（提案）", perm:"✍️", group:"notice", note:NOTE_MAP.F5, proposal:true },
+];
+
+/* P2 商品明細欄（write_xlsx P2COLS 鏡像；一列＝一件商品、以 G1b 模組位置掛到各模組）——參考組，不計入 P1 總數 */
+const P2_FIELDS = [
+  { code:"G1a", name:"G1a 頁面ID", perm:"🎚", note:"商品列所屬活動頁 ID。" },
+  { code:"G1b", name:"G1b 模組位置", perm:"🎚", enumName:"模組位置", note:"商品掛哪個模組——kv／featured-1~3／wall-1~5／promodeal／explore（wall-3~5 僅於對應牆啟用時有效）。" },
+  { code:"G1c", name:"G1c 排序", perm:"🎚", note:"模組內排序（拖排；列數彈性可增刪＝R1）。" },
+  { code:"G0", name:"G0 檢查結果", perm:"sys", note:"機器閘結果回填：OK／warning＋儲存格標紅（R4）。" },
+  { code:"G2", name:"G2 gdid", perm:"🔒", note:"商品唯一 ID；來源快照存在性檢查。" },
+  { code:"G3", name:"G3 商品名", perm:"🔒", note:"逐字取自來源。" },
+  { code:"G4a", name:"G4a 現價", perm:"🔒", note:"逐字真值；市價比 <0.4→異常標記。" },
+  { code:"G4b", name:"G4b 原價", perm:"🔒", note:"逐字真值。" },
+  { code:"G4c", name:"G4c 折數", perm:"🔒", note:"來源實算。" },
+  { code:"G5", name:"G5 優惠/活動標籤", perm:"🔒", note:"來源逐字。" },
+  { code:"G6", name:"G6 商品標籤", perm:"✍️", note:"卡面 chip——AI 初稿（①優惠②商品特色第一行替補）；超行 AI 改寫保留原意；市價比 <0.4 禁折數。" },
+  { code:"G6a", name:"G6a 標籤來源", perm:"🎚", enumName:"標籤來源", note:"offer｜feature｜無。" },
+  { code:"G6b", name:"G6b 標籤原文", perm:"🔒", note:"來源逐字備查。" },
+  { code:"G6c", name:"G6c KV縮寫名", perm:"✍️", note:"KV 主打商品 mobile 單行縮寫（≤188px、去品牌前綴、禁改價格/折數/型號）。" },
+  { code:"G7", name:"G7 商品圖", perm:"🎚", note:"預設＝商品頁圖庫第 2 張白底圖（列表主圖錨定法）。" },
+  { code:"G8", name:"G8 情境圖", perm:"🎚", note:"預設＝第 1 張情境圖（活動主題欄位用）。" },
+  { code:"G9", name:"G9 商品連結", perm:"🔒", note:"域名審計。" },
+];
+
+/* 模組堆疊×欄位區對照（鏡像 write_xlsx P0【一】表＋FrameTest section id 實測 2026-07-20） */
+const MODULES = [
+  { order:1,  secId:"sec-uh", group:"g-uh", label:"購物中心表頭", badge:"—（系統）" },
+  { order:2,  secId:null, group:"g-nav", label:"浮動 dock 導覽", badge:"F1 連動（版型層）", floating:true },
+  { order:3,  secId:"sec-hero", group:"g-hero", label:"KV 主視覺", badge:"B1~B6・C1~C9・D0~D9" },
+  { order:4,  secId:"sec-promodeal", group:"g-promo", label:"本期活動", badge:"E0~E6" },
+  { order:5,  secId:"sec-featureddeal-1", group:"g-featured", label:"主打精選 樓層1", badge:"F1.1~F3.1", codes:["F1.1","F2.1","F3.1"] },
+  { order:5,  secId:"sec-featureddeal-2", group:"g-featured", label:"主打精選 樓層2", badge:"F1.2~F3.2", codes:["F1.2","F2.2","F3.2"] },
+  { order:5,  secId:"sec-featureddeal-3", group:"g-featured", label:"主打精選 樓層3", badge:"F1.3~F3.3", codes:["F1.3","F2.3","F3.3"] },
+  { order:6,  secId:"sec-editortopic", group:"g-editor", label:"編輯精選", badge:"refEntry 引用" },
+  { order:7,  secId:"sec-categorygroup-tableware", group:"g-walls", label:"品類牆1", badge:"F1.4", codes:["F1.4","categoryWallCount"] },
+  { order:7,  secId:"sec-categorygroup-cookware", group:"g-walls", label:"品類牆2", badge:"F1.5", codes:["F1.5","categoryWallCount"] },
+  { order:7,  secId:"sec-categorygroup-third", group:"g-walls", label:"品類牆3", badge:"F1.6", codes:["F1.6","categoryWallCount"] },
+  { order:8,  secId:"sec-extendedexplore", group:"g-explore", label:"延伸探索", badge:"版型層" },
+  { order:9,  secId:"sec-notice", group:"g-notice", label:"注意事項", badge:"noticeText（F5 提案）" },
+  { order:10, secId:"sec-footer", group:"g-footer", label:"頁尾", badge:"footerTitle（F4 提案）" },
+];
+
+/* 面板分組（依頁面堆疊排序；page＝頁面層無單一模組框、p2＝商品明細參考組） */
+const GROUPS = [
+  { id:"g-page", ord:"P1", title:"頁面層（A 區＋CTA＋機器閘）", badge:"A1~A6", fieldGroup:"page",
+    note:"頁面級管理欄，無單一模組對應（A2 活動頁名稱連動 dock 主錨點短標）。" },
+  { id:"g-uh", ord:"1", title:"購物中心表頭", badge:"—", fieldGroup:null,
+    note:"系統元件（HorizontalUH），無 Sheets 欄位。" },
+  { id:"g-nav", ord:"2", title:"浮動 dock 導覽", badge:"F1 連動", fieldGroup:null,
+    note:"版型層：錨點文字由 F1 樓層/牆標題自動連動＋dockFeaturedLabel/dockPromoLabel 短標（資料層欄，Sheets 欄位化留待後續提案）；浮動元件、不標框。" },
+  { id:"g-hero", ord:"3", title:"KV 主視覺", badge:"B・C・D 區", fieldGroup:"hero",
+    note:"B 區配色＋C 區文案（含表尾 C9）＋D 區視覺（D0 版型＋D1~D6＋表尾 D7~D9 商品頁url）。" },
+  { id:"g-promo", ord:"4", title:"本期活動（圓形入口 3~4 則）", badge:"E0~E6", fieldGroup:"promo",
+    note:"單一來源制（U19）：同層 ≥3 才採用、<3 整組降層、不跨層補位；模組內型別混用＝機器閘 FAIL；恰 3 則＝等比放大版型（U17）。" },
+  { id:"g-featured", ord:"5", title:"主打精選（樓層1~3）", badge:"F1~F3 ×3", fieldGroup:"featured",
+    note:"每樓層＝標題＋情境卡圖＋情境卡文案；商品列＝P2 掛 featured-1~3（列數彈性 R1）。" },
+  { id:"g-editor", ord:"6", title:"編輯精選", badge:"refEntry", fieldGroup:null,
+    note:"無直接 P1 欄位＝引用本期活動入口（refEntry）；U11：去重範圍擴及編輯精選×本期活動＝Blocking；商品牆＝P2 資料。" },
+  { id:"g-walls", ord:"7", title:"品類牆（牆4~8＝品類牆1~5）", badge:"F1.4~F1.8＋數量", fieldGroup:"walls",
+    note:"U18：預設 3 組、可選 3~5；填牆標題即啟用該牆；商品列＝P2 掛 wall-1~5；dock 錨點隨牆數連動。" },
+  { id:"g-explore", ord:"8", title:"延伸探索", badge:"版型層", fieldGroup:null,
+    note:"moreUrl＋items＝版型層資料，無 P1 欄位；商品列可掛 P2 explore 位置。" },
+  { id:"g-notice", ord:"9", title:"注意事項", badge:"F5（提案）", fieldGroup:"notice",
+    note:"noticeText＝v1.2 §8 提案欄（暫存 P3；落地併 N-11）；AI 產初稿（法務樣板）→營運調修→核可建置。" },
+  { id:"g-footer", ord:"10", title:"頁尾", badge:"F4（提案）", fieldGroup:"footer",
+    note:"footerTitle＝v1.2 §8 提案欄；F1 樓層標題另自動連動頁尾導覽（版型層）。" },
+  { id:"g-p2", ord:"P2", title:"P2 商品明細（商品級欄位・參考）", badge:"G 區", fieldGroup:"p2",
+    note:"一列＝一件商品，以 G1b 模組位置掛到各模組（kv／featured／wall／promodeal／explore）——不屬單一模組，列此供參照。" },
+];
+
+/* 截圖模式標註比例（近似值——take-shots.js 於 2026-07-20 對線上 ?dataset=titanium 量測；
+   其他資料集/日後改版比例會漂移；部署後 http 環境自動 fetch shots/rects.json 蓋掉本內嵌值） */
+let RECTS = {
+  "capturedAt":"2026-07-20T07:35:42Z","dataset":"titanium",
+  "views":{
+    "desktop":{"file":"shots/desktop-1200.png","docW":1200,"docH":6468,"sections":{
+      "sec-uh":{"frac":{"top":0,"left":0,"w":1,"h":0.00696}},
+      "sec-hero":{"frac":{"top":0.00696,"left":0,"w":1,"h":0.08163}},
+      "sec-promodeal":{"frac":{"top":0.08859,"left":0,"w":1,"h":0.07174}},
+      "sec-featureddeal-1":{"frac":{"top":0.16033,"left":0,"w":1,"h":0.09122}},
+      "sec-featureddeal-2":{"frac":{"top":0.25155,"left":0,"w":1,"h":0.09122}},
+      "sec-featureddeal-3":{"frac":{"top":0.34276,"left":0,"w":1,"h":0.09122}},
+      "sec-editortopic":{"frac":{"top":0.44140,"left":0,"w":1,"h":0.18429}},
+      "sec-categorygroup-tableware":{"frac":{"top":0.62570,"left":0,"w":1,"h":0.09122}},
+      "sec-categorygroup-cookware":{"frac":{"top":0.71691,"left":0,"w":1,"h":0.09122}},
+      "sec-categorygroup-third":{"frac":{"top":0.80813,"left":0,"w":1,"h":0.09122}},
+      "sec-extendedexplore":{"frac":{"top":0.89935,"left":0,"w":1,"h":0.04360}},
+      "sec-notice":{"frac":{"top":0.94295,"left":0,"w":1,"h":0.02798}},
+      "sec-footer":{"frac":{"top":0.97093,"left":0,"w":1,"h":0.02907}}}},
+    "mobile":{"file":"shots/mobile-390.png","docW":390,"docH":8249,"sections":{
+      "sec-uh":{"frac":{"top":0,"left":0,"w":1,"h":0.00546}},
+      "sec-hero":{"frac":{"top":0.00546,"left":0,"w":1,"h":0.03419}},
+      "sec-promodeal":{"frac":{"top":0.03964,"left":0,"w":1,"h":0.06363}},
+      "sec-featureddeal-1":{"frac":{"top":0.10327,"left":0,"w":1,"h":0.08013}},
+      "sec-featureddeal-2":{"frac":{"top":0.18340,"left":0,"w":1,"h":0.08037}},
+      "sec-featureddeal-3":{"frac":{"top":0.26377,"left":0,"w":1,"h":0.08353}},
+      "sec-editortopic":{"frac":{"top":0.35118,"left":0,"w":1,"h":0.28929}},
+      "sec-categorygroup-tableware":{"frac":{"top":0.64047,"left":0,"w":1,"h":0.08401}},
+      "sec-categorygroup-cookware":{"frac":{"top":0.72448,"left":0,"w":1,"h":0.08401}},
+      "sec-categorygroup-third":{"frac":{"top":0.80849,"left":0,"w":1,"h":0.11989}},
+      "sec-extendedexplore":{"frac":{"top":0.92838,"left":0,"w":1,"h":0.02837}},
+      "sec-notice":{"frac":{"top":0.95675,"left":0,"w":1,"h":0.02507}},
+      "sec-footer":{"frac":{"top":0.98182,"left":0,"w":1,"h":0.01818}}}}
+  }
+};
+
+/* ============================================================================ 邏輯 */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const colLetter = (n) => { let s = ""; for (let x = n; x > 0; x = Math.floor((x - 1) / 26)) s = String.fromCharCode(65 + ((x - 1) % 26)) + s; return s; };
+const PERM_CLASS = { "🔒":"p-lock", "✍️":"p-write", "🎚":"p-pick", "sys":"p-sys" };
+const PRESET_ONLINE = "../lecreuset-frametest/";
+const PRESET_LOCAL = "../MVP_Phase1_LeCreuset_活動頁Prototype_FrameTest.html";
+const DATASET_LABEL = { lecreuset:"Le Creuset（預設）", camping:"KAZMI 露營", keyboard:"鍵盤/滑鼠", fashion:"銀穗女裝", titanium:"純鈦選品" };
+
+const state = {
+  mode: "iframe",            // iframe | shots
+  annotated: false,           // iframe 同源標註是否成立
+  baseUrl: PRESET_ONLINE,
+  dataset: "lecreuset",
+  device: "desktop",
+};
+let frameDoc = null, frameWin = null, loadTimer = null, layoutTimer = null, rafPending = false;
+
+/* ── 面板渲染 ── */
+function fieldRow(f, idx){
+  const pos = (typeof idx === "number") ? `<span class="pos" title="P1 物理欄位置＝三樓層×三牆示意；實際字母隨牆/樓層數浮動，以實際表頭定位">${colLetter(idx + 1)}欄${f.tail ? "・表尾附加" : ""}</span>` : "";
+  const enumTxt = f.enumName ? `<span class="enum">下拉（P4 ${esc(f.enumName)}）：${esc(ENUMS[f.enumName].join(" | "))}。</span>` : "";
+  const ptag = f.proposal ? `<span class="ptag">v1.2 提案・未入產表</span>` : "";
+  return `<div class="frow${f.proposal ? " proposal" : ""}" id="row-${f.code.replace(/\./g, "-")}" data-search="${esc((f.code + " " + f.name + " " + f.note).toLowerCase())}">
+    <span class="fcode ${PERM_CLASS[f.perm]}" title="${f.perm === "sys" ? "系統欄" : f.perm}">${esc(f.code)}</span>
+    <div class="fmain"><div class="fname">${esc(f.name)}${pos}${ptag}</div><div class="fnote">${enumTxt}${esc(f.note)}</div></div>
+  </div>`;
+}
+function renderPanel(){
+  const idxOf = new Map(P1_FIELDS.map((f, i) => [f.code, i]));
+  const byGroup = (g) => P1_FIELDS.filter((f) => f.group === g);
+  const html = GROUPS.map((G) => {
+    let rows = "";
+    if (G.fieldGroup === "p2") rows = P2_FIELDS.map((f) => fieldRow(f)).join("");
+    else if (G.fieldGroup) {
+      rows = byGroup(G.fieldGroup).map((f) => fieldRow(f, idxOf.get(f.code))).join("");
+      rows += PROPOSAL_FIELDS.filter((f) => f.group === G.fieldGroup).map((f) => fieldRow(f)).join("");
+    } else rows = PROPOSAL_FIELDS.filter((f) => f.group === G.id.replace(/^g-/, "")).map((f) => fieldRow(f)).join("");
+    const linked = MODULES.some((m) => m.group === G.id && m.secId);
+    return `<div class="gcard${linked ? " linked" : ""}" id="${G.id}">
+      <div class="ghead" data-group="${G.id}">
+        <span class="ord">${esc(G.ord)}</span><span class="gtitle">${esc(G.title)}</span>
+        <span class="gbadge">${esc(G.badge)}</span><span class="jump">${linked ? "⇢ 點我捲到模組" : "（不標框）"}</span>
+      </div>
+      <div class="gnote">${esc(G.note)}</div>${rows}
+    </div>`;
+  }).join("");
+  $("#groups").innerHTML = html + `<div class="foot">欄位定義鏡像自 write_xlsx.js P1COLS v6（生成日 ${GEN_META.generatedAt}）；填寫說明摘自 03 Schema v1.2。P1 欄位置＝三樓層×三牆 canonical 示意（例：兩牆版 C9=BM、三牆版 C9=BN），實際以產出表頭定位。本頁＝預覽版視覺對照，非過閘依據。</div>`;
+  const nP = P1_FIELDS.length, nProp = PROPOSAL_FIELDS.length, nP2 = P2_FIELDS.length;
+  $("#panel-stats").innerHTML = `P1 活動頁主表 <b>${nP} 欄</b>（＝write_xlsx P1COLS，三樓層×三牆示意）｜提案欄 <b>${nProp}</b>（F4/F5）｜P2 商品明細參考 <b>${nP2} 欄</b><br>來源：${esc(GEN_META.sourceVersion)}`;
+  document.querySelectorAll(".ghead").forEach((h) => h.addEventListener("click", () => jumpToModule(h.dataset.group)));
+}
+
+/* ── 面板⇄檢視 互動 ── */
+let hlTimer = null;
+function highlightGroup(groupId, codes){
+  document.querySelectorAll(".gcard.hl").forEach((el) => el.classList.remove("hl"));
+  document.querySelectorAll(".frow.hl").forEach((el) => el.classList.remove("hl"));
+  const card = document.getElementById(groupId);
+  if (!card) return;
+  card.classList.add("hl");
+  (codes || []).forEach((c) => { const r = document.getElementById("row-" + c.replace(/\./g, "-")); if (r) r.classList.add("hl"); });
+  card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  clearTimeout(hlTimer);
+  hlTimer = setTimeout(() => { card.classList.remove("hl"); document.querySelectorAll(".frow.hl").forEach((el) => el.classList.remove("hl")); }, 2600);
+}
+function jumpToModule(groupId){
+  const mods = MODULES.filter((m) => m.group === groupId && m.secId);
+  if (!mods.length) return;
+  const m = mods[0];
+  if (state.mode === "iframe" && state.annotated && frameDoc) {
+    const el = frameDoc.getElementById(m.secId);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    flashBox(m.secId);
+  } else if (state.mode === "shots") {
+    const box = document.querySelector(`.obox[data-sec="${m.secId}"]`);
+    if (box) {
+      const v = $("#viewer");
+      v.scrollTo({ top: box.offsetTop + $("#stage").offsetTop - 60, behavior: "smooth" });
+      flashBox(m.secId);
+    }
+  }
+}
+function flashBox(secId){
+  const box = document.querySelector(`.obox[data-sec="${secId}"]`);
+  if (!box) return;
+  box.classList.remove("flash"); void box.offsetWidth; box.classList.add("flash");
+  setTimeout(() => box.classList.remove("flash"), 1700);
+}
+
+/* ── 標註框建構（兩模式共用 DOM，位置演算不同） ── */
+function buildBoxes(){
+  $("#overlay").innerHTML = MODULES.filter((m) => m.secId).map((m) => `
+    <div class="obox" data-sec="${m.secId}" data-group="${m.group}" style="display:none">
+      <span class="obadge" title="hover＝面板高亮；點擊＝捲到欄位組"><b>${esc(m.label)}</b>｜${esc(m.badge)}</span>
+    </div>`).join("");
+  document.querySelectorAll(".obadge").forEach((b) => {
+    const box = b.parentElement;
+    const act = () => { document.querySelectorAll(".obox.hot").forEach((x) => x.classList.remove("hot")); box.classList.add("hot");
+      const m = MODULES.find((x) => x.secId === box.dataset.sec);
+      highlightGroup(box.dataset.group, m && m.codes); };
+    b.addEventListener("mouseenter", act);
+    b.addEventListener("click", act);
+    b.addEventListener("mouseleave", () => setTimeout(() => box.classList.remove("hot"), 900));
+  });
+}
+
+/* ── iframe 同源標註模式 ── */
+function scheduleLayout(){ if (rafPending) return; rafPending = true; requestAnimationFrame(() => { rafPending = false; layoutIframeBoxes(); }); }
+function sizeFrame(){ $("#frame").style.height = Math.max(320, $("#viewer").clientHeight - 28) + "px"; }
+function layoutIframeBoxes(){
+  if (!(state.mode === "iframe" && state.annotated && frameDoc)) return;
+  const fh = $("#frame").clientHeight;
+  MODULES.filter((m) => m.secId).forEach((m) => {
+    const box = document.querySelector(`.obox[data-sec="${m.secId}"]`);
+    const el = frameDoc.getElementById(m.secId);
+    if (!el) { box.style.display = "none"; return; }
+    const r = el.getBoundingClientRect();
+    if (r.bottom < 30 || r.top > fh - 10 || r.height < 2) { box.style.display = "none"; return; }
+    let top = r.top, h = r.height;
+    if (top < 0) { h += top; top = 0; } // 上緣被捲出時貼齊 0，讓左上角徽章恆可見
+    Object.assign(box.style, { display: "block", left: r.left + "px", top: top + "px", width: r.width + "px", height: h + "px" });
+  });
+}
+function detachFrame(){
+  if (frameWin) { try { frameWin.removeEventListener("scroll", scheduleLayout); frameWin.removeEventListener("resize", scheduleLayout); } catch {} }
+  frameDoc = frameWin = null; state.annotated = false;
+  clearInterval(layoutTimer);
+  document.querySelectorAll(".obox").forEach((b) => { b.style.display = "none"; });
+}
+function buildFrameSrc(){
+  try {
+    const u = new URL(state.baseUrl, location.href);
+    if (state.dataset !== "lecreuset") u.searchParams.set("dataset", state.dataset); else u.searchParams.delete("dataset");
+    if (state.device === "mobile") u.searchParams.set("device", "mobile"); else u.searchParams.delete("device");
+    return u.href;
+  } catch { return state.baseUrl; }
+}
+function loadIframe(){
+  detachFrame();
+  state.mode = "iframe";
+  syncModeUI();
+  $("#frame").hidden = false; $("#shot-img").hidden = true;
+  sizeFrame();
+  setStatus("載入 iframe 中…（" + esc(buildFrameSrc()) + "）", true);
+  clearTimeout(loadTimer);
+  loadTimer = setTimeout(() => { if (!state.annotated) fallbackToShots("iframe 載入逾時（12 秒）——可能被拒絕嵌入或網路不可達。"); }, 12000);
+  $("#frame").src = buildFrameSrc();
+}
+function onFrameLoad(){
+  clearTimeout(loadTimer);
+  setTimeout(() => {
+    let doc = null;
+    try { doc = $("#frame").contentDocument; } catch {}
+    if (doc && doc.getElementById("sec-hero")) {
+      frameDoc = doc; frameWin = $("#frame").contentWindow;
+      state.annotated = true;
+      frameWin.addEventListener("scroll", scheduleLayout, { passive: true });
+      frameWin.addEventListener("resize", scheduleLayout, { passive: true });
+      clearInterval(layoutTimer);
+      layoutTimer = setInterval(scheduleLayout, 1000); // 慢速補算：iframe 內圖片載入/資料重繪造成的版位漂移
+      scheduleLayout();
+      setStatus(`同源標註模式✔｜資料集 ${DATASET_LABEL[state.dataset]}｜${state.device}｜hover 框上徽章⇄面板互查`);
+    } else if (doc) {
+      setStatus("iframe 已載入，但頁內找不到 sec-hero——請確認網址是否為 FrameTest 活動頁。", true);
+    } else {
+      fallbackToShots("iframe 屬跨域（或 file:// 安全限制），無法讀取內部模組位置。");
+    }
+  }, 350);
+}
+function fallbackToShots(reason){
+  detachFrame();
+  enterShots();
+  setStatus(`已自動退回截圖模式（近似標註）——${reason} 同源即時標註需部署後以相對路徑載入（預設「線上同源」preset）。`, true);
+}
+
+/* ── 截圖模式 ── */
+function enterShots(){
+  state.mode = "shots";
+  syncModeUI();
+  clearTimeout(loadTimer);
+  $("#frame").hidden = true; $("#frame").removeAttribute("src");
+  const view = RECTS.views[state.device];
+  const img = $("#shot-img");
+  img.hidden = false;
+  img.src = view.file.startsWith("shots/") ? view.file : "shots/" + view.file;
+  layoutShotBoxes();
+  const dsNote = state.dataset !== RECTS.dataset ? `——注意：截圖快照僅 ${DATASET_LABEL[RECTS.dataset]}（拍攝 ${RECTS.capturedAt.slice(0, 10)}），資料集切換請待部署後用 iframe 模式` : `（快照＝${DATASET_LABEL[RECTS.dataset]}，拍攝 ${RECTS.capturedAt.slice(0, 10)}）`;
+  setStatus(`截圖模式｜標註框＝近似比例定位（以拍攝當日量測）${dsNote}`, state.dataset !== RECTS.dataset);
+}
+function layoutShotBoxes(){
+  if (state.mode !== "shots") return;
+  const view = RECTS.views[state.device];
+  MODULES.filter((m) => m.secId).forEach((m) => {
+    const box = document.querySelector(`.obox[data-sec="${m.secId}"]`);
+    const s = view.sections[m.secId];
+    if (!s) { box.style.display = "none"; return; }
+    Object.assign(box.style, { display: "block", left: (s.frac.left * 100) + "%", top: (s.frac.top * 100) + "%", width: (s.frac.w * 100) + "%", height: (s.frac.h * 100) + "%" });
+  });
+}
+
+/* ── 工具列/狀態 ── */
+function setStatus(html, warn){
+  $("#status-text").innerHTML = html;
+  $("#status-bar").classList.toggle("warn", !!warn);
+}
+function syncModeUI(){
+  document.querySelectorAll("#seg-mode button").forEach((b) => b.classList.toggle("on", b.dataset.mode === state.mode));
+  document.querySelectorAll("#seg-dataset button").forEach((b) => b.classList.toggle("on", b.dataset.ds === state.dataset));
+  document.querySelectorAll("#seg-device button").forEach((b) => b.classList.toggle("on", b.dataset.dev === state.device));
+  $("#stage").className = state.device;
+}
+function applyMode(){
+  if (state.mode === "iframe") loadIframe(); else enterShots();
+}
+
+$("#frame").addEventListener("load", () => { if ($("#frame").src) onFrameLoad(); });
+window.addEventListener("resize", () => { if (state.mode === "iframe") sizeFrame(); scheduleLayout(); }, { passive: true });
+$("#preset-online").addEventListener("click", () => { $("#url-input").value = PRESET_ONLINE; state.baseUrl = PRESET_ONLINE; state.mode = "iframe"; applyMode(); });
+$("#preset-local").addEventListener("click", () => { $("#url-input").value = PRESET_LOCAL; state.baseUrl = PRESET_LOCAL; state.mode = "iframe"; applyMode(); });
+$("#btn-load").addEventListener("click", () => { state.baseUrl = $("#url-input").value.trim() || PRESET_ONLINE; state.mode = "iframe"; applyMode(); });
+$("#url-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#btn-load").click(); });
+$("#seg-mode").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.mode = b.dataset.mode; applyMode(); });
+$("#seg-dataset").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.dataset = b.dataset.ds; applyMode(); });
+$("#seg-device").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.device = b.dataset.dev; applyMode(); });
+$("#field-search").addEventListener("input", (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll(".frow").forEach((r) => r.classList.toggle("dim", !!q && !r.dataset.search.includes(q)));
+  document.querySelectorAll(".gcard").forEach((g) => {
+    const rows = g.querySelectorAll(".frow");
+    const hasHit = !q || !rows.length ? true : [...rows].some((r) => !r.classList.contains("dim"));
+    g.style.display = hasHit ? "" : "none";
+  });
+});
+
+/* ── INIT ── */
+renderPanel();
+buildBoxes();
+$("#url-input").value = PRESET_ONLINE;
+if (location.protocol === "file:") {
+  // file://：iframe 同源讀取受瀏覽器安全限制 → 預設直接進截圖模式（近似標註）；仍可按「本機檔案」preset 試載 iframe（無標註時自動退回）
+  enterShots();
+  setStatus("本機 file:// 開啟——已用截圖模式（近似標註）。部署後（同源）自動可用 iframe 即時標註；本機想看 iframe 可按「預設：本機檔案」載入（瀏覽器安全限制下會自動退回截圖模式）。", true);
+} else {
+  loadIframe();
+}
+// 部署環境：以最新拍攝的 rects.json 蓋掉內嵌近似值（file:// fetch 會失敗＝吃內嵌值，靜默略過）
+if (location.protocol !== "file:") {
+  fetch("shots/rects.json").then((r) => (r.ok ? r.json() : null)).then((j) => {
+    if (j && j.views) {
+      j.views.desktop.file = "shots/" + (j.views.desktop.file || "desktop-1200.png").replace(/^shots\//, "");
+      j.views.mobile.file = "shots/" + (j.views.mobile.file || "mobile-390.png").replace(/^shots\//, "");
+      RECTS = j;
+      if (state.mode === "shots") { enterShots(); }
+    }
+  }).catch(() => {});
+}
+</script>
+</body>
+</html>

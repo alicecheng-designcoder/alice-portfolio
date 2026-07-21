@@ -4,6 +4,8 @@ const PROTECTED = [
   "/lecreuset-frametest/titanium-preview",
   "/lecreuset-frametest/platform-decisions",
   "/lecreuset-frametest/platform-plan-doc13",
+  "/lecreuset-frametest/platform-plan-doc15", // 2026-07-21：15 號 CMS 工作流程圖說（U26 提案）
+  "/lecreuset-frametest/field-map",           // 2026-07-21：U25 欄位視覺對照（內部工具）
 ];
 export async function onRequest(ctx) {
   const { pathname } = new URL(ctx.request.url);
