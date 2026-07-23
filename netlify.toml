@@ -1,14 +1,5 @@
-# N-15 過渡防護（2026-07-19）：敏感子路徑 basic auth＋noindex；LC demo 與作品站本體維持公開（PF-9：demo 資料可公開）
-[[edge_functions]]
-  function = "preview-auth"
-  path = "/lecreuset-frametest/titanium-preview/*"
-[[edge_functions]]
-  function = "preview-auth"
-  path = "/lecreuset-frametest/platform-decisions/*"
-[[edge_functions]]
-  function = "preview-auth"
-  path = "/lecreuset-frametest/platform-plan-doc13/*"
-
+# N-15 過渡防護退場（2026-07-23）：demo 內容已遷出 repo（舊路徑僅剩 301 轉新站），preview-auth basic auth 隨之退場
+# 敏感子路徑保留 noindex（與 _headers 重複宣告，維持雙保險）
 [[headers]]
   for = "/lecreuset-frametest/titanium-preview/*"
   [headers.values]
